@@ -1,4 +1,4 @@
-package sys.server.auction.api;
+package api.rest.server.auction.repository;
 
 import java.sql.SQLException;
 
@@ -6,7 +6,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 @Path("/products-auctions")
-public interface AuctionRepositoryRestAPI {
+public interface AuctionRepositoryAPI {
 
 	@POST
     @Path("/open-normal-auction")
