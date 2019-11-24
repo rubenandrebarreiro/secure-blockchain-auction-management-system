@@ -1,14 +1,23 @@
 package resources.bid;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+@DatabaseTable(tableName = "bids")
 public class Bid {
 	
+	@DatabaseField( id = true )
 	private long bidID;
-	
+	@DatabaseField
 	private String bidderUserClientID;
-	
+	@DatabaseField
 	private double bidValue;
-	
+	@DatabaseField
 	private long bidTimestamp;
+	
+	public Bid() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	public Bid(long bidID, String bidderUserClientID, double bidValue) {
 		this.bidID = bidID;

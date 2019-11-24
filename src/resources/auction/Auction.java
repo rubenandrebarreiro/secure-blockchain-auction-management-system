@@ -35,6 +35,10 @@ public class Auction {
 	@DatabaseField(dataType = DataType.SERIALIZABLE) 
 	private HashMap<String, Integer> numAuctionBidsForEachUserClient;
 	
+	public Auction() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	public Auction(String auctionID, int auctionSerialNumber, String auctionDescription,
 			byte auctionBidType, double initialBidValue, 
 			double minAmountBidValue, double maxAmountBidValue,
