@@ -4,14 +4,14 @@ public class MessageHeader {
 	
 	private byte versionID;
 	
-	private String sessionID;
+	private String auctionID;
 	
 	private byte messageType;
 	
 	
-	public MessageHeader(byte versionID, String sessionID, byte messageType) {
+	public MessageHeader(byte versionID, String auctionID, byte messageType) {
 		this.versionID = versionID;
-		this.sessionID = sessionID;
+		this.auctionID = auctionID;
 		this.messageType = messageType;
 	}
 	
@@ -23,12 +23,12 @@ public class MessageHeader {
 		this.versionID = versionID;
 	}
 	
-	public String sessionID() {
-		return this.sessionID;
+	public String getAuctionID() {
+		return this.auctionID;
 	}
 	
-	public void setSessionID(String sessionID) {
-		this.sessionID = sessionID;
+	public void setAuctionID(String auctionID) {
+		this.auctionID = auctionID;
 	}
 	
 	public byte getMessageType() {
