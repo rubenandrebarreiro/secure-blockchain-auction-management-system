@@ -1,4 +1,4 @@
-package messages.secure.bid.components.header;
+package messages.secure.bid.components.content.header;
 
 public class SecureBidMessageHeader {
 	
