@@ -1,4 +1,4 @@
-package sys.server.auction.repository;
+package sys.rest.server.auction.repository;
 
 import java.net.URI;
 import java.sql.SQLException;
@@ -22,13 +22,13 @@ import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import api.rest.server.auction.repository.AuctionRepositoryAPI;
 import resources.auction.Auction;
 import resources.auction.utils.AuctionBidTypes;
 import resources.bid.Bid;
 import resources.user.User;
-import sys.server.auction.api.AuctionRepositoryRestAPI;
 
-public class AuctionRepositoryServer implements AuctionRepositoryRestAPI {
+public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	private Gson gsonObject;
 
