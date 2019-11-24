@@ -1,0 +1,1 @@
+package messages.secure.bid.components.proposal.control.auction;
