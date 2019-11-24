@@ -1,4 +1,4 @@
-package sys.server.auction;
+package sys.rest.server.auction;
 
 public class AuctionServer {
 
