@@ -1,0 +1,1 @@
+package resources.auction.utils;
