@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Compile') {
       steps {
-        sh 'mvn clean compile'
+        sh 'mvn -T 4 clean compile'
       }
     }
     stage('Create folders') {
