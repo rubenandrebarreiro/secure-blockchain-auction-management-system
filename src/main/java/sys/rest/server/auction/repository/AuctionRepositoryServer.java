@@ -46,7 +46,10 @@ import main.java.resources.user.User;
 
 public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
-	private static final byte REPOSITORY_DATABASE_STRUCTURE_TYPE = 1;
+	private static final byte JDBC = 0;
+	private static final byte JCR = 1;
+	
+	private static final byte REPOSITORY_DATABASE_STRUCTURE_TYPE = JCR;
 
 	private Gson gsonObject;
 
@@ -79,6 +82,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	private Node allUsersRootNode;
 
 	private Dao<User, String> allUsersRepositoryDao;
+	
+	private byte repositoryDatabaseStructure;
 
 
 	public AuctionRepositoryServer(byte repositoryType) throws LoginException, RepositoryException {
@@ -88,6 +93,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 			case 0:
 				
+				System.out.println("Created JDBC Connection");
 				this.createAuctionRepositoriesDao();
 				
 				break;
@@ -95,6 +101,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				
 			case 1:
 				
+				System.out.println("Created JCR Connection");
 				this.createAuctionRepositoriesJCR();
 				
 				break;
@@ -111,17 +118,18 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	public static void main(String[] args) throws LoginException, RepositoryException {
 
 		int port = 8080;
-
-		//if(args.length == 2) {
-		//	port = Integer.parseInt(args[0]);
-		//}
+		byte repositoryDatabaseStructure = REPOSITORY_DATABASE_STRUCTURE_TYPE;
+		
+		if(args.length == 1) {
+			repositoryDatabaseStructure = Byte.parseByte(args[0]);
+		}
 
 		//String secret = args[0];
 
 		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
 
 		ResourceConfig config = new ResourceConfig();
-		config.register( new AuctionRepositoryServer(REPOSITORY_DATABASE_STRUCTURE_TYPE) );
+		config.register( new AuctionRepositoryServer(repositoryDatabaseStructure) );
 
 		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
@@ -434,7 +442,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
 			       RepositoryException {
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
@@ -613,7 +621,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 	
 			case 0:
 	
@@ -675,7 +683,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 			case 0:
 	
 				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
@@ -727,7 +735,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
@@ -781,7 +789,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
@@ -857,7 +865,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
@@ -915,7 +923,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 		
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 	
 			case 0:
 	
@@ -991,7 +999,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 	
 			case 0:
 	
@@ -1049,7 +1057,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
