@@ -85,19 +85,24 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		switch(repositoryType) {
 
-		case 0:
-			this.createAuctionRepositoriesJCR();
-
-			break;
-
-		case 1:
-			this.createAuctionRepositoriesDao();
-
-			break;
-
-		default:
-
-			break;
+			case 0:
+				
+				this.createAuctionRepositoriesJCR();
+	
+				break;
+	
+				
+			case 1:
+				this.createAuctionRepositoriesDao();
+	
+				break;
+	
+			
+			default:
+	
+				break;
+		
+				
 		}
 	}
 
