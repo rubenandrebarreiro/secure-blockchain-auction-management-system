@@ -113,6 +113,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		
 				
 		}
+		repositoryDatabaseStructure = repositoryType;
 	}
 
 	public static void main(String[] args) throws LoginException, RepositoryException {
@@ -138,39 +139,59 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	private synchronized void createAuctionRepositoriesJCR() throws LoginException, RepositoryException {
 
-		this.allUsersRepositoryJCR = new TransientRepository();
+		this.allUsersRepositoryJCR = new TransientRepository(new File("res/jcr/allUsersRepositoryJCR"));
 
-		this.allProductsAuctionsRepositoryJCR = new TransientRepository();
+		this.allProductsAuctionsRepositoryJCR = new TransientRepository(new File("res/jcr/allProductsAuctionsRepositoryJCR"));
 
-		this.openedProductsAuctionsRepositoryJCR = new TransientRepository();
+		this.openedProductsAuctionsRepositoryJCR = new TransientRepository(new File("res/jcr/openedProductsAuctionsRepositoryJCR"));
 
-		this.closedProductsAuctionsRepositoryJCR = new TransientRepository();
+		this.closedProductsAuctionsRepositoryJCR = new TransientRepository(new File("res/jcr/closedProductsAuctionsRepositoryJCR"));
 
-		this.allBidsRepositoryJCR = new TransientRepository();
+		this.allBidsRepositoryJCR = new TransientRepository(new File("res/jcr/allBidsRepositoryJCR"));
 
 
+//		this.allUsersRepositorySession = 
+//				this.allUsersRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+//
+//		this.allProductsAuctionsRepositorySession = 
+//				this.allProductsAuctionsRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+//
+//		this.openedProductsAuctionsRepositorySession = 
+//				this.openedProductsAuctionsRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+//
+//		this.closedProductsAuctionsRepositorySession = 
+//				this.closedProductsAuctionsRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+//
+//		this.allBidsRepositorySession = 
+//				this.allBidsRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+
+
+		// TODO Change credentials for repository
 		this.allUsersRepositorySession = 
 				this.allUsersRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
-
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
+		
 		this.allProductsAuctionsRepositorySession = 
 				this.allProductsAuctionsRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
 
 		this.openedProductsAuctionsRepositorySession = 
 				this.openedProductsAuctionsRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
 
 		this.closedProductsAuctionsRepositorySession = 
 				this.closedProductsAuctionsRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
 
 		this.allBidsRepositorySession = 
 				this.allBidsRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
-
-
-		this.allUsersRootNode = this.allUsersRepositorySession.getRootNode();
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
+		
 
 		this.allProductsAuctionsRootNode = this.allProductsAuctionsRepositorySession.getRootNode();
 
