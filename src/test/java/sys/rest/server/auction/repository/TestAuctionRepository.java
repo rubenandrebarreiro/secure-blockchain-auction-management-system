@@ -5,6 +5,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.io.File;
 import java.io.FilenameFilter;
+
+import javax.jcr.LoginException;
+import javax.jcr.RepositoryException;
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.jupiter.api.AfterAll;
@@ -29,7 +32,7 @@ public class TestAuctionRepository {
 	private Gson gson;
 	
 	@BeforeAll
-	public static void initAuctionRepositoryServer() throws InterruptedException {
+	public static void initAuctionRepositoryServer() throws InterruptedException, LoginException, RepositoryException {
     	File file = new File("res/database");
     	File[] files = file.listFiles();
     	for (File tempFile : files) {
@@ -112,7 +115,7 @@ public class TestAuctionRepository {
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
         .body("auctionID", equalTo(testAuction.getAuctionID()))
-        .body("auctionSerialNumber", equalTo(testAuction.getAuctionSerial()))
+        .body("auctionSerialNumber", equalTo(testAuction.getAuctionSerialNumber()))
         .body("auctionDescription", equalTo(testAuction.getAuctionDescription()))
         .body("auctionBidType", equalTo( (int) testAuction.getAuctionBidType()))
         .body("currentBidValue", equalTo( (float) testAuction.getCurrentBidValue()))
@@ -136,7 +139,7 @@ public class TestAuctionRepository {
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
         .body("auctionID[0]", equalTo(testAuction.getAuctionID()))
-        .body("auctionSerialNumber[0]", equalTo(testAuction.getAuctionSerial()))
+        .body("auctionSerialNumber[0]", equalTo(testAuction.getAuctionSerialNumber()))
         .body("auctionDescription[0]", equalTo(testAuction.getAuctionDescription()))
         .body("auctionBidType[0]", equalTo( (int) testAuction.getAuctionBidType()))
         .body("currentBidValue[0]", equalTo( (float) testAuction.getCurrentBidValue()))
@@ -184,7 +187,7 @@ public class TestAuctionRepository {
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
         .body("auctionID[0]", equalTo(testAuction.getAuctionID()))
-        .body("auctionSerialNumber[0]", equalTo(testAuction.getAuctionSerial()))
+        .body("auctionSerialNumber[0]", equalTo(testAuction.getAuctionSerialNumber()))
         .body("auctionDescription[0]", equalTo(testAuction.getAuctionDescription()))
         .body("auctionBidType[0]", equalTo( (int) testAuction.getAuctionBidType()))
         .body("currentBidValue[0]", equalTo( (float) testAuction.getCurrentBidValue()))
@@ -225,7 +228,7 @@ public class TestAuctionRepository {
         .contentType(ContentType.JSON)
         .body("auctionID.size()", equalTo(1))
         .body("auctionID[0]", equalTo(testAuction1.getAuctionID()))
-        .body("auctionSerialNumber[0]", equalTo(testAuction1.getAuctionSerial()))
+        .body("auctionSerialNumber[0]", equalTo(testAuction1.getAuctionSerialNumber()))
         .body("auctionDescription[0]", equalTo(testAuction1.getAuctionDescription()))
         .body("auctionBidType[0]", equalTo( (int) testAuction1.getAuctionBidType()))
         .body("currentBidValue[0]", equalTo( (float) testAuction1.getCurrentBidValue()))
@@ -246,7 +249,7 @@ public class TestAuctionRepository {
         .contentType(ContentType.JSON)
         .body("auctionID.size()", equalTo(1))
         .body("auctionID[0]", equalTo(testAuction2.getAuctionID()))
-        .body("auctionSerialNumber[0]", equalTo(testAuction2.getAuctionSerial()))
+        .body("auctionSerialNumber[0]", equalTo(testAuction2.getAuctionSerialNumber()))
         .body("auctionDescription[0]", equalTo(testAuction2.getAuctionDescription()))
         .body("auctionBidType[0]", equalTo( (int) testAuction2.getAuctionBidType()))
         .body("currentBidValue[0]", equalTo( (float) testAuction2.getCurrentBidValue()))
