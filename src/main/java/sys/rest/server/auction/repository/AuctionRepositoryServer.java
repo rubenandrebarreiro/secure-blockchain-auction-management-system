@@ -1186,11 +1186,13 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 				}
 				
+				
 				openedAuctionToBeClosedNode.remove();
 				System.out.println("Auction which will be closed deleted from all Opened Product Auctions!!!");
 				
-
+				
 				auctionToBeClosedNode.setProperty("auction-is-open", false);
+				System.out.println("Auction setted/updated as closed to all Product Auctions!!!");
 				
 				
 				Node newClosedAuctionNode = 
@@ -1224,6 +1226,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 						             auctionToBeClosedNode.getProperty("product-name").getString());
 				newClosedAuctionNode.setProperty("product-owner-user-client-id", 
 						             auctionToBeClosedNode.getProperty("product-owner-user-client-id").getString());
+				
+				System.out.println("Closed Auction added to all Closed Product Auctions!!!");
 				
 				
 				return Response.status(Status.ACCEPTED).build();
