@@ -632,8 +632,6 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				
 			case 1:
 	
-				this.addOpenedAuction(newAuction, null);
-				
 				return this.addAuctionNodeJCR(newAuction, newAuctionID);
 	
 				
@@ -1423,6 +1421,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				bidNode.setProperty("bid-value", newBid.getBidValue());
 				bidNode.setProperty("bid-timestamp", newBid.getBidTimestamp());
 				
+			
 				
 				// TODO
 				//auctionNode.setProperty("", value);
