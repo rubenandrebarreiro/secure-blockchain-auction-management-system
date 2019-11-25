@@ -1,6 +1,6 @@
-package main.java.messages.secure.components.header;
+package main.java.messages.secure.bid.components.content.header;
 
-public class MessageHeader {
+public class SecureBidMessageHeader {
 	
 	private byte versionID;
 	
@@ -9,7 +9,7 @@ public class MessageHeader {
 	private byte messageType;
 	
 	
-	public MessageHeader(byte versionID, String auctionID, byte messageType) {
+	public SecureBidMessageHeader(byte versionID, String auctionID, byte messageType) {
 		this.versionID = versionID;
 		this.auctionID = auctionID;
 		this.messageType = messageType;

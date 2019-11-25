@@ -45,8 +45,6 @@ public class TestAuctionRepository {
     
     @Test
     public void testSimpleAuctionAdd() {
-//    	Auction testAuction = buildAuction(AuctionRepositoryTestData.auction0002);
-
     	given()
     	.contentType("application/json")
     	.body(AuctionRepositoryTestData.auction0002)
