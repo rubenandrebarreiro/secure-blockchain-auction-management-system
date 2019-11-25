@@ -305,6 +305,25 @@ public class TestAuctionJDBC {
         .body("auctionID.size()", equalTo(6));
     }
     
+    @Test
+    @Order(13)
+    public void testGetAllAuctionsFromUser() {
+        get("/all/by-product-owner-user/Elon Musk")
+        .then()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("auctionID.size()", equalTo(3));
+        
+        get("/all/by-product-owner-user/rubenandrebarreiro")
+        .then()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("auctionID.size()", equalTo(1));
+    }
+    
+    @Test
+    @Order(14)
+    
     private Auction buildAuction(String json) {
     	return gson.fromJson(json, Auction.class);
     }
