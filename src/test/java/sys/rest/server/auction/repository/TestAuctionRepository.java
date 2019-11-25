@@ -5,26 +5,25 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.nio.file.Files;
-
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import com.google.gson.Gson;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import main.java.resources.auction.Auction;
 import main.java.sys.rest.server.auction.repository.AuctionRepositoryServer;
 import test.java.sys.rest.server.auction.repository.data.AuctionRepositoryTestData;
 
+@TestMethodOrder(OrderAnnotation.class)
 public class TestAuctionRepository {
 	
 	private Gson gson;
@@ -76,6 +75,7 @@ public class TestAuctionRepository {
     }
     
     @Test
+    @Order(1)
     public void testConnection() throws InterruptedException {
         get("/products-auctions/all")
         .then()
@@ -83,6 +83,7 @@ public class TestAuctionRepository {
     }
     
     @Test
+    @Order(2)
     public void testSimpleAuctionAdd() throws InterruptedException {
     	given()
     	.contentType(ContentType.JSON)
@@ -94,6 +95,7 @@ public class TestAuctionRepository {
     }
     
     @Test
+    @Order(3)
     public void testGetAuctionsFromPreviousAdd() throws InterruptedException {
         get("/products-auctions/all")
         .then()
@@ -102,6 +104,7 @@ public class TestAuctionRepository {
     }
     
     @Test
+    @Order(4)
     public void testGetAuctionAddedFromPreviousAdd() throws InterruptedException {
     	Auction testAuction = buildAuction(AuctionRepositoryTestData.auction0002);
         get("/products-auctions/all/auction0002")
@@ -123,6 +126,79 @@ public class TestAuctionRepository {
         .body("productName", equalTo(testAuction.getProductName()))
         .body("productOwnerUserClientID", equalTo(testAuction.getProductOwnerUserClientID()));
     }
+    
+    @Test
+    @Order(5)
+    public void testGetOpenAuctions() {
+    	Auction testAuction = buildAuction(AuctionRepositoryTestData.auction0002);
+        get("/products-auctions/opened")
+        .then()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("auctionID[0]", equalTo(testAuction.getAuctionID()))
+        .body("auctionSerialNumber[0]", equalTo(testAuction.getAuctionSerial()))
+        .body("auctionDescription[0]", equalTo(testAuction.getAuctionDescription()))
+//        .body("auctionBidType[0]", equalTo(testAuction.getAuctionBidType()))
+//        .body("currentBidValue[0]", equalTo(testAuction.getCurrentBidValue()))
+//        .body("minAmountBidValue[0]", equalTo(testAuction.getMinAmountBidValue()))
+//        .body("maxAmountBidValue[0]", equalTo(testAuction.getMaxAmountBidValue()))
+        .body("numMaxAuctionBidsAllowed[0]", equalTo(testAuction.getNumMaxAuctionBidsAllowed()))
+        .body("auctionTimestampStart[0]", equalTo(testAuction.getAuctionTimestampStart()))
+        .body("auctionTimestampLimit[0]", equalTo(testAuction.getAuctionTimestampLimit()))
+        .body("auctionIsOpen[0]", equalTo(testAuction.verifyIfAuctionIsOpen()))
+        .body("productID[0]", equalTo(testAuction.getProductID()))
+        .body("productName[0]", equalTo(testAuction.getProductName()))
+        .body("productOwnerUserClientID[0]", equalTo(testAuction.getProductOwnerUserClientID()));
+    }
+    
+    @Test
+    @Order(6)
+    public void testGetClosedAuctions() {
+        get("/products-auctions/closed")
+        .then()
+        .statusCode(Status.NO_CONTENT.getStatusCode());
+    }
+    
+    @Test
+    @Order(7)
+    public void testClosingAuction() {
+    	put("/products-auctions/close-auction/auction0002")
+    	.then()
+        .statusCode(Status.ACCEPTED.getStatusCode());
+    }
+    
+    @Test
+    @Order(8)
+    public void testGetOpenAuctionsFromPreviousClose() {
+        get("/products-auctions/opened")
+        .then()
+        .statusCode(Status.NO_CONTENT.getStatusCode());
+    }
+    
+    @Test
+    @Order(9)
+    public void testGetClosedAuctionsFromPreviousClose() {
+    	Auction testAuction = buildAuction(AuctionRepositoryTestData.auction0002);
+        get("/products-auctions/closed")
+        .then()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("auctionID[0]", equalTo(testAuction.getAuctionID()))
+        .body("auctionSerialNumber[0]", equalTo(testAuction.getAuctionSerial()))
+        .body("auctionDescription[0]", equalTo(testAuction.getAuctionDescription()))
+//        .body("auctionBidType[0]", equalTo(testAuction.getAuctionBidType()))
+//        .body("currentBidValue[0]", equalTo(testAuction.getCurrentBidValue()))
+//        .body("minAmountBidValue[0]", equalTo(testAuction.getMinAmountBidValue()))
+//        .body("maxAmountBidValue[0]", equalTo(testAuction.getMaxAmountBidValue()))
+        .body("numMaxAuctionBidsAllowed[0]", equalTo(testAuction.getNumMaxAuctionBidsAllowed()))
+        .body("auctionTimestampStart[0]", equalTo(testAuction.getAuctionTimestampStart()))
+        .body("auctionTimestampLimit[0]", equalTo(testAuction.getAuctionTimestampLimit()))
+        .body("auctionIsOpen[0]", equalTo(!testAuction.verifyIfAuctionIsOpen()))
+        .body("productID[0]", equalTo(testAuction.getProductID()))
+        .body("productName[0]", equalTo(testAuction.getProductName()))
+        .body("productOwnerUserClientID[0]", equalTo(testAuction.getProductOwnerUserClientID()));
+    }
+    
     
     private Auction buildAuction(String json) {
     	return gson.fromJson(json, Auction.class);
