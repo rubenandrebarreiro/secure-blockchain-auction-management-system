@@ -45,7 +45,7 @@ public class TestAuctionJDBC {
     @BeforeEach
     public void init() {
         gson = new Gson();
-        RestAssured.baseURI = "http://localhost";
+        RestAssured.baseURI = "http://localhost/products-auctions";
         RestAssured.port = 8080;
     }
  
@@ -80,7 +80,7 @@ public class TestAuctionJDBC {
     @Test
     @Order(1)
     public void testConnection() throws InterruptedException {
-        get("/products-auctions/all")
+        get("/all")
         .then()
         .statusCode(Status.NO_CONTENT.getStatusCode());
     }
@@ -92,7 +92,7 @@ public class TestAuctionJDBC {
     	.contentType(ContentType.JSON)
     	.body(AuctionRepositoryTestData.auction0001)
     	.when()
-    	.post("/products-auctions/open-normal-auction")
+    	.post("/open-normal-auction")
         .then()  	
         .statusCode(Status.ACCEPTED.getStatusCode());   	
     }
@@ -100,7 +100,7 @@ public class TestAuctionJDBC {
     @Test
     @Order(3)
     public void testGetAuctionsFromPreviousAdd() throws InterruptedException {
-        get("/products-auctions/all")
+        get("/all")
         .then()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON);
@@ -110,7 +110,7 @@ public class TestAuctionJDBC {
     @Order(4)
     public void testGetAuctionAddedFromPreviousAdd() throws InterruptedException {
     	Auction testAuction = buildAuction(AuctionRepositoryTestData.auction0001);
-        get("/products-auctions/all/auction0001")
+        get("/all/auction0001")
         .then()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
@@ -134,7 +134,7 @@ public class TestAuctionJDBC {
     @Order(5)
     public void testGetOpenAuctions() {
     	Auction testAuction = buildAuction(AuctionRepositoryTestData.auction0001);
-        get("/products-auctions/opened")
+        get("/opened")
         .then()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
@@ -157,7 +157,7 @@ public class TestAuctionJDBC {
     @Test
     @Order(6)
     public void testGetClosedAuctions() {
-        get("/products-auctions/closed")
+        get("/closed")
         .then()
         .statusCode(Status.NO_CONTENT.getStatusCode());
     }
@@ -165,7 +165,7 @@ public class TestAuctionJDBC {
     @Test
     @Order(7)
     public void testClosingAuction() {
-    	put("/products-auctions/close-auction/auction0001")
+    	put("/close-auction/auction0001")
     	.then()
         .statusCode(Status.ACCEPTED.getStatusCode());
     }
@@ -173,7 +173,7 @@ public class TestAuctionJDBC {
     @Test
     @Order(8)
     public void testGetOpenAuctionsFromPreviousClose() {
-        get("/products-auctions/opened")
+        get("/opened")
         .then()
         .statusCode(Status.NO_CONTENT.getStatusCode());
     }
@@ -182,7 +182,7 @@ public class TestAuctionJDBC {
     @Order(9)
     public void testGetClosedAuctionsFromPreviousClose() {
     	Auction testAuction = buildAuction(AuctionRepositoryTestData.auction0001);
-        get("/products-auctions/closed")
+        get("/closed")
         .then()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
@@ -209,11 +209,11 @@ public class TestAuctionJDBC {
     	.contentType(ContentType.JSON)
     	.body(AuctionRepositoryTestData.auction0002)
     	.when()
-    	.post("/products-auctions/open-normal-auction")
+    	.post("/open-normal-auction")
         .then()  	
         .statusCode(Status.ACCEPTED.getStatusCode());
 
-        get("/products-auctions/all")
+        get("/all")
         .then()
         .body("auctionID.size()", equalTo(2));
     }
@@ -222,7 +222,7 @@ public class TestAuctionJDBC {
     @Order(11)
     public void testGetClosedAndOpenAuctionsSeperatlyAfterPreviousAdd() {
     	Auction testAuction1 = buildAuction(AuctionRepositoryTestData.auction0001);
-        get("/products-auctions/closed")
+        get("/closed")
         .then()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
@@ -243,7 +243,7 @@ public class TestAuctionJDBC {
         .body("productOwnerUserClientID[0]", equalTo(testAuction1.getProductOwnerUserClientID()));
         
     	Auction testAuction2 = buildAuction(AuctionRepositoryTestData.auction0002);
-        get("/products-auctions/opened")
+        get("/opened")
         .then()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
@@ -271,21 +271,21 @@ public class TestAuctionJDBC {
     	.contentType(ContentType.JSON)
     	.body(AuctionRepositoryTestData.auction0003)
     	.when()
-    	.post("/products-auctions/open-normal-auction")
+    	.post("/open-normal-auction")
         .then()  	
         .statusCode(Status.ACCEPTED.getStatusCode());
     	given()
     	.contentType(ContentType.JSON)
     	.body(AuctionRepositoryTestData.auction0005)
     	.when()
-    	.post("/products-auctions/open-normal-auction")
+    	.post("/open-normal-auction")
         .then()  	
         .statusCode(Status.ACCEPTED.getStatusCode());
     	given()
     	.contentType(ContentType.JSON)
     	.body(AuctionRepositoryTestData.auction0006)
     	.when()
-    	.post("/products-auctions/open-normal-auction")
+    	.post("/open-normal-auction")
         .then()  	
         .statusCode(Status.ACCEPTED.getStatusCode());
     	
@@ -294,11 +294,11 @@ public class TestAuctionJDBC {
     	.contentType(ContentType.JSON)
     	.body(AuctionRepositoryTestData.auction0004)
     	.when()
-    	.post("/products-auctions/open-auction-min-initial-bid-value")
+    	.post("/open-auction-min-initial-bid-value")
         .then()  	
         .statusCode(Status.ACCEPTED.getStatusCode());
     	
-        get("/products-auctions/all")
+        get("/all")
         .then()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
