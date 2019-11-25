@@ -1,5 +1,6 @@
 package main.java.sys.rest.server.auction.repository;
 
+import java.io.File;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -69,6 +70,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	}
 
 	private void createAuctionRepositoriesDao() {
+		
+		new File("res/database").mkdirs();
 
 		String databaseAllUsersRepositoryURL = "jdbc:sqlite:res/database/all-users.db";
 
