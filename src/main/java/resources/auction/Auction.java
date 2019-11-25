@@ -168,12 +168,12 @@ public class Auction {
 		this.auctionID = auctionID;
 	}
 
-	public int getAuctionSerial() {
+	public int getAuctionSerialNumber() {
 		return this.auctionSerialNumber;
 	}
 
-	public void setAuctionSerial(int auctionSerial) {
-		this.auctionSerialNumber = auctionSerial;
+	public void setAuctionSerialNumber(int auctionSerialNumber) {
+		this.auctionSerialNumber = auctionSerialNumber;
 	}
 
 	public String getAuctionDescription() {
