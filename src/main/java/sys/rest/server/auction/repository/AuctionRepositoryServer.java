@@ -88,14 +88,15 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 			case 0:
 				
-				this.createAuctionRepositoriesJCR();
-	
+				this.createAuctionRepositoriesDao();
+				
 				break;
 	
 				
 			case 1:
-				this.createAuctionRepositoriesDao();
-	
+				
+				this.createAuctionRepositoriesJCR();
+				
 				break;
 	
 			
@@ -1088,7 +1089,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 
 		Auction auctionFromAllAuctions = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
-
+		
 		Auction auctionFromOpenedAuctions = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
 
 		if( !(auctionFromAllAuctions.getAuctionID().equals(auctionFromOpenedAuctions.getAuctionID())) ) {
@@ -1126,8 +1127,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		System.out.println("Preparing to add a Bid to a current Opened Product's Auction occurring, at this moment, from JSON Object...");
 
 		Bid newBid = this.gsonObject.fromJson(bidForOpenedProductAuctionJSONString, Bid.class);
-
-
+		
+		
 		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
 		if( !this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions) ) {
@@ -1165,14 +1166,14 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		if( !auction.equals(openedAuction) ) {
 
 			System.err.println("Not a valid Opened Auction to receive Bids!!!");
-
+			
 			return Response.status(Status.BAD_REQUEST).build(); 
-
+			
 		}
 
 		openedAuction.addAuctionBid(newBid);
-
-
+		
+		
 		this.allBidsRepositoryDao.create(newBid);
 
 
@@ -1189,7 +1190,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	public Response listAllProductsAuctions() throws SQLException {
 
 		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
-
+		
 		if(!this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions)) {
 
 			return Response.status(Status.NO_CONTENT).build();
@@ -1537,7 +1538,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		Map<Long ,Bid> bidsFromAuctionMadeByBidderUserClient = new HashMap<Long, Bid>();
+		Map<Long, Bid> bidsFromAuctionMadeByBidderUserClient = new HashMap<Long, Bid>();
 
 		for(Bid bid : bidsFromAuctionMadeByBidderUserClientList) {
 			bidsFromAuctionMadeByBidderUserClient.put(bid.getBidID(), bid);
