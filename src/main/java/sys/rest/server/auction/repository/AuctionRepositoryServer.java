@@ -413,7 +413,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		try {
 
 			Node newAuctionNode = this.allProductsAuctionsRootNode
-					.addNode(String.format("/%s", newAuctionID));
+					.addNode(newAuctionID);
 
 			this.addOpenedAuction(newAuction, newAuctionNode);
 
@@ -434,7 +434,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		try {
 
 			Node newOpenedAuctionNode = this.openedProductsAuctionsRootNode
-					.addNode(String.format("/%s", newAuctionID));
+					.addNode(newAuctionID);
 
 			this.addOpenedAuction(newAuction, newOpenedAuctionNode);
 
