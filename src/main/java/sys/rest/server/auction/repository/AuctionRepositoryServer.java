@@ -33,7 +33,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -46,7 +45,7 @@ import main.java.resources.user.User;
 
 public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
-	private static final byte REPOSITORY_TYPE = 1;
+	private static final byte REPOSITORY_DATABASE_STRUCTURE_TYPE = 1;
 
 	private Gson gsonObject;
 
@@ -115,7 +114,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
 
 		ResourceConfig config = new ResourceConfig();
-		config.register( new AuctionRepositoryServer(REPOSITORY_TYPE) );
+		config.register( new AuctionRepositoryServer(REPOSITORY_DATABASE_STRUCTURE_TYPE) );
 
 		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
@@ -246,7 +245,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	private boolean verifyExistenceOfAlreadyOpenedAuction(String newAuctionID) throws SQLException {
 
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 
 		case 0:
 
@@ -392,7 +391,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			this.addOpenedAuction(newAuction, newAuctionNode);
 
 			System.out.println("New Auction added to all Product Auctions!!!");
-
+			
 		}
 		catch (ItemExistsException itemExistsException) {
 
@@ -426,6 +425,10 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		}
 
+		this.allProductsAuctionsRepositorySession.save();
+		
+		this.openedProductsAuctionsRepositorySession.save();
+		
 
 		return Response.status(Status.ACCEPTED).build();
 
@@ -435,7 +438,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
 			       RepositoryException {
 
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 
 			case 0:
 	
@@ -613,7 +616,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 	
 			case 0:
 	
@@ -675,7 +678,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 			case 0:
 	
 				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
@@ -727,7 +730,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 
 			case 0:
 	
@@ -781,7 +784,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 
 			case 0:
 	
@@ -857,7 +860,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 
 			case 0:
 	
@@ -915,7 +918,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 		
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 	
 			case 0:
 	
@@ -991,7 +994,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 	
 			case 0:
 	
@@ -1049,7 +1052,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_TYPE) {
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
 
 			case 0:
 	
@@ -1526,7 +1529,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		List<Bid> bidsFromAuctionMadeByBidderUserClientList = 
 				bidsFromAuction.entrySet().stream()
 				.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
-				.map(x -> x.getValue())
+				.map(bidEntry -> bidEntry.getValue())
 				.collect(Collectors.toList());
 
 		if(bidsFromAuctionMadeByBidderUserClientList.isEmpty()) {
@@ -1583,7 +1586,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		List<Bid> bidsFromOpenedAuctionMadeByBidderUserClientList = 
 				bidsFromOpenedAuction.entrySet().stream()
 				.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
-				.map(x -> x.getValue())
+				.map(bidEntry -> bidEntry.getValue())
 				.collect(Collectors.toList());
 
 		if(bidsFromOpenedAuctionMadeByBidderUserClientList.isEmpty()) {
@@ -1640,7 +1643,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		List<Bid> bidsFromClosedAuctionMadeByBidderUserClientList = 
 				bidsFromClosedAuction.entrySet().stream()
 				.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
-				.map(x -> x.getValue())
+				.map(bidEntry -> bidEntry.getValue())
 				.collect(Collectors.toList());
 
 		if(bidsFromClosedAuctionMadeByBidderUserClientList.isEmpty()) {
