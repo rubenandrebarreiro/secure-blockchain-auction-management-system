@@ -741,7 +741,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		Auction auctionFromOpenedAuctions = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
 
-		if( !(auctionFromAllAuctions.equals(auctionFromOpenedAuctions)) ) {
+		if( !(auctionFromAllAuctions.getAuctionID().equals(auctionFromOpenedAuctions.getAuctionID())) ) {
 
 			System.err.println("Not a valid Opened Auction to be closed!!!");
 
