@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
+import javax.jcr.ValueFormatException;
 import javax.jcr.lock.LockException;
 import javax.jcr.nodetype.ConstraintViolationException;
 import javax.jcr.version.VersionException;
@@ -33,37 +34,49 @@ public interface AuctionRepositoryAPI {
     @Path("/open-auction-min-amount-bid-value")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response openAuctionWithMinimumAmountBidValue(String auctionWithMinAmountBidValueJSONString) throws SQLException;
+    public Response openAuctionWithMinimumAmountBidValue(String auctionWithMinAmountBidValueJSONString)
+    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException, 
+    	   		  RepositoryException;
 	
 	@POST
     @Path("/open-auction-max-amount-bid-value")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response openAuctionWithMaximumAmountBidValue(String auctionWithMaxAmountBidValueJSONString) throws SQLException;
+    public Response openAuctionWithMaximumAmountBidValue(String auctionWithMaxAmountBidValueJSONString)
+    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+    	          RepositoryException;
 	
 	@POST
     @Path("/open-auction-min-and-max-amount-bid-value")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response openAuctionWithMinimumAndMaximumAmountBidValue(String auctionWithMinAndMaxAmountBidValueJSONString) throws SQLException;
+    public Response openAuctionWithMinimumAndMaximumAmountBidValue(String auctionWithMinAndMaxAmountBidValueJSONString)
+    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+    	          RepositoryException;
 	
 	@POST
     @Path("/open-auction-limited-set-user-client-bidders")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response openAuctionWithLimitedSetUserClientBidders(String auctionWithLimitedSetUserClientBiddersJSONString) throws SQLException;
+    public Response openAuctionWithLimitedSetUserClientBidders(String auctionWithLimitedSetUserClientBiddersJSONString)
+    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+    	          RepositoryException;
 	
 	@POST
     @Path("/open-auction-limited-number-bids-for-each-user-client-bidder")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response openAuctionWithLimitedNumberBidsForEachUserClientBidder(String auctionWithLimitedNumberBidsForEachUserClientBidderJSONString) throws SQLException;
+    public Response openAuctionWithLimitedNumberBidsForEachUserClientBidder(String auctionWithLimitedNumberBidsForEachUserClientBidderJSONString)
+    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+    	          RepositoryException;
 	
 	@POST
     @Path("/open-auction-limited-number-bids")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response openAuctionWithLimitedNumberOfBids(String auctionWithLimitedNumberBidsJSONString) throws SQLException;
+    public Response openAuctionWithLimitedNumberOfBids(String auctionWithLimitedNumberBidsJSONString)
+    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+    	          RepositoryException;
 	
 	@PUT
 	@Path("/close-auction/{auction-id}")

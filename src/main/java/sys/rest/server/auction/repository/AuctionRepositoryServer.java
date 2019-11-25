@@ -16,6 +16,7 @@ import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
+import javax.jcr.ValueFormatException;
 import javax.jcr.lock.LockException;
 import javax.jcr.nodetype.ConstraintViolationException;
 import javax.jcr.version.VersionException;
@@ -32,6 +33,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -246,46 +248,50 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		switch(REPOSITORY_TYPE) {
 
-			case 0:
-	
-				if(this.allProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
-	
-					System.err.println(String.format
-							("Already exists a Product Auction "
-									+ "with the ID [%s]!!!",
-									newAuctionID));
-	
-					return true;
-	
-				}
-	
-				if(this.openedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
-	
-					System.err.println(String.format
-							("Already exists an Opened Product Auction "
-									+ "with the ID [%s]!!!",
-									newAuctionID));
-	
-					return true;
-	
-				}
-	
-				if(this.closedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
-	
-					System.err.println(String.format
-							("Already exists a Closed Product Auction "
-									+ "with the ID [%s]!!!",
-									newAuctionID));
-	
-					return true;
-				}
-	
-				return false;
-				
-			
-			default:
-				return false;
-				
+		case 0:
+
+			if(this.allProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
+
+				System.err.println(String.format
+						("Already exists a Product Auction "
+								+ "with the ID [%s]!!!",
+								newAuctionID));
+
+				return true;
+
+			}
+
+			if(this.openedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
+
+				System.err.println(String.format
+						("Already exists an Opened Product Auction "
+								+ "with the ID [%s]!!!",
+								newAuctionID));
+
+				return true;
+
+			}
+
+			if(this.closedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
+
+				System.err.println(String.format
+						("Already exists a Closed Product Auction "
+								+ "with the ID [%s]!!!",
+								newAuctionID));
+
+				return true;
+			}
+
+			return false;
+
+
+		case 1:
+
+
+
+		default:
+			return false;
+
 		}
 	}
 
@@ -374,13 +380,96 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		return true;
 	}
 
-	private void addOpenedAuction(Auction newAuction) throws SQLException {
+	private Response addAuctionNodeJCR(Auction newAuction, String newAuctionID)
+			throws PathNotFoundException, VersionException, ConstraintViolationException,
+			       LockException, RepositoryException, SQLException, ValueFormatException {
 
-		this.allProductsAuctionsRepositoryDao.create(newAuction);
-		System.out.println("New Auction added to all Product Auctions!!!");
+		try {
 
-		this.openedProductsAuctionsRepositoryDao.create(newAuction);
-		System.out.println("New Auction added to all Opened Product Auctions!!!");
+			Node newAuctionNode = this.allProductsAuctionsRootNode
+					.addNode(String.format("/%s", newAuctionID));
+
+			this.addOpenedAuction(newAuction, newAuctionNode);
+
+			System.out.println("New Auction added to all Product Auctions!!!");
+
+		}
+		catch (ItemExistsException itemExistsException) {
+
+			System.err.println(String.format
+					("Already exists a Product Auction "
+							+ "with the ID [%s]!!!",
+							newAuctionID));
+
+			return Response.status(Status.CONFLICT).build();
+
+		}
+
+		try {
+
+			Node newOpenedAuctionNode = this.openedProductsAuctionsRootNode
+					.addNode(String.format("/%s", newAuctionID));
+
+			this.addOpenedAuction(newAuction, newOpenedAuctionNode);
+
+			System.out.println("New Auction added to all Opened Product Auctions!!!");
+
+		}
+		catch (ItemExistsException itemExistsException) {
+
+			System.err.println(String.format
+					("Already exists an Opened Product Auction "
+							+ "with the ID [%s]!!!",
+							newAuctionID));
+
+			return Response.status(Status.CONFLICT).build();
+
+		}
+
+
+		return Response.status(Status.ACCEPTED).build();
+
+	}
+
+	private void addOpenedAuction(Auction newAuction, Node newAuctionNode)
+			throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+			       RepositoryException {
+
+		switch(REPOSITORY_TYPE) {
+
+			case 0:
+	
+				this.allProductsAuctionsRepositoryDao.create(newAuction);
+				System.out.println("New Auction added to all Product Auctions!!!");
+	
+				this.openedProductsAuctionsRepositoryDao.create(newAuction);
+				System.out.println("New Auction added to all Opened Product Auctions!!!");
+	
+	
+			case 1:
+	
+				newAuctionNode.setProperty("auction-id", newAuction.getAuctionID());
+				newAuctionNode.setProperty("auction-serial-number", newAuction.getAuctionSerialNumber());
+				newAuctionNode.setProperty("auction-description", newAuction.getAuctionDescription());
+				newAuctionNode.setProperty("auction-bid-type", newAuction.getAuctionBidType());
+				newAuctionNode.setProperty("current-bid-value", newAuction.getCurrentBidValue());
+				newAuctionNode.setProperty("min-amount-bid-value", newAuction.getMinAmountBidValue());
+				newAuctionNode.setProperty("max-amount-bid-value", newAuction.getMaxAmountBidValue());
+				newAuctionNode.setProperty("num-max-auctions-bids-allowed", newAuction.getNumMaxAuctionBidsAllowed());
+				newAuctionNode.setProperty("auction-timestamp-start", newAuction.getAuctionTimestampStart());
+				newAuctionNode.setProperty("auction-timestamp-limit", newAuction.getAuctionTimestampLimit());
+				newAuctionNode.setProperty("auction-is-open", newAuction.verifyIfAuctionIsOpen());
+				newAuctionNode.setProperty("product-id", newAuction.getProductID());
+				newAuctionNode.setProperty("product-name", newAuction.getProductName());
+				newAuctionNode.setProperty("product-owner-user-client-id", newAuction.getProductOwnerUserClientID());
+	
+	
+			default:
+	
+				break;
+				
+				
+		}
 	}
 
 	private boolean verifyExistenceOfAnyProductsAuctions(List<Auction> allProductsAuctions) {
@@ -506,90 +595,55 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	@Override
 	public Response openNormalAuction(String normalAuctionJSONString) 
 		   throws SQLException, PathNotFoundException, VersionException, ConstraintViolationException,
-		          LockException, RepositoryException {
+			      LockException, RepositoryException {
 
 		// TODO Could be a potentially less expensive operation 
 		// by checking if ID exists before creating auction from json 
 		System.out.println("Preparing to create a Normal Auction from JSON Object...");
 
 		Auction newAuction = this.gsonObject.fromJson(normalAuctionJSONString, Auction.class);
-		
+
 		String newAuctionID = newAuction.getAuctionID();
-		
-		
+
+
 		byte auctionBidType = newAuction.getAuctionBidType();
 
 		if(auctionBidType != AuctionBidTypes.NORMAL_BIDS.getBidsType()) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
-		
-		
+
+
 		switch(REPOSITORY_TYPE) {
-			
+	
 			case 0:
-				
+	
 				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
 					return Response.status(Status.CONFLICT).build();
 				}
-
-
-				this.addOpenedAuction(newAuction);
-
-
+	
+	
+				this.addOpenedAuction(newAuction, null);
+	
+	
 				return Response.status(Status.ACCEPTED).build();
+	
 				
 			case 1:
-				
-				try {
-					
-					this.allProductsAuctionsRootNode.addNode(String.format("/%s", newAuctionID));
-					
-					System.out.println("New Auction added to all Product Auctions!!!");
-				
-				}
-				catch (ItemExistsException itemExistsException) {
 	
-					System.err.println(String.format
-							("Already exists a Product Auction "
-									+ "with the ID [%s]!!!",
-									newAuctionID));
-					
-					return Response.status(Status.CONFLICT).build();
+				return this.addAuctionNodeJCR(newAuction, newAuctionID);
 	
-				}
-				
-				try {
-				
-					this.openedProductsAuctionsRootNode.addNode(String.format("/%s", newAuctionID));
-
-					System.out.println("New Auction added to all Opened Product Auctions!!!");
-				
-				}
-				catch (ItemExistsException itemExistsException) {
-					
-					System.err.println(String.format
-							("Already exists an Opened Product Auction "
-									+ "with the ID [%s]!!!",
-									newAuctionID));
-					
-					return Response.status(Status.CONFLICT).build();
-
-				}
-				
-
-				return Response.status(Status.ACCEPTED).build();
 				
 			default:
-				
+	
 				return Response.status(Status.NOT_IMPLEMENTED).build();
-				
+
 		}
 	}
 
 	@Override
 	public Response openAuctionWithMinimumInitialBidValue(String auctionWithMinInitialBidValueJSONString)
-		   throws SQLException, PathNotFoundException, VersionException, ConstraintViolationException,
-		          LockException, RepositoryException {
+			throws SQLException, PathNotFoundException, VersionException, ConstraintViolationException,
+				   LockException, RepositoryException {
 
 		System.out.println("Preparing to create an Auction with Minimum Initial Bid Value from JSON Object...");
 
@@ -597,16 +651,16 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		String newAuctionID = newAuction.getAuctionID();
 
-		
+
 		byte auctionBidType = newAuction.getAuctionBidType();
 
 		if(auctionBidType != AuctionBidTypes.MIN_INITIAL_VALUE_BID.getBidsType()) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
-		
+
 		double auctionMinInitialBidValue = newAuction.getCurrentBidValue();
 
-		
+
 		if(auctionMinInitialBidValue <= 0.0) {
 
 			System.err.println(String.format
@@ -620,69 +674,37 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		}
 
-		
+
 		switch(REPOSITORY_TYPE) {
 			case 0:
-				
+	
 				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
 					return Response.status(Status.CONFLICT).build();
 				}
-
-
-				this.addOpenedAuction(newAuction);
-
-
+	
+	
+				this.addOpenedAuction(newAuction, null);
+	
+	
 				return Response.status(Status.ACCEPTED).build();
-
-				
+	
+	
 			case 1:
-				
-				try {
-					
-					this.allProductsAuctionsRootNode.addNode(String.format("/%s", newAuctionID));
-					
-					System.out.println("New Auction added to all Product Auctions!!!");
-				
-				}
-				catch (ItemExistsException itemExistsException) {
 	
-					System.err.println(String.format
-							("Already exists a Product Auction "
-									+ "with the ID [%s]!!!",
-									newAuctionID));
-					
-					return Response.status(Status.CONFLICT).build();
+				return this.addAuctionNodeJCR(newAuction, newAuctionID);
 	
-				}
-				
-				try {
-				
-					this.openedProductsAuctionsRootNode.addNode(String.format("/%s", newAuctionID));
 
-					System.out.println("New Auction added to all Opened Product Auctions!!!");
-				
-				}
-				catch (ItemExistsException itemExistsException) {
-					
-					System.err.println(String.format
-							("Already exists an Opened Product Auction "
-									+ "with the ID [%s]!!!",
-									newAuctionID));
-					
-					return Response.status(Status.CONFLICT).build();
-
-				}
-
-				
 			default:
-				
+
 				return Response.status(Status.NOT_IMPLEMENTED).build();
 
 		}
 	}
 
 	@Override
-	public Response openAuctionWithMinimumAmountBidValue(String auctionWithMinAmountBidValueJSONString) throws SQLException {
+	public Response openAuctionWithMinimumAmountBidValue(String auctionWithMinAmountBidValueJSONString)
+		   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+				  RepositoryException {
 
 		System.out.println("Preparing to create an Auction with Minimum Amount Bid Value from JSON Object...");
 
@@ -690,50 +712,59 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		String newAuctionID = newAuction.getAuctionID();
 
-		
+
 		byte auctionBidType = newAuction.getAuctionBidType();
 
 		if(auctionBidType != AuctionBidTypes.MIN_AMOUNT_VALUE_BID.getBidsType()) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
-		double auctionMinAmountBidValue = newAuction.getMinAmountBidValue();
 
+		double auctionMinAmountBidValue = newAuction.getMinAmountBidValue();
 
 		if(this.verifyMinAmountBidValueForAuction(auctionMinAmountBidValue)) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
-		
-		
 
-		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
+		switch(REPOSITORY_TYPE) {
+
+			case 0:
+	
+				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
+	
+	
+				this.addOpenedAuction(newAuction, null);
+	
+	
+				return Response.status(Status.ACCEPTED).build();
+	
+	
+			case 1:
+	
+				return this.addAuctionNodeJCR(newAuction, newAuctionID);
+	
+	
+			default:
+	
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+				
+				
 		}
-
-
-		
-
-		this.addOpenedAuction(newAuction);
-
-
-		return Response.status(Status.ACCEPTED).build();
-
 	}
 
 	@Override
-	public Response openAuctionWithMaximumAmountBidValue(String auctionWithMaxAmountBidValueJSONString) throws SQLException {
+	public Response openAuctionWithMaximumAmountBidValue(String auctionWithMaxAmountBidValueJSONString)
+		   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+			      RepositoryException {
 
 		System.out.println("Preparing to create an Auction with Minimum Amount Bid Value from JSON Object...");
 
 		Auction newAuction = this.gsonObject.fromJson(auctionWithMaxAmountBidValueJSONString, Auction.class);
 
 		String newAuctionID = newAuction.getAuctionID();
-
-
-		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
-		}
 
 
 		byte auctionBidType = newAuction.getAuctionBidType();
@@ -750,27 +781,45 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction);
+		switch(REPOSITORY_TYPE) {
 
-
-		return Response.status(Status.ACCEPTED).build();
-
+			case 0:
+	
+				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
+	
+	
+				this.addOpenedAuction(newAuction, null);
+	
+	
+				return Response.status(Status.ACCEPTED).build();
+	
+	
+			case 1:
+	
+				return this.addAuctionNodeJCR(newAuction, newAuctionID);
+	
+	
+			default:
+	
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+				
+				
+		}
 	}
 
 	@Override
-	public Response openAuctionWithMinimumAndMaximumAmountBidValue(
-			String auctionWithMinAndMaxAmountBidValueJSONString) throws SQLException {
+	public Response openAuctionWithMinimumAndMaximumAmountBidValue
+		  (String auctionWithMinAndMaxAmountBidValueJSONString)
+		   throws SQLException, ValueFormatException, VersionException, LockException,
+		   		  ConstraintViolationException, RepositoryException {
 
 		System.out.println("Preparing to create an Auction with Minimum and Maximum Amount Bid Value from JSON Object...");
 
 		Auction newAuction = this.gsonObject.fromJson(auctionWithMinAndMaxAmountBidValueJSONString, Auction.class);
 
 		String newAuctionID = newAuction.getAuctionID();
-
-
-		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
-		}
 
 
 		byte auctionBidType = newAuction.getAuctionBidType();
@@ -807,26 +856,46 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
-		this.addOpenedAuction(newAuction);
 
+		switch(REPOSITORY_TYPE) {
 
-		return Response.status(Status.ACCEPTED).build();
-
+			case 0:
+	
+				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
+	
+	
+				this.addOpenedAuction(newAuction, null);
+	
+	
+				return Response.status(Status.ACCEPTED).build();
+	
+	
+			case 1:
+	
+				return this.addAuctionNodeJCR(newAuction, newAuctionID);
+	
+	
+			default:
+	
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+				
+				
+		}
 	}
 
 	@Override
-	public Response openAuctionWithLimitedSetUserClientBidders(String auctionWithLimitedSetClientBiddersJSONString) throws SQLException {
+	public Response openAuctionWithLimitedSetUserClientBidders
+	      (String auctionWithLimitedSetClientBiddersJSONString)
+		   throws SQLException, ValueFormatException, VersionException, LockException,
+		          ConstraintViolationException, RepositoryException {
 
 		System.out.println("Preparing to create an Auction with Limited Set of User/Client Bidders from JSON Object...");
 
 		Auction newAuction = this.gsonObject.fromJson(auctionWithLimitedSetClientBiddersJSONString, Auction.class);
 
 		String newAuctionID = newAuction.getAuctionID();
-
-
-		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
-		}
 
 
 		byte auctionBidType = newAuction.getAuctionBidType();
@@ -845,28 +914,47 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			}
 		}
 
-
-		this.addOpenedAuction(newAuction);
-
-
-		return Response.status(Status.ACCEPTED).build();
-
+		
+		switch(REPOSITORY_TYPE) {
+	
+			case 0:
+	
+				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
+	
+	
+				this.addOpenedAuction(newAuction, null);
+	
+	
+				return Response.status(Status.ACCEPTED).build();
+	
+			case 1:
+	
+				return this.addAuctionNodeJCR(newAuction, newAuctionID);
+				
+	
+			default:
+	
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+				
+				
+		}
 	}
 
 	@Override
 	public Response openAuctionWithLimitedNumberBidsForEachUserClientBidder
-	(String auctionWithLimitedNumberBidsForEachUserClientBidderJSONString) throws SQLException {
+		  (String auctionWithLimitedNumberBidsForEachUserClientBidderJSONString)
+		   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+		          RepositoryException {
 
 		System.out.println("Preparing to create an Auction with Limited Number of Bids for each User/Client Bidder from JSON Object...");
 
-		Auction newAuction = this.gsonObject.fromJson(auctionWithLimitedNumberBidsForEachUserClientBidderJSONString, Auction.class);
+		Auction newAuction = 
+				this.gsonObject
+				.fromJson(auctionWithLimitedNumberBidsForEachUserClientBidderJSONString, Auction.class);
 
 		String newAuctionID = newAuction.getAuctionID();
-
-
-		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
-		}
 
 
 		byte auctionBidType = newAuction.getAuctionBidType();
@@ -876,7 +964,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		for(Entry<String, Integer> limitedNumberOfBidsForUserClient : newAuction.getNumAuctionBidsForEachUserClient().entrySet()) {
+		for(Entry<String, Integer> limitedNumberOfBidsForUserClient : 
+			newAuction.getNumAuctionBidsForEachUserClient().entrySet()) {
 
 			String limitedUserClientBidderID = limitedNumberOfBidsForUserClient.getKey();
 
@@ -902,26 +991,42 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction);
-
-
-		return Response.status(Status.ACCEPTED).build();
-
+		switch(REPOSITORY_TYPE) {
+	
+			case 0:
+	
+				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
+	
+	
+				this.addOpenedAuction(newAuction, null);
+	
+	
+				return Response.status(Status.ACCEPTED).build();
+	
+			case 1:
+	
+				return this.addAuctionNodeJCR(newAuction, newAuctionID);
+	
+	
+			default:
+	
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+	
+		}
 	}
 
 	@Override
-	public Response openAuctionWithLimitedNumberOfBids(String auctionWithLimitedNumberBidsJSONString) throws SQLException {
+	public Response openAuctionWithLimitedNumberOfBids(String auctionWithLimitedNumberBidsJSONString)
+		   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
+		   		  RepositoryException {
 
 		System.out.println("Preparing to create an Auction with Limited Number of Bids from JSON Object...");
 
 		Auction newAuction = this.gsonObject.fromJson(auctionWithLimitedNumberBidsJSONString, Auction.class);
 
 		String newAuctionID = newAuction.getAuctionID();
-
-
-		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
-		}
 
 
 		byte auctionBidType = newAuction.getAuctionBidType();
@@ -944,12 +1049,35 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction);
+		switch(REPOSITORY_TYPE) {
+
+			case 0:
+	
+				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
+	
+	
+				this.addOpenedAuction(newAuction, null);
+	
+	
+				return Response.status(Status.ACCEPTED).build();
+	
+	
+			case 1:
+	
+				return this.addAuctionNodeJCR(newAuction, newAuctionID);
+	
+	
+			default:
+	
+				return Response.status(Status.NOT_IMPLEMENTED).build();
 
 
-		return Response.status(Status.ACCEPTED).build();
-
+		}
 	}
+
+
 
 	@Override
 	public Response closeAuction(String openedAuctionID) throws SQLException {
