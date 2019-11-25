@@ -46,12 +46,29 @@ public class TestAuctionRepository {
     @Test
     public void testSimpleAuctionAdd() {
     	given()
-    	.contentType("application/json")
+    	.contentType(ContentType.JSON)
     	.body(AuctionRepositoryTestData.auction0002)
     	.when()
     	.post("/products-auctions/open-normal-auction")
         .then()  	
         .statusCode(Status.ACCEPTED.getStatusCode());   	
+    }
+    
+    @Test
+    public void testGetAuctionsFromPreviousAdd() {
+        get("/products-auctions/all")
+        .then()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON);
+    }
+    
+    @Test
+    public void testGetAuctionAddedFromPreviousAdd() {
+        get("/products-auctions/all/auction0002")
+        .then()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("auctionID", equalTo("auction0002"));
     }
     
     private Auction buildAuction(String json) {
