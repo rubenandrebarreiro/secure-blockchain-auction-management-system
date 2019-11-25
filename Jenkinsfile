@@ -6,7 +6,11 @@ pipeline {
         sh 'mvn clean compile'
       }
     }
-
+    stage('Create folders') {
+      steps {
+        sh 'mkdir -p res/database'
+      }
+    }
     stage('Test') {
       steps {
         sh 'mvn test'
