@@ -762,7 +762,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		this.allProductsAuctionsRepositoryDao.update(auctionToBeClosed);
 		System.out.println("Auction setted/updated as closed to all Product Auctions!!!");
 
-		this.allProductsAuctionsRepositoryDao.update(auctionToBeClosed);
+		this.closedProductsAuctionsRepositoryDao.create(auctionToBeClosed);
 		System.out.println("Closed Auction added to all Closed Product Auctions!!!");
 
 
