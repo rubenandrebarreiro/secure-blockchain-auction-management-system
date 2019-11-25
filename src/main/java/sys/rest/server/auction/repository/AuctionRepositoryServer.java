@@ -8,6 +8,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.jcr.ItemExistsException;
+import javax.jcr.LoginException;
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.SimpleCredentials;
+import javax.jcr.lock.LockException;
+import javax.jcr.nodetype.ConstraintViolationException;
+import javax.jcr.version.VersionException;
+
+import org.apache.jackrabbit.core.TransientRepository;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -30,25 +44,63 @@ import main.java.resources.user.User;
 
 public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
+	private static final byte REPOSITORY_TYPE = 1;
+
 	private Gson gsonObject;
+
+	private Repository allProductsAuctionsRepositoryJCR;
+	private Session allProductsAuctionsRepositorySession;
+	private Node allProductsAuctionsRootNode;
 
 	private Dao<Auction, String> allProductsAuctionsRepositoryDao;
 
+	private Repository openedProductsAuctionsRepositoryJCR;
+	private Session openedProductsAuctionsRepositorySession;
+	private Node openedProductsAuctionsRootNode;
+
 	private Dao<Auction, String> openedProductsAuctionsRepositoryDao;
+
+	private Repository closedProductsAuctionsRepositoryJCR;
+	private Session closedProductsAuctionsRepositorySession;
+	private Node closedProductsAuctionsRootNode;
 
 	private Dao<Auction, String> closedProductsAuctionsRepositoryDao;
 
+	private Repository allBidsRepositoryJCR;
+	private Session allBidsRepositorySession;
+	private Node allBidsRootNode;
+
 	private Dao<Bid, Long> allBidsRepositoryDao;
+
+	private Repository allUsersRepositoryJCR;
+	private Session allUsersRepositorySession;
+	private Node allUsersRootNode;
 
 	private Dao<User, String> allUsersRepositoryDao;
 
 
-	public AuctionRepositoryServer() {
+	public AuctionRepositoryServer(byte repositoryType) throws LoginException, RepositoryException {
 		this.gsonObject = new Gson();
-		this.createAuctionRepositoriesDao();
+
+		switch(repositoryType) {
+
+		case 0:
+			this.createAuctionRepositoriesJCR();
+
+			break;
+
+		case 1:
+			this.createAuctionRepositoriesDao();
+
+			break;
+
+		default:
+
+			break;
+		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws LoginException, RepositoryException {
 
 		int port = 8080;
 
@@ -61,11 +113,68 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
 
 		ResourceConfig config = new ResourceConfig();
-		config.register( new AuctionRepositoryServer() );
+		config.register( new AuctionRepositoryServer(REPOSITORY_TYPE) );
 
 		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
 		System.out.println("Auction Repository Server ready @ " + baseUri);
+	}
+
+	private synchronized void createAuctionRepositoriesJCR() throws LoginException, RepositoryException {
+
+		this.allUsersRepositoryJCR = new TransientRepository();
+
+		this.allProductsAuctionsRepositoryJCR = new TransientRepository();
+
+		this.openedProductsAuctionsRepositoryJCR = new TransientRepository();
+
+		this.closedProductsAuctionsRepositoryJCR = new TransientRepository();
+
+		this.allBidsRepositoryJCR = new TransientRepository();
+
+
+		this.allUsersRepositorySession = 
+				this.allUsersRepositoryJCR
+				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+
+		this.allProductsAuctionsRepositorySession = 
+				this.allProductsAuctionsRepositoryJCR
+				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+
+		this.openedProductsAuctionsRepositorySession = 
+				this.openedProductsAuctionsRepositoryJCR
+				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+
+		this.closedProductsAuctionsRepositorySession = 
+				this.closedProductsAuctionsRepositoryJCR
+				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+
+		this.allBidsRepositorySession = 
+				this.allBidsRepositoryJCR
+				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+
+
+		this.allUsersRootNode = this.allUsersRepositorySession.getRootNode();
+
+		this.allProductsAuctionsRootNode = this.allProductsAuctionsRepositorySession.getRootNode();
+
+		this.openedProductsAuctionsRootNode = this.openedProductsAuctionsRepositorySession.getRootNode();
+
+		this.closedProductsAuctionsRootNode = this.closedProductsAuctionsRepositorySession.getRootNode();
+
+		this.allBidsRootNode = this.allBidsRepositorySession.getRootNode();
+
+
+		this.allUsersRepositorySession.save();
+
+		this.allProductsAuctionsRepositorySession.save();
+
+		this.openedProductsAuctionsRepositorySession.save();
+
+		this.closedProductsAuctionsRepositorySession.save();
+
+		this.allBidsRepositorySession.save();
+
 	}
 
 	private void createAuctionRepositoriesDao() {
@@ -132,41 +241,52 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 	}
 
+
 	private boolean verifyExistenceOfAlreadyOpenedAuction(String newAuctionID) throws SQLException {
 
-		if(this.allProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
+		switch(REPOSITORY_TYPE) {
 
-			System.err.println(String.format
-					("Already exists a Product Auction "
-							+ "with the ID [%s]!!!",
-							newAuctionID));
-
-			return true;
-
+			case 0:
+	
+				if(this.allProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
+	
+					System.err.println(String.format
+							("Already exists a Product Auction "
+									+ "with the ID [%s]!!!",
+									newAuctionID));
+	
+					return true;
+	
+				}
+	
+				if(this.openedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
+	
+					System.err.println(String.format
+							("Already exists an Opened Product Auction "
+									+ "with the ID [%s]!!!",
+									newAuctionID));
+	
+					return true;
+	
+				}
+	
+				if(this.closedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
+	
+					System.err.println(String.format
+							("Already exists a Closed Product Auction "
+									+ "with the ID [%s]!!!",
+									newAuctionID));
+	
+					return true;
+				}
+	
+				return false;
+				
+			
+			default:
+				return false;
+				
 		}
-
-		if(this.openedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
-
-			System.err.println(String.format
-					("Already exists an Opened Product Auction "
-							+ "with the ID [%s]!!!",
-							newAuctionID));
-
-			return true;
-
-		}
-
-		if(this.closedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
-
-			System.err.println(String.format
-					("Already exists a Closed Product Auction "
-							+ "with the ID [%s]!!!",
-							newAuctionID));
-
-			return true;
-		}
-
-		return false;
 	}
 
 	private boolean verifyExistenceOfAlreadyClosedAuction(String newAuctionID) throws SQLException {
@@ -348,11 +468,11 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		if(bidsFromAuction.isEmpty()) {
 
 			System.err.println(String.format("Don't exist any Bid made for the Product's Auction with the ID: [%s]!!!", auctionID));
-			
+
 			return false;
 
 		}
-		
+
 		return true;
 	}
 
@@ -361,7 +481,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		if(bidsFromOpenedAuction.isEmpty()) {
 
 			System.err.println(String.format("Don't exist any Bid made for the Opened Product's Auction with the ID: [%s]!!!", openedAuctionID));
-			
+
 			return false;
 
 		}
@@ -375,46 +495,101 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		if(bidsFromClosedAuction.isEmpty()) {
 
 			System.err.println(String.format("Don't exist any Bid made for the Closed Product's Auction with the ID: [%s]!!!", closedAuctionID));
-			
+
 			return false;
-			
+
 		}
 
 		return true;
 	}
 
 	@Override
-	public Response openNormalAuction(String normalAuctionJSONString) throws SQLException {
+	public Response openNormalAuction(String normalAuctionJSONString) 
+		   throws SQLException, PathNotFoundException, VersionException, ConstraintViolationException,
+		          LockException, RepositoryException {
 
 		// TODO Could be a potentially less expensive operation 
 		// by checking if ID exists before creating auction from json 
 		System.out.println("Preparing to create a Normal Auction from JSON Object...");
 
 		Auction newAuction = this.gsonObject.fromJson(normalAuctionJSONString, Auction.class);
-
+		
 		String newAuctionID = newAuction.getAuctionID();
-
-
-		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
-		}
-
-
+		
+		
 		byte auctionBidType = newAuction.getAuctionBidType();
 
 		if(auctionBidType != AuctionBidTypes.NORMAL_BIDS.getBidsType()) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
+		
+		
+		switch(REPOSITORY_TYPE) {
+			
+			case 0:
+				
+				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
 
-		this.addOpenedAuction(newAuction);
+
+				this.addOpenedAuction(newAuction);
 
 
-		return Response.status(Status.ACCEPTED).build();
+				return Response.status(Status.ACCEPTED).build();
+				
+			case 1:
+				
+				try {
+					
+					this.allProductsAuctionsRootNode.addNode(String.format("/%s", newAuctionID));
+					
+					System.out.println("New Auction added to all Product Auctions!!!");
+				
+				}
+				catch (ItemExistsException itemExistsException) {
+	
+					System.err.println(String.format
+							("Already exists a Product Auction "
+									+ "with the ID [%s]!!!",
+									newAuctionID));
+					
+					return Response.status(Status.CONFLICT).build();
+	
+				}
+				
+				try {
+				
+					this.openedProductsAuctionsRootNode.addNode(String.format("/%s", newAuctionID));
 
+					System.out.println("New Auction added to all Opened Product Auctions!!!");
+				
+				}
+				catch (ItemExistsException itemExistsException) {
+					
+					System.err.println(String.format
+							("Already exists an Opened Product Auction "
+									+ "with the ID [%s]!!!",
+									newAuctionID));
+					
+					return Response.status(Status.CONFLICT).build();
+
+				}
+				
+
+				return Response.status(Status.ACCEPTED).build();
+				
+			default:
+				
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+				
+		}
 	}
 
 	@Override
-	public Response openAuctionWithMinimumInitialBidValue(String auctionWithMinInitialBidValueJSONString) throws SQLException {
+	public Response openAuctionWithMinimumInitialBidValue(String auctionWithMinInitialBidValueJSONString)
+		   throws SQLException, PathNotFoundException, VersionException, ConstraintViolationException,
+		          LockException, RepositoryException {
 
 		System.out.println("Preparing to create an Auction with Minimum Initial Bid Value from JSON Object...");
 
@@ -422,21 +597,16 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		String newAuctionID = newAuction.getAuctionID();
 
-
-		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
-		}
-
-
+		
 		byte auctionBidType = newAuction.getAuctionBidType();
 
 		if(auctionBidType != AuctionBidTypes.MIN_INITIAL_VALUE_BID.getBidsType()) {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
-
-
+		
 		double auctionMinInitialBidValue = newAuction.getCurrentBidValue();
 
+		
 		if(auctionMinInitialBidValue <= 0.0) {
 
 			System.err.println(String.format
@@ -450,12 +620,65 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		}
 
+		
+		switch(REPOSITORY_TYPE) {
+			case 0:
+				
+				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
 
-		this.addOpenedAuction(newAuction);
+
+				this.addOpenedAuction(newAuction);
 
 
-		return Response.status(Status.ACCEPTED).build();
+				return Response.status(Status.ACCEPTED).build();
 
+				
+			case 1:
+				
+				try {
+					
+					this.allProductsAuctionsRootNode.addNode(String.format("/%s", newAuctionID));
+					
+					System.out.println("New Auction added to all Product Auctions!!!");
+				
+				}
+				catch (ItemExistsException itemExistsException) {
+	
+					System.err.println(String.format
+							("Already exists a Product Auction "
+									+ "with the ID [%s]!!!",
+									newAuctionID));
+					
+					return Response.status(Status.CONFLICT).build();
+	
+				}
+				
+				try {
+				
+					this.openedProductsAuctionsRootNode.addNode(String.format("/%s", newAuctionID));
+
+					System.out.println("New Auction added to all Opened Product Auctions!!!");
+				
+				}
+				catch (ItemExistsException itemExistsException) {
+					
+					System.err.println(String.format
+							("Already exists an Opened Product Auction "
+									+ "with the ID [%s]!!!",
+									newAuctionID));
+					
+					return Response.status(Status.CONFLICT).build();
+
+				}
+
+				
+			default:
+				
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+
+		}
 	}
 
 	@Override
@@ -467,12 +690,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		String newAuctionID = newAuction.getAuctionID();
 
-
-		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
-		}
-
-
+		
 		byte auctionBidType = newAuction.getAuctionBidType();
 
 		if(auctionBidType != AuctionBidTypes.MIN_AMOUNT_VALUE_BID.getBidsType()) {
@@ -486,6 +704,15 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			return Response.status(Status.BAD_REQUEST).build();
 		}
 
+		
+		
+
+		if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
+			return Response.status(Status.CONFLICT).build();
+		}
+
+
+		
 
 		this.addOpenedAuction(newAuction);
 
@@ -769,12 +996,12 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	@Override
 	public Response addBidToOpenedProductAuction(String openedAuctionID, String bidForOpenedProductAuctionJSONString) throws SQLException {
-		
+
 		System.out.println("Preparing to add a Bid to a current Opened Product's Auction occurring, at this moment, from JSON Object...");
 
 		Bid newBid = this.gsonObject.fromJson(bidForOpenedProductAuctionJSONString, Bid.class);
-		
-		
+
+
 		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
 		if( !this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions) ) {
@@ -782,7 +1009,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			return Response.status(Status.NO_CONTENT).build();
 
 		}
-		
+
 		List<Auction> openedProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
 		if( !this.verifyExistenceOfAnyOpenedProductsAuctions(openedProductsAuctions) ) {
@@ -790,8 +1017,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			return Response.status(Status.NO_CONTENT).build();
 
 		}
-		
-		
+
+
 		Auction auction = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
 
 		if( !this.verifyExistenceOfProductAuction(openedAuctionID, auction) ) {
@@ -799,8 +1026,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			return Response.status(Status.NOT_FOUND).build(); 
 
 		}
-		
-		
+
+
 		Auction openedAuction = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
 
 		if( !this.verifyExistenceOfOpenedProductAuction(openedAuctionID, openedAuction) ) {
@@ -810,26 +1037,26 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 		if( !auction.equals(openedAuction) ) {
-			
+
 			System.err.println("Not a valid Opened Auction to receive Bids!!!");
-			
+
 			return Response.status(Status.BAD_REQUEST).build(); 
-			
+
 		}
-		
+
 		openedAuction.addAuctionBid(newBid);
-		
-		
+
+
 		this.allBidsRepositoryDao.create(newBid);
-		
-		
+
+
 		this.allProductsAuctionsRepositoryDao.update(openedAuction);
-		
+
 		this.openedProductsAuctionsRepositoryDao.update(openedAuction);
-		
-		
+
+
 		return null;
-		
+
 	}
 
 	@Override
@@ -879,7 +1106,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	@Override
 	public Response listAllProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID) throws SQLException {
-		
+
 		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
 		if(!this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions)) {
@@ -887,28 +1114,28 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			return Response.status(Status.NO_CONTENT).build();
 
 		}
-		
-		
+
+
 		List<Auction> allProductsAuctionsByUser = allProductsAuctions.stream()
-												  .filter(auction -> auction.getProductOwnerUserClientID().equalsIgnoreCase(productOwnerUserClientID))
-												  .collect(Collectors.toList());
-		
+				.filter(auction -> auction.getProductOwnerUserClientID().equalsIgnoreCase(productOwnerUserClientID))
+				.collect(Collectors.toList());
+
 		if(allProductsAuctionsByUser.isEmpty()) {
-			
+
 			System.err.println(String.format("The User/Client with the ID: [%s] don't have any Product's Auction, at this moment!!!",
-							   productOwnerUserClientID));	
-			
+					productOwnerUserClientID));	
+
 			return Response.status(Status.NO_CONTENT).build();
-			
+
 		}
-		
+
 		return Response.ok(this.gsonObject.toJson(allProductsAuctionsByUser)).build();
-		
+
 	}
 
 	@Override
 	public Response listOpenedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID) throws SQLException {
-		
+
 		List<Auction> openedProductsAuctions = this.openedProductsAuctionsRepositoryDao.queryForAll();
 
 		if(!this.verifyExistenceOfAnyOpenedProductsAuctions(openedProductsAuctions)) {
@@ -916,28 +1143,28 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			return Response.status(Status.NO_CONTENT).build();
 
 		}
-		
-		
+
+
 		List<Auction> openedProductsAuctionsByUser = openedProductsAuctions.stream()
-												  .filter(auction -> auction.getProductOwnerUserClientID().equalsIgnoreCase(productOwnerUserClientID))
-												  .collect(Collectors.toList());
-		
+				.filter(auction -> auction.getProductOwnerUserClientID().equalsIgnoreCase(productOwnerUserClientID))
+				.collect(Collectors.toList());
+
 		if(openedProductsAuctionsByUser.isEmpty()) {
-			
+
 			System.err.println(String.format("The User/Client with the ID: [%s] don't have any Opened Product's Auction occurring, at this moment!!!",
-							   productOwnerUserClientID));	
-			
+					productOwnerUserClientID));	
+
 			return Response.status(Status.NO_CONTENT).build();
-			
+
 		}
-		
+
 		return Response.ok(this.gsonObject.toJson(openedProductsAuctionsByUser)).build();
-		
+
 	}
 
 	@Override
 	public Response listClosedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID) throws SQLException {
-		
+
 		List<Auction> closedProductsAuctions = this.closedProductsAuctionsRepositoryDao.queryForAll();
 
 		if(!this.verifyExistenceOfAnyClosedProductsAuctions(closedProductsAuctions)) {
@@ -945,23 +1172,23 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			return Response.status(Status.NO_CONTENT).build();
 
 		}
-		
-		
+
+
 		List<Auction> closedProductsAuctionsByUser = closedProductsAuctions.stream()
-												  	 .filter(auction -> auction.getProductOwnerUserClientID().equalsIgnoreCase(productOwnerUserClientID))
-												  	 .collect(Collectors.toList());
-		
+				.filter(auction -> auction.getProductOwnerUserClientID().equalsIgnoreCase(productOwnerUserClientID))
+				.collect(Collectors.toList());
+
 		if(closedProductsAuctionsByUser.isEmpty()) {
-			
+
 			System.err.println(String.format("The User/Client with the ID: [%s] don't have any Closed Product's Auction, at this moment!!!",
-							   productOwnerUserClientID));	
-			
+					productOwnerUserClientID));	
+
 			return Response.status(Status.NO_CONTENT).build();
-			
+
 		}
-		
+
 		return Response.ok(this.gsonObject.toJson(closedProductsAuctionsByUser)).build();
-		
+
 	}
 
 	@Override
@@ -1041,7 +1268,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	@Override
 	public Response listAllBidsOfProductAuctionByID(String auctionID) throws SQLException {
-		
+
 		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
 		if( !this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions) ) {
@@ -1063,9 +1290,9 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		Map<Long, Bid> bidsFromAuction = auction.getAuctionBidsMade();
 
 		if( !this.verifyExistenceOfBidsInProductAuction(auctionID, bidsFromAuction) ) {
-			
+
 			return Response.status(Status.NO_CONTENT).build();
-			
+
 		}
 
 		return Response.ok(this.gsonObject.toJson(bidsFromAuction)).build();
@@ -1096,9 +1323,9 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		Map<Long, Bid> bidsFromOpenedAuction = openedAuction.getAuctionBidsMade();
 
 		if( !this.verifyExistenceOfBidsInOpenedProductAuction(openedAuctionID, bidsFromOpenedAuction) ) {
-			
+
 			return Response.status(Status.NO_CONTENT).build();
-			
+
 		}
 
 		return Response.ok(this.gsonObject.toJson(bidsFromOpenedAuction)).build();
@@ -1129,18 +1356,18 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		Map<Long, Bid> bidsFromClosedAuction = closedAuction.getAuctionBidsMade();
 
 		if( !this.verifyExistenceOfBidsInClosedProductAuction(closedAuctionID, bidsFromClosedAuction) ) {
-			
+
 			return Response.status(Status.NO_CONTENT).build();
-			
+
 		}
-		
+
 		return Response.ok(this.gsonObject.toJson(bidsFromClosedAuction)).build();
 
 	}
 
 	@Override
 	public Response listAllBidsMadeByBidderUserClientInProductAuctionByID(String auctionID, String bidderUserClientID) throws SQLException {
-		
+
 		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
 		if( !this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions) ) {
@@ -1162,42 +1389,42 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		Map<Long, Bid> bidsFromAuction = auction.getAuctionBidsMade();
 
 		if( !this.verifyExistenceOfBidsInProductAuction(auctionID, bidsFromAuction) ) {
-			
+
 			return Response.status(Status.NO_CONTENT).build();
-			
+
 		}
 
-		
+
 		List<Bid> bidsFromAuctionMadeByBidderUserClientList = 
-						bidsFromAuction.entrySet().stream()
-						.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
-						.map(x -> x.getValue())
-						.collect(Collectors.toList());
-		
+				bidsFromAuction.entrySet().stream()
+				.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
+				.map(x -> x.getValue())
+				.collect(Collectors.toList());
+
 		if(bidsFromAuctionMadeByBidderUserClientList.isEmpty()) {
-			
+
 			System.err.println(String.format("Don't exist any Bid made by the User/Client with the ID: [%s] in "
-										   + "the Product's Auction with the ID: [%s]!!!", bidderUserClientID, auctionID));
-			
+					+ "the Product's Auction with the ID: [%s]!!!", bidderUserClientID, auctionID));
+
 			return Response.status(Status.NOT_FOUND).build();
 
 		}
-		
-		
+
+
 		Map<Long ,Bid> bidsFromAuctionMadeByBidderUserClient = new HashMap<Long, Bid>();
-		
+
 		for(Bid bid : bidsFromAuctionMadeByBidderUserClientList) {
 			bidsFromAuctionMadeByBidderUserClient.put(bid.getBidID(), bid);
 		}
-		
-		
+
+
 		return Response.ok(this.gsonObject.toJson(bidsFromAuctionMadeByBidderUserClient)).build();
-		
+
 	}
 
 	@Override
 	public Response listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(String openedAuctionID, String bidderUserClientID) throws SQLException {
-		
+
 		List<Auction> openedProductsAuctions = this.openedProductsAuctionsRepositoryDao.queryForAll();
 
 		if( !this.verifyExistenceOfAnyOpenedProductsAuctions(openedProductsAuctions) ) {
@@ -1219,42 +1446,42 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		Map<Long, Bid> bidsFromOpenedAuction = openedAuction.getAuctionBidsMade();
 
 		if( !this.verifyExistenceOfBidsInOpenedProductAuction(openedAuctionID, bidsFromOpenedAuction) ) {
-			
+
 			return Response.status(Status.NO_CONTENT).build();
-			
+
 		}
 
-		
+
 		List<Bid> bidsFromOpenedAuctionMadeByBidderUserClientList = 
-						bidsFromOpenedAuction.entrySet().stream()
-						.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
-						.map(x -> x.getValue())
-						.collect(Collectors.toList());
-		
+				bidsFromOpenedAuction.entrySet().stream()
+				.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
+				.map(x -> x.getValue())
+				.collect(Collectors.toList());
+
 		if(bidsFromOpenedAuctionMadeByBidderUserClientList.isEmpty()) {
-			
+
 			System.err.println(String.format("Don't exist any Bid made by the User/Client with the ID: [%s] in "
-										   + "the Opened Product's Auction with the ID: [%s]!!!", bidderUserClientID, openedAuctionID));
-			
+					+ "the Opened Product's Auction with the ID: [%s]!!!", bidderUserClientID, openedAuctionID));
+
 			return Response.status(Status.NOT_FOUND).build();
 
 		}
-		
-		
+
+
 		Map<Long ,Bid> bidsFromOpenedAuctionMadeByBidderUserClient = new HashMap<Long, Bid>();
-		
+
 		for(Bid bid : bidsFromOpenedAuctionMadeByBidderUserClientList) {
 			bidsFromOpenedAuctionMadeByBidderUserClient.put(bid.getBidID(), bid);
 		}
-		
-		
+
+
 		return Response.ok(this.gsonObject.toJson(bidsFromOpenedAuctionMadeByBidderUserClient)).build();
-		
+
 	}
 
 	@Override
 	public Response listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(String closedAuctionID, String bidderUserClientID) throws SQLException {
-		
+
 		List<Auction> closedProductsAuctions = this.closedProductsAuctionsRepositoryDao.queryForAll();
 
 		if( !this.verifyExistenceOfAnyClosedProductsAuctions(closedProductsAuctions) ) {
@@ -1276,36 +1503,36 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		Map<Long, Bid> bidsFromClosedAuction = closedAuction.getAuctionBidsMade();
 
 		if( !this.verifyExistenceOfBidsInClosedProductAuction(closedAuctionID, bidsFromClosedAuction) ) {
-			
+
 			return Response.status(Status.NO_CONTENT).build();
-			
+
 		}
 
-		
+
 		List<Bid> bidsFromClosedAuctionMadeByBidderUserClientList = 
-						bidsFromClosedAuction.entrySet().stream()
-						.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
-						.map(x -> x.getValue())
-						.collect(Collectors.toList());
-		
+				bidsFromClosedAuction.entrySet().stream()
+				.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
+				.map(x -> x.getValue())
+				.collect(Collectors.toList());
+
 		if(bidsFromClosedAuctionMadeByBidderUserClientList.isEmpty()) {
-			
+
 			System.err.println(String.format("Don't exist any Bid made by the User/Client with the ID: [%s] in "
-										   + "the Closed Product's Auction with the ID: [%s]!!!", bidderUserClientID, closedAuctionID));
-			
+					+ "the Closed Product's Auction with the ID: [%s]!!!", bidderUserClientID, closedAuctionID));
+
 			return Response.status(Status.NOT_FOUND).build();
 
 		}
-		
-		
+
+
 		Map<Long ,Bid> bidsFromClosedAuctionMadeByBidderUserClient = new HashMap<Long, Bid>();
-		
+
 		for(Bid bid : bidsFromClosedAuctionMadeByBidderUserClientList) {
 			bidsFromClosedAuctionMadeByBidderUserClient.put(bid.getBidID(), bid);
 		}
-		
-		
+
+
 		return Response.ok(this.gsonObject.toJson(bidsFromClosedAuctionMadeByBidderUserClient)).build();
-		
+
 	}
 }
