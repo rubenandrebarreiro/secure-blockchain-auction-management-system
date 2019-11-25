@@ -406,7 +406,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			this.addOpenedAuction(newAuction, newOpenedAuctionNode);
 
 			System.out.println("New Auction added to all Opened Product Auctions!!!");
-
+			
 		}
 		catch (ItemExistsException itemExistsException) {
 
@@ -452,6 +452,11 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				newAuctionNode.setProperty("current-bid-value", newAuction.getCurrentBidValue());
 				newAuctionNode.setProperty("min-amount-bid-value", newAuction.getMinAmountBidValue());
 				newAuctionNode.setProperty("max-amount-bid-value", newAuction.getMaxAmountBidValue());
+				
+				// TODO
+				//newAuctionNode.setPropert.setProperty("num-auction-bids-for-each-user-client", newAuction.getNumAuctionBidsForEachUserClient());
+				//newAuctionNode.setProperty("auction-bids-made", newAuction.getMaxAmountBidValue());
+				
 				newAuctionNode.setProperty("num-max-auctions-bids-allowed", newAuction.getNumMaxAuctionBidsAllowed());
 				newAuctionNode.setProperty("auction-timestamp-start", newAuction.getAuctionTimestampStart());
 				newAuctionNode.setProperty("auction-timestamp-limit", newAuction.getAuctionTimestampLimit());
@@ -627,6 +632,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				
 			case 1:
 	
+				this.addOpenedAuction(newAuction, null);
+				
 				return this.addAuctionNodeJCR(newAuction, newAuctionID);
 	
 				
@@ -1228,7 +1235,10 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 						             auctionToBeClosedNode.getProperty("product-owner-user-client-id").getString());
 				
 				System.out.println("Closed Auction added to all Closed Product Auctions!!!");
-				
+
+				this.allProductsAuctionsRepositorySession.save();
+				this.openedProductsAuctionsRepositorySession.save();
+				this.closedProductsAuctionsRepositorySession.save();
 				
 				return Response.status(Status.ACCEPTED).build();
 				
@@ -1242,68 +1252,200 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	}
 
 	@Override
-	public Response addBidToOpenedProductAuction(String openedAuctionID, String bidForOpenedProductAuctionJSONString) throws SQLException {
+	public Response addBidToOpenedProductAuction(String openedAuctionID, String bidForOpenedProductAuctionJSONString) 
+		   throws SQLException, RepositoryException {
 
 		System.out.println("Preparing to add a Bid to a current Opened Product's Auction occurring, at this moment, from JSON Object...");
 
 		Bid newBid = this.gsonObject.fromJson(bidForOpenedProductAuctionJSONString, Bid.class);
 		
 		
-		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
+		Auction openedAuction;
+		
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		
+			case 0:
+				
+				List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
-		if( !this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions) ) {
+				if( !this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions) ) {
 
-			return Response.status(Status.NO_CONTENT).build();
+					return Response.status(Status.NO_CONTENT).build();
 
-		}
+				}
 
-		List<Auction> openedProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
+				List<Auction> openedProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
-		if( !this.verifyExistenceOfAnyOpenedProductsAuctions(openedProductsAuctions) ) {
+				if( !this.verifyExistenceOfAnyOpenedProductsAuctions(openedProductsAuctions) ) {
 
-			return Response.status(Status.NO_CONTENT).build();
+					return Response.status(Status.NO_CONTENT).build();
 
-		}
-
-
-		Auction auction = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
-
-		if( !this.verifyExistenceOfProductAuction(openedAuctionID, auction) ) {
-
-			return Response.status(Status.NOT_FOUND).build(); 
-
-		}
+				}
 
 
-		Auction openedAuction = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
+				Auction auction = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
 
-		if( !this.verifyExistenceOfOpenedProductAuction(openedAuctionID, openedAuction) ) {
+				if( !this.verifyExistenceOfProductAuction(openedAuctionID, auction) ) {
 
-			return Response.status(Status.NOT_FOUND).build(); 
+					return Response.status(Status.NOT_FOUND).build(); 
 
-		}
+				}
 
-		if( !auction.equals(openedAuction) ) {
 
-			System.err.println("Not a valid Opened Auction to receive Bids!!!");
+				openedAuction = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
+
+				if( !this.verifyExistenceOfOpenedProductAuction(openedAuctionID, openedAuction) ) {
+
+					return Response.status(Status.NOT_FOUND).build(); 
+
+				}
+
+				
+				if( !auction.equals(openedAuction) ) {
+
+					System.err.println("Not a valid Opened Auction to receive Bids!!!");
+					
+					return Response.status(Status.BAD_REQUEST).build(); 
+					
+				}
+				
+				
+				if( !auction.verifyIfAuctionIsOpen() ) {
+					
+					System.err.println("The Auction must be opened, in order to receive Bids!!!");
+					
+					return Response.status(Status.BAD_REQUEST).build(); 
+					
+				}
+				
+				
+				openedAuction.addAuctionBid(newBid);
+				
+				
+				this.allBidsRepositoryDao.create(newBid);
+
+
+				this.allProductsAuctionsRepositoryDao.update(openedAuction);
+
+				this.openedProductsAuctionsRepositoryDao.update(openedAuction);
+
+
+				return Response.status(Status.ACCEPTED).build();
+
+				
+				
+			case 1:
+				
+				Node auctionNode;
+				
+				Node openedAuctionNode;
+				
+				try {
+					
+					auctionNode = this.allProductsAuctionsRootNode
+									  .getNode(String.format("/%s", openedAuctionID));
+										
+				}
+				catch(PathNotFoundException pathNotFoundException) {
+					System.err.println(String.format
+							("Don't exist a Product Auction "
+									+ "with the ID [%s]!!!",
+									openedAuctionID));
+					
+					return Response.status(Status.NOT_FOUND).build();
+					
+				}
 			
-			return Response.status(Status.BAD_REQUEST).build(); 
+				try {
+					
+					openedAuctionNode = this.openedProductsAuctionsRootNode
+										    .getNode(String.format("/%s", openedAuctionID));
+					
+				}
+				catch(PathNotFoundException pathNotFoundException) {
+					System.err.println(String.format
+							("Don't exist an Opened Product Auction "
+									+ "with the ID [%s]!!!",
+									openedAuctionID));
+
+					return Response.status(Status.NOT_FOUND).build();
+					
+				}
+				
+				
+				if( !( auctionNode.equals(openedAuctionNode) ) ) {
+
+					System.err.println("Not a valid Opened Auction to receive Bids!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+					
+				}
+				
+				
+				boolean isAuctionNodeOpened = 
+						auctionNode.getProperty("auction-is-open").getBoolean();
 			
-		}
+				if( !isAuctionNodeOpened ) {
+					
+					System.err.println("The Auction must be opened, in order to receive Bids!!!");
+					
+					return Response.status(Status.BAD_REQUEST).build();
+					
+				}
+				
+				
+				// TODO
+				/*openedAuction = new Auction(auctionNode.getProperty("auction-id").getString(),
+								    ( (int) auctionNode.getProperty("auction-serial-number").getLong() ),
+										    auctionNode.getProperty("auction-description").getString(),
+								   ( (byte) auctionNode.getProperty("auction-bid-type").getLong() ),
+										    auctionNode.getProperty("current-bid-value").getDouble(),
+										    auctionNode.getProperty("min-amount-bid-value").getDouble(),
+										    auctionNode.getProperty("max-amount-bid-value").getDouble(),
+										    
+										    // TODO
+											//newAuctionNode.setPropert.setProperty("num-auction-bids-for-each-user-client", newAuction.getNumAuctionBidsForEachUserClient());
+											//newAuctionNode.setProperty("auction-bids-made", newAuction.getMaxAmountBidValue());
+											
+									( (int) auctionNode.getProperty("num-max-auctions-bids-allowed").getLong() ),
+										    auctionNode.getProperty("auction-timestamp-start").getLong(),
+										    auctionNode.getProperty("auction-timestamp-limit").getLong(),
+										    auctionNode.getProperty("auction-is-open").getBoolean(),
+									( (int) auctionNode.getProperty("product-id").getLong() ),
+										    auctionNode.getProperty("product-name").getString(),
+										    auctionNode.getProperty("product-owner-user-client-id").getString());
+				*/
+				
+				Node bidNode = this.allBidsRootNode.addNode(String.format("/%s", newBid.getBidID()));
+				
+				bidNode.setProperty("bid-id", newBid.getBidID());
+				bidNode.setProperty("bidder-user-client-id", newBid.getBidderUserClientID());
+				bidNode.setProperty("bid-value", newBid.getBidValue());
+				bidNode.setProperty("bid-timestamp", newBid.getBidTimestamp());
+				
+				
+				// TODO
+				//auctionNode.setProperty("", value);
+				
+				//this.allProductsAuctionsRepositoryJCR.update(openedAuction);
 
-		openedAuction.addAuctionBid(newBid);
-		
-		
-		this.allBidsRepositoryDao.create(newBid);
+				//this.openedProductsAuctionsRepositoryDao.update(openedAuction);
+				
+				
+				this.allProductsAuctionsRepositorySession.save();
+				this.openedProductsAuctionsRepositorySession.save();
+				this.allBidsRepositorySession.save();
+				
 
+				return Response.status(Status.ACCEPTED).build();
 
-		this.allProductsAuctionsRepositoryDao.update(openedAuction);
-
-		this.openedProductsAuctionsRepositoryDao.update(openedAuction);
-
-
-		return Response.status(Status.ACCEPTED).build();
-		
+				
+				
+			default:
+				
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+				
+		}				
 	}
 
 	@Override
