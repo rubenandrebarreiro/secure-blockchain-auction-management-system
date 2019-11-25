@@ -27,7 +27,7 @@ import main.java.sys.rest.server.auction.repository.AuctionRepositoryServer;
 import test.java.sys.rest.server.auction.repository.data.AuctionRepositoryTestData;
 
 @TestMethodOrder(OrderAnnotation.class)
-public class TestAuctionRepository {
+public class TestAuctionJDBC {
 	
 	private Gson gson;
 	
@@ -39,7 +39,7 @@ public class TestAuctionRepository {
 			tempFile.renameTo(new File(tempFile.getAbsolutePath() + ".bak"));
 		}
     	
-    	AuctionRepositoryServer.main(null);
+    	AuctionRepositoryServer.main(new String[] {"0"});
 	}
 	
     @BeforeEach
