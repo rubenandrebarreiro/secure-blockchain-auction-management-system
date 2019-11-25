@@ -192,7 +192,9 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				this.allBidsRepositoryJCR
 				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
 		
-
+		
+		this.allUsersRootNode = this.allUsersRepositorySession.getRootNode();
+		
 		this.allProductsAuctionsRootNode = this.allProductsAuctionsRepositorySession.getRootNode();
 
 		this.openedProductsAuctionsRootNode = this.openedProductsAuctionsRepositorySession.getRootNode();
