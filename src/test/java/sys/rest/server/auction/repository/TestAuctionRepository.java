@@ -54,7 +54,6 @@ public class TestAuctionRepository {
 			
 			@Override
 			public boolean accept(File dir, String name) {
-				// TODO Auto-generated method stub
 				return name.endsWith(".db");
 			}
 		});
@@ -67,8 +66,6 @@ public class TestAuctionRepository {
 			
 			@Override
 			public boolean accept(File dir, String name) {
-				// TODO Auto-generated method stub
-				System.err.println("Found: " + name);
 				return name.endsWith(".bak");
 			}
 		});
