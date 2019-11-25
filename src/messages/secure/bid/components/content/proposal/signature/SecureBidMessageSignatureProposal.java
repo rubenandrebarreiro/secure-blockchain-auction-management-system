@@ -3,6 +3,11 @@ package messages.secure.bid.components.content.proposal.signature;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import common.utils.CommonUtils;
 import resources.bid.Bid;
 
 public class SecureBidMessageSignatureProposal {
@@ -215,7 +220,42 @@ public class SecureBidMessageSignatureProposal {
 			
 			// TODO - to complete
 			
-			this.setIsBidSerializedHashed(true);			
+			
+			
+			// Set the Secret Key and its specifications,
+	 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
+	 	 //   SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
+	 	    
+			
+			//Cipher secureBidMessageSignatureProposalSymmetricEncryptionCipher = 
+				//		Cipher.getInstance(String.format("%s/%s/%s",
+					//					   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
+						//		           provider);
+
+			//if(requiresIV(symmetricEncryptionMode)) {
+				
+				// Modes that do not need IVs: ECB
+				// The parameter specifications for the Initialization Vector				
+				//System.out.println("[SecureBidMessageSignatureProposal.ENCRYPT] Block mode needs IV");
+				//this.IVBytes = generateIV(secureMessagePayloadSerializationSymmetricEncryptionCipher);
+				
+				//System.out.println("[SecureBidMessageSignatureProposal.ENCRYPT] IV is: " + CommonUtils.fromByteArrayToHexadecimalFormat(this.IVBytes));
+				
+				//IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(this.IVBytes);
+				//secureMessagePayloadSerializationSymmetricEncryptionCipher
+					//.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
+			//}
+			//else {
+				//System.out.println("[SecureBidMessageSignatureProposal.ENCRYPT] Block mode doesn't needs IV");
+			//	secureMessagePayloadSerializationSymmetricEncryptionCipher
+				//	.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
+		//	}
+							
+		//	this.bidSerializedHashedCiphered = 
+			//		secureBidMessageSignatureProposalSymmetricEncryptionCipher.doFinal(this.bidSerializedHashed);
+			
+			
+			this.setIsBidSerializedHashedCiphered(true);			
 		}
 		
 	}
