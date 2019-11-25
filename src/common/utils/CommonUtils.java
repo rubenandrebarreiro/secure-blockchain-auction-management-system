@@ -88,12 +88,12 @@ public class CommonUtils {
 	/**
 	 * The Total Length of a Char
 	 */
-	public static final int CHAR_LENGTH = 1;
+	public static final int CHAR_IN_BYTES_LENGTH = 1;
 
 	/**
 	 * The Total Length of a Short
 	 */
-	public static final int SHORT_LENGTH = 2;
+	public static final int SHORT_IN_BYTES_LENGTH = 2;
 	
 	/**
 	 * The Total Length of an Integer
@@ -101,9 +101,14 @@ public class CommonUtils {
 	public static final int INTEGER_IN_BYTES_LENGTH = 4;
 	
 	/**
+	 * The Total Length of an Double
+	 */
+	public static final int DOUBLE_IN_BYTES_LENGTH = 8;
+	
+	/**
 	 * The Total Length of a Long
 	 */
-	public static final int LONG_LENGTH = 6;
+	public static final int LONG_IN_BYTES_LENGTH = 8;
 	
 	/**
 	 * The time (in milliseconds) to the pooling test of termination of
@@ -172,7 +177,7 @@ public class CommonUtils {
      * @return and converts a Byte Array, from a given Short Number
      */
 	public static byte[] fromShortToByteArray(short shortNumber) {
-		byte[] shortNumberSerialized = new byte[SHORT_LENGTH];
+		byte[] shortNumberSerialized = new byte[SHORT_IN_BYTES_LENGTH];
 		
 		ByteBuffer byteBuffer = ByteBuffer.wrap(shortNumberSerialized);
 		byteBuffer.order(ByteOrder.nativeOrder()).putShort(shortNumber);
@@ -197,6 +202,22 @@ public class CommonUtils {
 	}
 	
 	/**
+     * Returns and converts a Byte Array, from a given Double Number.
+     * 
+     * @param doubleNumber a given Double Number to be converted
+     * 
+     * @return and converts a Byte Array, from a given Double Number
+     */
+	public static byte[] fromDoubleToByteArray(double doubleNumber) {
+		byte[] doubleNumberSerialized = new byte[DOUBLE_IN_BYTES_LENGTH];
+		
+		ByteBuffer byteBuffer = ByteBuffer.wrap(doubleNumberSerialized);
+		byteBuffer.order(ByteOrder.nativeOrder()).putDouble(doubleNumber);
+		
+		return doubleNumberSerialized;
+	}
+	
+	/**
      * Returns and converts a Byte Array, from a given Long Number.
      * 
      * @param longNumber a given Long Number to be converted
@@ -204,7 +225,7 @@ public class CommonUtils {
      * @return and converts a Byte Array, from a given Long Number
      */
 	public static byte[] fromLongToByteArray(long longNumber) {
-		byte[] longNumberSerialized = new byte[LONG_LENGTH];
+		byte[] longNumberSerialized = new byte[LONG_IN_BYTES_LENGTH];
 		
 		ByteBuffer byteBuffer = ByteBuffer.wrap(longNumberSerialized);
 		byteBuffer.order(ByteOrder.nativeOrder()).putLong(longNumber);
