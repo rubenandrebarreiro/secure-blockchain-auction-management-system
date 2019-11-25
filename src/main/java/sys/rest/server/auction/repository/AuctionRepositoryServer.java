@@ -250,53 +250,40 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	private boolean verifyExistenceOfAlreadyOpenedAuction(String newAuctionID) throws SQLException {
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		if(this.allProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
 
-		case 0:
+			System.err.println(String.format
+					("Already exists a Product Auction "
+							+ "with the ID [%s]!!!",
+							newAuctionID));
 
-			if(this.allProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
-
-				System.err.println(String.format
-						("Already exists a Product Auction "
-								+ "with the ID [%s]!!!",
-								newAuctionID));
-
-				return true;
-
-			}
-
-			if(this.openedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
-
-				System.err.println(String.format
-						("Already exists an Opened Product Auction "
-								+ "with the ID [%s]!!!",
-								newAuctionID));
-
-				return true;
-
-			}
-
-			if(this.closedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
-
-				System.err.println(String.format
-						("Already exists a Closed Product Auction "
-								+ "with the ID [%s]!!!",
-								newAuctionID));
-
-				return true;
-			}
-
-			return false;
-
-
-		case 1:
-
-
-
-		default:
-			return false;
+			return true;
 
 		}
+
+		if(this.openedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
+
+			System.err.println(String.format
+					("Already exists an Opened Product Auction "
+							+ "with the ID [%s]!!!",
+							newAuctionID));
+
+			return true;
+
+		}
+
+		if(this.closedProductsAuctionsRepositoryDao.idExists(newAuctionID)) {
+
+			System.err.println(String.format
+					("Already exists a Closed Product Auction "
+							+ "with the ID [%s]!!!",
+							newAuctionID));
+
+			return true;
+		}
+
+		return false;
+
 	}
 
 	private boolean verifyExistenceOfAlreadyClosedAuction(String newAuctionID) throws SQLException {
@@ -1191,8 +1178,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		this.openedProductsAuctionsRepositoryDao.update(openedAuction);
 
 
-		return null;
-
+		return Response.status(Status.ACCEPTED).build();
+		
 	}
 
 	@Override
