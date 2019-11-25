@@ -33,6 +33,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -379,7 +380,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		try {
 
 			Node newAuctionNode = this.allProductsAuctionsRootNode
-					.addNode(String.format("/%s", newAuctionID));
+									  .addNode(String.format("/%s", newAuctionID));
 
 			this.addOpenedAuction(newAuction, newAuctionNode);
 
@@ -400,7 +401,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		try {
 
 			Node newOpenedAuctionNode = this.openedProductsAuctionsRootNode
-					.addNode(String.format("/%s", newAuctionID));
+											.addNode(String.format("/%s", newAuctionID));
 
 			this.addOpenedAuction(newAuction, newOpenedAuctionNode);
 
@@ -1076,46 +1077,164 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 
 	@Override
-	public Response closeAuction(String openedAuctionID) throws SQLException {
+	public Response closeAuction(String openedAuctionID) throws SQLException, RepositoryException {
 
 		System.out.println("Preparing to close an Auction...");		
 
-		if(this.verifyExistenceOfAlreadyClosedAuction(openedAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
+		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+				
+			case 0:
+
+				if(this.verifyExistenceOfAlreadyClosedAuction(openedAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
+
+
+				Auction auctionFromAllAuctions = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
+				
+				Auction auctionFromOpenedAuctions = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
+
+				if( !( auctionFromAllAuctions.equals(auctionFromOpenedAuctions) ) ) {
+
+					System.err.println("Not a valid Opened Auction to be closed!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+
+				}
+
+				
+				Auction auctionToBeClosed = auctionFromAllAuctions;
+				
+				if( !( auctionToBeClosed.verifyIfAuctionIsOpen() ) ) {
+
+					System.err.println("The Auction should be opened, in order to be closed!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+
+				}
+				
+
+				this.openedProductsAuctionsRepositoryDao.delete(auctionToBeClosed);
+				System.out.println("Auction which will be closed deleted from all Opened Product Auctions!!!");
+
+
+				auctionToBeClosed.closeAuction();
+
+
+				this.allProductsAuctionsRepositoryDao.update(auctionToBeClosed);
+				System.out.println("Auction setted/updated as closed to all Product Auctions!!!");
+
+				this.closedProductsAuctionsRepositoryDao.create(auctionToBeClosed);
+				System.out.println("Closed Auction added to all Closed Product Auctions!!!");
+
+
+				return Response.status(Status.ACCEPTED).build();
+				
+				
+			case 1:
+				
+				Node auctionToBeClosedNode;
+				
+				Node openedAuctionToBeClosedNode;
+				
+				try {
+					auctionToBeClosedNode = this.allProductsAuctionsRootNode
+												.getNode(String.format("/%s", openedAuctionID));
+										
+				}
+				catch(PathNotFoundException pathNotFoundException) {
+					System.err.println(String.format
+							("Don't exist a Product Auction "
+									+ "with the ID [%s]!!!",
+									openedAuctionID));
+
+					return Response.status(Status.NOT_FOUND).build();
+				}
+			
+				try {
+					openedAuctionToBeClosedNode = this.openedProductsAuctionsRootNode
+													  .getNode(String.format("/%s", openedAuctionID));
+					
+				}
+				catch(PathNotFoundException pathNotFoundException) {
+					System.err.println(String.format
+							("Don't exist an Opened Product Auction "
+									+ "with the ID [%s]!!!",
+									openedAuctionID));
+
+					return Response.status(Status.NOT_FOUND).build();
+				}
+				
+			
+				if( !( auctionToBeClosedNode.equals(openedAuctionToBeClosedNode) ) ) {
+
+					System.err.println("Not a valid Opened Auction to be closed!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+
+				}
+				
+				
+				boolean isAuctionToBeClosedNodeOpened = 
+						auctionToBeClosedNode.getProperty("auction-is-open").getBoolean();
+			
+				if( !isAuctionToBeClosedNodeOpened ) {
+
+					System.err.println("The Auction should be opened, in order to be closed!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+
+				}
+				
+				openedAuctionToBeClosedNode.remove();
+				System.out.println("Auction which will be closed deleted from all Opened Product Auctions!!!");
+				
+
+				auctionToBeClosedNode.setProperty("auction-is-open", false);
+				
+				
+				Node newClosedAuctionNode = 
+						this.closedProductsAuctionsRootNode.addNode(String.format("/%s", openedAuctionID));
+				
+				newClosedAuctionNode.setProperty("auction-id", 
+									 auctionToBeClosedNode.getProperty("auction-id").getString());
+				newClosedAuctionNode.setProperty("auction-serial-number", 
+							  ((int) auctionToBeClosedNode.getProperty("auction-serial-number").getLong()));
+				newClosedAuctionNode.setProperty("auction-description", 
+									 auctionToBeClosedNode.getProperty("auction-description").getString());
+				newClosedAuctionNode.setProperty("auction-bid-type", 
+							 ((byte) auctionToBeClosedNode.getProperty("auction-bid-type").getLong()));
+				newClosedAuctionNode.setProperty("current-bid-value", 
+									 auctionToBeClosedNode.getProperty("current-bid-value").getDouble());
+				newClosedAuctionNode.setProperty("min-amount-bid-value", 
+									 auctionToBeClosedNode.getProperty("min-amount-bid-value").getDouble());
+				newClosedAuctionNode.setProperty("max-amount-bid-value", 
+									 auctionToBeClosedNode.getProperty("max-amount-bid-value").getDouble());
+				newClosedAuctionNode.setProperty("num-max-auctions-bids-allowed", 
+						      ((int) auctionToBeClosedNode.getProperty("num-max-auctions-bids-allowed").getLong()));
+				newClosedAuctionNode.setProperty("auction-timestamp-start", 
+						             auctionToBeClosedNode.getProperty("auction-timestamp-start").getLong());
+				newClosedAuctionNode.setProperty("auction-timestamp-limit", 
+						             auctionToBeClosedNode.getProperty("auction-timestamp-limit").getLong());
+				newClosedAuctionNode.setProperty("auction-is-open", 
+						             auctionToBeClosedNode.getProperty("auction-is-open").getBoolean());
+				newClosedAuctionNode.setProperty("product-id", 
+						      ((int) auctionToBeClosedNode.getProperty("product-id").getLong()));
+				newClosedAuctionNode.setProperty("product-name", 
+						             auctionToBeClosedNode.getProperty("product-name").getString());
+				newClosedAuctionNode.setProperty("product-owner-user-client-id", 
+						             auctionToBeClosedNode.getProperty("product-owner-user-client-id").getString());
+				
+				
+				return Response.status(Status.ACCEPTED).build();
+				
+				
+			default:
+
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+				
+				
 		}
-
-
-		Auction auctionFromAllAuctions = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
-		
-		Auction auctionFromOpenedAuctions = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
-
-		if( !(auctionFromAllAuctions.equals(auctionFromOpenedAuctions)) ) {
-
-			System.err.println("Not a valid Opened Auction to be closed!!!");
-
-			return Response.status(Status.BAD_REQUEST).build();
-
-		}
-
-		Auction auctionToBeClosed = auctionFromAllAuctions;
-
-
-		this.openedProductsAuctionsRepositoryDao.delete(auctionToBeClosed);
-		System.out.println("Auction which will be closed deleted from all Opened Product Auctions!!!");
-
-
-		auctionToBeClosed.closeAuction();
-
-
-		this.allProductsAuctionsRepositoryDao.update(auctionToBeClosed);
-		System.out.println("Auction setted/updated as closed to all Product Auctions!!!");
-
-		this.allProductsAuctionsRepositoryDao.update(auctionToBeClosed);
-		System.out.println("Closed Auction added to all Closed Product Auctions!!!");
-
-
-		return Response.status(Status.ACCEPTED).build();
-
 	}
 
 	@Override
