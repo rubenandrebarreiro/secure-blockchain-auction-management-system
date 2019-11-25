@@ -444,6 +444,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				this.openedProductsAuctionsRepositoryDao.create(newAuction);
 				System.out.println("New Auction added to all Opened Product Auctions!!!");
 	
+				break;
 	
 			case 1:
 	
