@@ -5,6 +5,9 @@
 	<groupId>simple-secure-blockchain-auctoin-managment-system</groupId>
 	<artifactId>simple-secure-blockchain-auctoin-managment-system</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
@@ -73,6 +76,11 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.6.0-M1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
 			<version>5.6.0-M1</version>
 		</dependency>
 		<dependency>
