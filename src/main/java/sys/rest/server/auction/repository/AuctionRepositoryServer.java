@@ -34,6 +34,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -439,7 +440,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			this.addOpenedAuction(newAuction, newOpenedAuctionNode);
 
 			System.out.println("New Auction added to all Opened Product Auctions!!!");
-
+			
 		}
 		catch (ItemExistsException itemExistsException) {
 
@@ -486,6 +487,11 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				newAuctionNode.setProperty("current-bid-value", newAuction.getCurrentBidValue());
 				newAuctionNode.setProperty("min-amount-bid-value", newAuction.getMinAmountBidValue());
 				newAuctionNode.setProperty("max-amount-bid-value", newAuction.getMaxAmountBidValue());
+				
+				// TODO
+				//newAuctionNode.setPropert.setProperty("num-auction-bids-for-each-user-client", newAuction.getNumAuctionBidsForEachUserClient());
+				//newAuctionNode.setProperty("auction-bids-made", newAuction.getMaxAmountBidValue());
+				
 				newAuctionNode.setProperty("num-max-auctions-bids-allowed", newAuction.getNumMaxAuctionBidsAllowed());
 				newAuctionNode.setProperty("auction-timestamp-start", newAuction.getAuctionTimestampStart());
 				newAuctionNode.setProperty("auction-timestamp-limit", newAuction.getAuctionTimestampLimit());
@@ -1111,111 +1117,368 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 
 	@Override
-	public Response closeAuction(String openedAuctionID) throws SQLException {
+	public Response closeAuction(String openedAuctionID) throws SQLException, RepositoryException {
 
 		System.out.println("Preparing to close an Auction...");		
 
-		if(this.verifyExistenceOfAlreadyClosedAuction(openedAuctionID)) {
-			return Response.status(Status.CONFLICT).build();
+		switch(repositoryDatabaseStructure) {
+				
+			case 0:
+
+				if(this.verifyExistenceOfAlreadyClosedAuction(openedAuctionID)) {
+					return Response.status(Status.CONFLICT).build();
+				}
+
+
+				Auction auctionFromAllAuctions = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
+				
+				Auction auctionFromOpenedAuctions = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
+
+				if( !(auctionFromAllAuctions.getAuctionID().equals(auctionFromOpenedAuctions.getAuctionID())) ) {
+
+					System.err.println("Not a valid Opened Auction to be closed!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+
+				}
+
+				
+				Auction auctionToBeClosed = auctionFromAllAuctions;
+				
+				if( !( auctionToBeClosed.verifyIfAuctionIsOpen() ) ) {
+
+					System.err.println("The Auction should be opened, in order to be closed!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+
+				}
+				
+
+				this.openedProductsAuctionsRepositoryDao.delete(auctionToBeClosed);
+				System.out.println("Auction which will be closed deleted from all Opened Product Auctions!!!");
+
+
+				auctionToBeClosed.closeAuction();
+
+				this.allProductsAuctionsRepositoryDao.update(auctionToBeClosed);
+				System.out.println("Auction setted/updated as closed to all Product Auctions!!!");
+
+				this.closedProductsAuctionsRepositoryDao.create(auctionToBeClosed);
+				System.out.println("Closed Auction added to all Closed Product Auctions!!!");
+
+
+				return Response.status(Status.ACCEPTED).build();
+				
+				
+			case 1:
+				
+				Node auctionToBeClosedNode;
+				
+				Node openedAuctionToBeClosedNode;
+				
+				try {
+					auctionToBeClosedNode = this.allProductsAuctionsRootNode
+												.getNode(String.format("/%s", openedAuctionID));
+										
+				}
+				catch(PathNotFoundException pathNotFoundException) {
+					System.err.println(String.format
+							("Don't exist a Product Auction "
+									+ "with the ID [%s]!!!",
+									openedAuctionID));
+
+					return Response.status(Status.NOT_FOUND).build();
+				}
+			
+				try {
+					openedAuctionToBeClosedNode = this.openedProductsAuctionsRootNode
+													  .getNode(String.format("/%s", openedAuctionID));
+					
+				}
+				catch(PathNotFoundException pathNotFoundException) {
+					System.err.println(String.format
+							("Don't exist an Opened Product Auction "
+									+ "with the ID [%s]!!!",
+									openedAuctionID));
+
+					return Response.status(Status.NOT_FOUND).build();
+				}
+				
+			
+				if( !( auctionToBeClosedNode.equals(openedAuctionToBeClosedNode) ) ) {
+
+					System.err.println("Not a valid Opened Auction to be closed!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+
+				}
+				
+				
+				boolean isAuctionToBeClosedNodeOpened = 
+						auctionToBeClosedNode.getProperty("auction-is-open").getBoolean();
+			
+				if( !isAuctionToBeClosedNodeOpened ) {
+
+					System.err.println("The Auction should be opened, in order to be closed!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+
+				}
+				
+				
+				openedAuctionToBeClosedNode.remove();
+				System.out.println("Auction which will be closed deleted from all Opened Product Auctions!!!");
+				
+				
+				auctionToBeClosedNode.setProperty("auction-is-open", false);
+				System.out.println("Auction setted/updated as closed to all Product Auctions!!!");
+				
+				
+				Node newClosedAuctionNode = 
+						this.closedProductsAuctionsRootNode.addNode(String.format("/%s", openedAuctionID));
+				
+				newClosedAuctionNode.setProperty("auction-id", 
+									 auctionToBeClosedNode.getProperty("auction-id").getString());
+				newClosedAuctionNode.setProperty("auction-serial-number", 
+							  ((int) auctionToBeClosedNode.getProperty("auction-serial-number").getLong()));
+				newClosedAuctionNode.setProperty("auction-description", 
+									 auctionToBeClosedNode.getProperty("auction-description").getString());
+				newClosedAuctionNode.setProperty("auction-bid-type", 
+							 ((byte) auctionToBeClosedNode.getProperty("auction-bid-type").getLong()));
+				newClosedAuctionNode.setProperty("current-bid-value", 
+									 auctionToBeClosedNode.getProperty("current-bid-value").getDouble());
+				newClosedAuctionNode.setProperty("min-amount-bid-value", 
+									 auctionToBeClosedNode.getProperty("min-amount-bid-value").getDouble());
+				newClosedAuctionNode.setProperty("max-amount-bid-value", 
+									 auctionToBeClosedNode.getProperty("max-amount-bid-value").getDouble());
+				newClosedAuctionNode.setProperty("num-max-auctions-bids-allowed", 
+						      ((int) auctionToBeClosedNode.getProperty("num-max-auctions-bids-allowed").getLong()));
+				newClosedAuctionNode.setProperty("auction-timestamp-start", 
+						             auctionToBeClosedNode.getProperty("auction-timestamp-start").getLong());
+				newClosedAuctionNode.setProperty("auction-timestamp-limit", 
+						             auctionToBeClosedNode.getProperty("auction-timestamp-limit").getLong());
+				newClosedAuctionNode.setProperty("auction-is-open", 
+						             auctionToBeClosedNode.getProperty("auction-is-open").getBoolean());
+				newClosedAuctionNode.setProperty("product-id", 
+						      ((int) auctionToBeClosedNode.getProperty("product-id").getLong()));
+				newClosedAuctionNode.setProperty("product-name", 
+						             auctionToBeClosedNode.getProperty("product-name").getString());
+				newClosedAuctionNode.setProperty("product-owner-user-client-id", 
+						             auctionToBeClosedNode.getProperty("product-owner-user-client-id").getString());
+				
+				System.out.println("Closed Auction added to all Closed Product Auctions!!!");
+
+				this.allProductsAuctionsRepositorySession.save();
+				this.openedProductsAuctionsRepositorySession.save();
+				this.closedProductsAuctionsRepositorySession.save();
+				
+				return Response.status(Status.ACCEPTED).build();
+				
+				
+			default:
+
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+				
+				
 		}
-
-
-		Auction auctionFromAllAuctions = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
-		
-		Auction auctionFromOpenedAuctions = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
-
-		if( !(auctionFromAllAuctions.getAuctionID().equals(auctionFromOpenedAuctions.getAuctionID())) ) {
-
-			System.err.println("Not a valid Opened Auction to be closed!!!");
-
-			return Response.status(Status.BAD_REQUEST).build();
-
-		}
-
-		Auction auctionToBeClosed = auctionFromAllAuctions;
-
-
-		this.openedProductsAuctionsRepositoryDao.delete(auctionToBeClosed);
-		System.out.println("Auction which will be closed deleted from all Opened Product Auctions!!!");
-
-
-		auctionToBeClosed.closeAuction();
-
-
-		this.allProductsAuctionsRepositoryDao.update(auctionToBeClosed);
-		System.out.println("Auction setted/updated as closed to all Product Auctions!!!");
-
-		this.closedProductsAuctionsRepositoryDao.create(auctionToBeClosed);
-		System.out.println("Closed Auction added to all Closed Product Auctions!!!");
-
-
-		return Response.status(Status.ACCEPTED).build();
-
 	}
 
 	@Override
-	public Response addBidToOpenedProductAuction(String openedAuctionID, String bidForOpenedProductAuctionJSONString) throws SQLException {
+	public Response addBidToOpenedProductAuction(String openedAuctionID, String bidForOpenedProductAuctionJSONString) 
+		   throws SQLException, RepositoryException {
 
 		System.out.println("Preparing to add a Bid to a current Opened Product's Auction occurring, at this moment, from JSON Object...");
 
 		Bid newBid = this.gsonObject.fromJson(bidForOpenedProductAuctionJSONString, Bid.class);
 		
 		
-		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
+		Auction openedAuction;
+		
+		switch(repositoryDatabaseStructure) {
+		
+			case 0:
+				
+				List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
-		if( !this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions) ) {
+				if( !this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions) ) {
 
-			return Response.status(Status.NO_CONTENT).build();
+					return Response.status(Status.NO_CONTENT).build();
 
-		}
+				}
 
-		List<Auction> openedProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
+				List<Auction> openedProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
 
-		if( !this.verifyExistenceOfAnyOpenedProductsAuctions(openedProductsAuctions) ) {
+				if( !this.verifyExistenceOfAnyOpenedProductsAuctions(openedProductsAuctions) ) {
 
-			return Response.status(Status.NO_CONTENT).build();
+					return Response.status(Status.NO_CONTENT).build();
 
-		}
-
-
-		Auction auction = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
-
-		if( !this.verifyExistenceOfProductAuction(openedAuctionID, auction) ) {
-
-			return Response.status(Status.NOT_FOUND).build(); 
-
-		}
+				}
 
 
-		Auction openedAuction = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
+				Auction auction = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
 
-		if( !this.verifyExistenceOfOpenedProductAuction(openedAuctionID, openedAuction) ) {
+				if( !this.verifyExistenceOfProductAuction(openedAuctionID, auction) ) {
 
-			return Response.status(Status.NOT_FOUND).build(); 
+					return Response.status(Status.NOT_FOUND).build(); 
 
-		}
+				}
 
-		if( !auction.equals(openedAuction) ) {
 
-			System.err.println("Not a valid Opened Auction to receive Bids!!!");
+				openedAuction = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
+
+				if( !this.verifyExistenceOfOpenedProductAuction(openedAuctionID, openedAuction) ) {
+
+					return Response.status(Status.NOT_FOUND).build(); 
+
+				}
+
+				
+				if( !auction.equals(openedAuction) ) {
+
+					System.err.println("Not a valid Opened Auction to receive Bids!!!");
+					
+					return Response.status(Status.BAD_REQUEST).build(); 
+					
+				}
+				
+				
+				if( !auction.verifyIfAuctionIsOpen() ) {
+					
+					System.err.println("The Auction must be opened, in order to receive Bids!!!");
+					
+					return Response.status(Status.BAD_REQUEST).build(); 
+					
+				}
+				
+				
+				openedAuction.addAuctionBid(newBid);
+				
+				
+				this.allBidsRepositoryDao.create(newBid);
+
+
+				this.allProductsAuctionsRepositoryDao.update(openedAuction);
+
+				this.openedProductsAuctionsRepositoryDao.update(openedAuction);
+
+
+				return Response.status(Status.ACCEPTED).build();
+
+				
+				
+			case 1:
+				
+				Node auctionNode;
+				
+				Node openedAuctionNode;
+				
+				try {
+					
+					auctionNode = this.allProductsAuctionsRootNode
+									  .getNode(String.format("/%s", openedAuctionID));
+										
+				}
+				catch(PathNotFoundException pathNotFoundException) {
+					System.err.println(String.format
+							("Don't exist a Product Auction "
+									+ "with the ID [%s]!!!",
+									openedAuctionID));
+					
+					return Response.status(Status.NOT_FOUND).build();
+					
+				}
 			
-			return Response.status(Status.BAD_REQUEST).build(); 
+				try {
+					
+					openedAuctionNode = this.openedProductsAuctionsRootNode
+										    .getNode(String.format("/%s", openedAuctionID));
+					
+				}
+				catch(PathNotFoundException pathNotFoundException) {
+					System.err.println(String.format
+							("Don't exist an Opened Product Auction "
+									+ "with the ID [%s]!!!",
+									openedAuctionID));
+
+					return Response.status(Status.NOT_FOUND).build();
+					
+				}
+				
+				
+				if( !( auctionNode.equals(openedAuctionNode) ) ) {
+
+					System.err.println("Not a valid Opened Auction to receive Bids!!!");
+
+					return Response.status(Status.BAD_REQUEST).build();
+					
+				}
+				
+				
+				boolean isAuctionNodeOpened = 
+						auctionNode.getProperty("auction-is-open").getBoolean();
 			
-		}
+				if( !isAuctionNodeOpened ) {
+					
+					System.err.println("The Auction must be opened, in order to receive Bids!!!");
+					
+					return Response.status(Status.BAD_REQUEST).build();
+					
+				}
+				
+				
+				// TODO
+				/*openedAuction = new Auction(auctionNode.getProperty("auction-id").getString(),
+								    ( (int) auctionNode.getProperty("auction-serial-number").getLong() ),
+										    auctionNode.getProperty("auction-description").getString(),
+								   ( (byte) auctionNode.getProperty("auction-bid-type").getLong() ),
+										    auctionNode.getProperty("current-bid-value").getDouble(),
+										    auctionNode.getProperty("min-amount-bid-value").getDouble(),
+										    auctionNode.getProperty("max-amount-bid-value").getDouble(),
+										    
+										    // TODO
+											//newAuctionNode.setPropert.setProperty("num-auction-bids-for-each-user-client", newAuction.getNumAuctionBidsForEachUserClient());
+											//newAuctionNode.setProperty("auction-bids-made", newAuction.getMaxAmountBidValue());
+											
+									( (int) auctionNode.getProperty("num-max-auctions-bids-allowed").getLong() ),
+										    auctionNode.getProperty("auction-timestamp-start").getLong(),
+										    auctionNode.getProperty("auction-timestamp-limit").getLong(),
+										    auctionNode.getProperty("auction-is-open").getBoolean(),
+									( (int) auctionNode.getProperty("product-id").getLong() ),
+										    auctionNode.getProperty("product-name").getString(),
+										    auctionNode.getProperty("product-owner-user-client-id").getString());
+				*/
+				
+				Node bidNode = this.allBidsRootNode.addNode(String.format("/%s", newBid.getBidID()));
+				
+				bidNode.setProperty("bid-id", newBid.getBidID());
+				bidNode.setProperty("bidder-user-client-id", newBid.getBidderUserClientID());
+				bidNode.setProperty("bid-value", newBid.getBidValue());
+				bidNode.setProperty("bid-timestamp", newBid.getBidTimestamp());
+				
+			
+				
+				// TODO
+				//auctionNode.setProperty("", value);
+				
+				//this.allProductsAuctionsRepositoryJCR.update(openedAuction);
 
-		openedAuction.addAuctionBid(newBid);
-		
-		
-		this.allBidsRepositoryDao.create(newBid);
+				//this.openedProductsAuctionsRepositoryDao.update(openedAuction);
+				
+				
+				this.allProductsAuctionsRepositorySession.save();
+				this.openedProductsAuctionsRepositorySession.save();
+				this.allBidsRepositorySession.save();
+				
 
+				return Response.status(Status.ACCEPTED).build();
 
-		this.allProductsAuctionsRepositoryDao.update(openedAuction);
-
-		this.openedProductsAuctionsRepositoryDao.update(openedAuction);
-
-
-		return Response.status(Status.ACCEPTED).build();
-		
+				
+				
+			default:
+				
+				return Response.status(Status.NOT_IMPLEMENTED).build();
+				
+		}				
 	}
 
 	@Override

@@ -81,13 +81,16 @@ public interface AuctionRepositoryAPI {
 	@PUT
 	@Path("/close-auction/{auction-id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response closeAuction(@PathParam("auction-id") String openedAuctionID) throws SQLException;
+	public Response closeAuction(@PathParam("auction-id") String openedAuctionID)
+		   throws SQLException, RepositoryException;
 	
 	@POST
     @Path("/add-bid-to-opened-auction/{auction-id}")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-    public Response addBidToOpenedProductAuction(@PathParam("auction-id") String openedAuctionID, String bidForAuctionJSONString) throws SQLException;
+    public Response addBidToOpenedProductAuction
+    	 (@PathParam("auction-id") String openedAuctionID, String bidForAuctionJSONString)
+    	   throws SQLException, RepositoryException;
 	
 	@GET
 	@Path("/all")
