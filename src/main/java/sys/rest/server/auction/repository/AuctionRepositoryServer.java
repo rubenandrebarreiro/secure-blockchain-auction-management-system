@@ -2,6 +2,7 @@ package main.java.sys.rest.server.auction.repository;
 
 import java.io.File;
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -9,14 +10,23 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
+
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsParameters;
+import com.sun.net.httpserver.HttpsServer;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import com.google.gson.Gson;
+
+import com.google.gson.Gson;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -46,9 +56,11 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	private Dao<Bid, Long> closedBidsRepositoryDao; //TODO - ver como fechar a bid
 	
 	private Dao<User, String> allUsersRepositoryDao;
-
-
+	
+	
+	
 	public AuctionRepositoryServer() {
+		
 		this.gsonObject = new Gson();
 		
 		System.out.println("Created a JDBC Connection!!!");
@@ -57,21 +69,48 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws NoSuchAlgorithmException {
 
 		int port = 8080;
 		
-
+		String[] configurationCipherSuites = {"TLS_RSA_WITH_AES_256_CBC_SHA256"};
+        String[] configurationProtocols = {"TLSv1.2"};
+		
+		
 		//String secret = args[0];
-
-		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
+		
+		
+		URI baseUri = UriBuilder.fromUri("https://0.0.0.0/").port(port).build();
 
 		ResourceConfig config = new ResourceConfig();
 		config.register( new AuctionRepositoryServer() );
 
-		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
+		final SSLContext sslContext = SSLContext.getInstance("TLS");
+		
+		
+		HttpsServer auctionRepositoryHTTPSServer = (HttpsServer) JdkHttpServerFactory
+																 .createHttpServer(baseUri, config, sslContext );
+		
+		
+		auctionRepositoryHTTPSServer.setHttpsConfigurator(new HttpsConfigurator(sslContext) {
+		    
+			@Override
+		    public void configure(final HttpsParameters params) {
+				
+				final SSLContext sslContext = getSSLContext();
+				final SSLParameters sslparams = sslContext.getDefaultSSLParameters();
+				
+				params.setSSLParameters(sslparams);
+				
+				params.setProtocols(configurationProtocols);
+				params.setCipherSuites(configurationCipherSuites);
+		    }
+		});
+		
+	
 		System.out.println("Auction Repository Server ready @ " + baseUri);
+	
 	}
 	
 	private void createAuctionRepositoriesDao() {
