@@ -1,5 +1,6 @@
 package main.java.sys.rest.server.auction.repository;
 
+import java.io.File;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -46,7 +47,10 @@ import main.java.resources.user.User;
 
 public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
-	private static final byte REPOSITORY_DATABASE_STRUCTURE_TYPE = 1;
+	private static final byte JDBC = 0;
+	private static final byte JCR = 1;
+	
+	private static final byte REPOSITORY_DATABASE_STRUCTURE_TYPE = JCR;
 
 	private Gson gsonObject;
 
@@ -79,6 +83,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	private Node allUsersRootNode;
 
 	private Dao<User, String> allUsersRepositoryDao;
+	
+	private byte repositoryDatabaseStructure;
 
 
 	public AuctionRepositoryServer(byte repositoryType) throws LoginException, RepositoryException {
@@ -88,6 +94,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 			case 0:
 				
+				System.out.println("Created JDBC Connection");
 				this.createAuctionRepositoriesDao();
 				
 				break;
@@ -95,6 +102,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				
 			case 1:
 				
+				System.out.println("Created JCR Connection");
 				this.createAuctionRepositoriesJCR();
 				
 				break;
@@ -106,22 +114,24 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		
 				
 		}
+		repositoryDatabaseStructure = repositoryType;
 	}
 
 	public static void main(String[] args) throws LoginException, RepositoryException {
 
 		int port = 8080;
-
-		//if(args.length == 2) {
-		//	port = Integer.parseInt(args[0]);
-		//}
+		byte repositoryDatabaseStructure = REPOSITORY_DATABASE_STRUCTURE_TYPE;
+		
+		if(args.length == 1) {
+			repositoryDatabaseStructure = Byte.parseByte(args[0]);
+		}
 
 		//String secret = args[0];
 
 		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
 
 		ResourceConfig config = new ResourceConfig();
-		config.register( new AuctionRepositoryServer(REPOSITORY_DATABASE_STRUCTURE_TYPE) );
+		config.register( new AuctionRepositoryServer(repositoryDatabaseStructure) );
 
 		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
@@ -130,40 +140,62 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	private synchronized void createAuctionRepositoriesJCR() throws LoginException, RepositoryException {
 
-		this.allUsersRepositoryJCR = new TransientRepository();
+		this.allUsersRepositoryJCR = new TransientRepository(new File("res/jcr/allUsersRepositoryJCR"));
 
-		this.allProductsAuctionsRepositoryJCR = new TransientRepository();
+		this.allProductsAuctionsRepositoryJCR = new TransientRepository(new File("res/jcr/allProductsAuctionsRepositoryJCR"));
 
-		this.openedProductsAuctionsRepositoryJCR = new TransientRepository();
+		this.openedProductsAuctionsRepositoryJCR = new TransientRepository(new File("res/jcr/openedProductsAuctionsRepositoryJCR"));
 
-		this.closedProductsAuctionsRepositoryJCR = new TransientRepository();
+		this.closedProductsAuctionsRepositoryJCR = new TransientRepository(new File("res/jcr/closedProductsAuctionsRepositoryJCR"));
 
-		this.allBidsRepositoryJCR = new TransientRepository();
+		this.allBidsRepositoryJCR = new TransientRepository(new File("res/jcr/allBidsRepositoryJCR"));
 
 
+//		this.allUsersRepositorySession = 
+//				this.allUsersRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+//
+//		this.allProductsAuctionsRepositorySession = 
+//				this.allProductsAuctionsRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+//
+//		this.openedProductsAuctionsRepositorySession = 
+//				this.openedProductsAuctionsRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+//
+//		this.closedProductsAuctionsRepositorySession = 
+//				this.closedProductsAuctionsRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+//
+//		this.allBidsRepositorySession = 
+//				this.allBidsRepositoryJCR
+//				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+
+
+		// TODO Change credentials for repository
 		this.allUsersRepositorySession = 
 				this.allUsersRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
-
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
+		
 		this.allProductsAuctionsRepositorySession = 
 				this.allProductsAuctionsRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
 
 		this.openedProductsAuctionsRepositorySession = 
 				this.openedProductsAuctionsRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
 
 		this.closedProductsAuctionsRepositorySession = 
 				this.closedProductsAuctionsRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
 
 		this.allBidsRepositorySession = 
 				this.allBidsRepositoryJCR
-				.login( new SimpleCredentials( "eduardo-and-ruben-admins", "fctnova1920!".toCharArray() ) );
-
-
+				.login( new SimpleCredentials( "admin", "admin".toCharArray() ) );
+		
+		
 		this.allUsersRootNode = this.allUsersRepositorySession.getRootNode();
-
+		
 		this.allProductsAuctionsRootNode = this.allProductsAuctionsRepositorySession.getRootNode();
 
 		this.openedProductsAuctionsRootNode = this.openedProductsAuctionsRepositorySession.getRootNode();
@@ -186,6 +218,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	}
 
 	private void createAuctionRepositoriesDao() {
+		
+		new File("res/database").mkdirs();
 
 		String databaseAllUsersRepositoryURL = "jdbc:sqlite:res/database/all-users.db";
 
@@ -380,7 +414,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		try {
 
 			Node newAuctionNode = this.allProductsAuctionsRootNode
-									  .addNode(String.format("/%s", newAuctionID));
+					.addNode(newAuctionID);
 
 			this.addOpenedAuction(newAuction, newAuctionNode);
 
@@ -401,7 +435,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		try {
 
 			Node newOpenedAuctionNode = this.openedProductsAuctionsRootNode
-											.addNode(String.format("/%s", newAuctionID));
+					.addNode(newAuctionID);
 
 			this.addOpenedAuction(newAuction, newOpenedAuctionNode);
 
@@ -432,7 +466,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 			throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
 			       RepositoryException {
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
@@ -442,6 +476,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				this.openedProductsAuctionsRepositoryDao.create(newAuction);
 				System.out.println("New Auction added to all Opened Product Auctions!!!");
 	
+				break;
 	
 			case 1:
 	
@@ -615,7 +650,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 	
 			case 0:
 	
@@ -677,7 +712,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 			case 0:
 	
 				if(this.verifyExistenceOfAlreadyOpenedAuction(newAuctionID)) {
@@ -729,7 +764,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
@@ -783,7 +818,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
@@ -859,7 +894,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
@@ -917,7 +952,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 		
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 	
 			case 0:
 	
@@ -993,7 +1028,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 	
 			case 0:
 	
@@ -1051,7 +1086,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 
 			case 0:
 	
@@ -1086,7 +1121,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		System.out.println("Preparing to close an Auction...");		
 
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 				
 			case 0:
 
@@ -1099,7 +1134,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				
 				Auction auctionFromOpenedAuctions = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
 
-				if( !( auctionFromAllAuctions.equals(auctionFromOpenedAuctions) ) ) {
+				if( !(auctionFromAllAuctions.getAuctionID().equals(auctionFromOpenedAuctions.getAuctionID())) ) {
 
 					System.err.println("Not a valid Opened Auction to be closed!!!");
 
@@ -1124,7 +1159,6 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 
 				auctionToBeClosed.closeAuction();
-
 
 				this.allProductsAuctionsRepositoryDao.update(auctionToBeClosed);
 				System.out.println("Auction setted/updated as closed to all Product Auctions!!!");
@@ -1260,7 +1294,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		
 		Auction openedAuction;
 		
-		switch(REPOSITORY_DATABASE_STRUCTURE_TYPE) {
+		switch(repositoryDatabaseStructure) {
 		
 			case 0:
 				
