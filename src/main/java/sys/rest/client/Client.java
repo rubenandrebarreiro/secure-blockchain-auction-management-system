@@ -2,8 +2,6 @@ package main.java.sys.rest.client;
 
 import java.net.URI;
 
-import javax.jcr.LoginException;
-import javax.jcr.RepositoryException;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
@@ -14,7 +12,7 @@ import main.java.sys.rest.server.auction.repository.AuctionRepositoryServer;
 
 public class Client implements ClientAPI {
 
-	public static void main(String[] args) throws LoginException, RepositoryException {
+	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		int port = 8082;
 		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
