@@ -9,21 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import javax.jcr.ItemExistsException;
-import javax.jcr.LoginException;
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Repository;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
-import javax.jcr.ValueFormatException;
-import javax.jcr.lock.LockException;
-import javax.jcr.nodetype.ConstraintViolationException;
-import javax.jcr.version.VersionException;
-
-import org.apache.jackrabbit.core.TransientRepository;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -34,7 +19,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -64,7 +48,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	private Dao<User, String> allUsersRepositoryDao;
 
 
-	public AuctionRepositoryServer() throws LoginException, RepositoryException {
+	public AuctionRepositoryServer() {
 		this.gsonObject = new Gson();
 		
 		System.out.println("Created a JDBC Connection!!!");
@@ -73,7 +57,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		
 	}
 
-	public static void main(String[] args) throws LoginException, RepositoryException {
+	public static void main(String[] args) {
 
 		int port = 8080;
 		
@@ -300,9 +284,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		return true;
 	}
 
-	private void addOpenedAuction(Auction newAuction, Node newAuctionNode)
-			throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-			       RepositoryException {
+	private void addOpenedAuction(Auction newAuction) throws SQLException {
 
 		this.allProductsAuctionsRepositoryDao.create(newAuction);
 		System.out.println("New Auction added to all Product Auctions!!!");
@@ -433,9 +415,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	}
 
 	@Override
-	public Response openNormalAuction(String normalAuctionJSONString) 
-		   throws SQLException, PathNotFoundException, VersionException, ConstraintViolationException,
-			      LockException, RepositoryException {
+	public Response openNormalAuction(String normalAuctionJSONString) throws SQLException {
 
 		// TODO Could be a potentially less expensive operation 
 		// by checking if ID exists before creating auction from json 
@@ -457,7 +437,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction, null);
+		this.addOpenedAuction(newAuction);
 
 
 		return Response.status(Status.ACCEPTED).build();
@@ -465,9 +445,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	}
 
 	@Override
-	public Response openAuctionWithMinimumInitialBidValue(String auctionWithMinInitialBidValueJSONString)
-			throws SQLException, PathNotFoundException, VersionException, ConstraintViolationException,
-				   LockException, RepositoryException {
+	public Response openAuctionWithMinimumInitialBidValue(String auctionWithMinInitialBidValueJSONString) throws SQLException {
 
 		System.out.println("Preparing to create an Auction with Minimum Initial Bid Value from JSON Object...");
 
@@ -504,7 +482,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction, null);
+		this.addOpenedAuction(newAuction);
 
 
 		return Response.status(Status.ACCEPTED).build();
@@ -512,9 +490,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	}
 
 	@Override
-	public Response openAuctionWithMinimumAmountBidValue(String auctionWithMinAmountBidValueJSONString)
-		   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-				  RepositoryException {
+	public Response openAuctionWithMinimumAmountBidValue(String auctionWithMinAmountBidValueJSONString) throws SQLException {
 
 		System.out.println("Preparing to create an Auction with Minimum Amount Bid Value from JSON Object...");
 
@@ -542,7 +518,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 	
 
-		this.addOpenedAuction(newAuction, null);
+		this.addOpenedAuction(newAuction);
 
 
 		return Response.status(Status.ACCEPTED).build();
@@ -550,9 +526,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	}
 
 	@Override
-	public Response openAuctionWithMaximumAmountBidValue(String auctionWithMaxAmountBidValueJSONString)
-		   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-			      RepositoryException {
+	public Response openAuctionWithMaximumAmountBidValue(String auctionWithMaxAmountBidValueJSONString) throws SQLException {
 
 		System.out.println("Preparing to create an Auction with Minimum Amount Bid Value from JSON Object...");
 
@@ -580,7 +554,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction, null);
+		this.addOpenedAuction(newAuction);
 
 
 		return Response.status(Status.ACCEPTED).build();
@@ -589,9 +563,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	@Override
 	public Response openAuctionWithMinimumAndMaximumAmountBidValue
-		  (String auctionWithMinAndMaxAmountBidValueJSONString)
-		   throws SQLException, ValueFormatException, VersionException, LockException,
-		   		  ConstraintViolationException, RepositoryException {
+		  (String auctionWithMinAndMaxAmountBidValueJSONString) throws SQLException {
 
 		System.out.println("Preparing to create an Auction with Minimum and Maximum Amount Bid Value from JSON Object...");
 
@@ -640,7 +612,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction, null);
+		this.addOpenedAuction(newAuction);
 
 
 		return Response.status(Status.ACCEPTED).build();
@@ -649,9 +621,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	@Override
 	public Response openAuctionWithLimitedSetUserClientBidders
-	      (String auctionWithLimitedSetClientBiddersJSONString)
-		   throws SQLException, ValueFormatException, VersionException, LockException,
-		          ConstraintViolationException, RepositoryException {
+	      (String auctionWithLimitedSetClientBiddersJSONString) throws SQLException {
 
 		System.out.println("Preparing to create an Auction with Limited Set of User/Client Bidders from JSON Object...");
 
@@ -682,7 +652,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction, null);
+		this.addOpenedAuction(newAuction);
 
 
 		return Response.status(Status.ACCEPTED).build();
@@ -692,9 +662,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	@Override
 	public Response openAuctionWithLimitedNumberBidsForEachUserClientBidder
-		  (String auctionWithLimitedNumberBidsForEachUserClientBidderJSONString)
-		   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-		          RepositoryException {
+		  (String auctionWithLimitedNumberBidsForEachUserClientBidderJSONString) throws SQLException {
 
 		System.out.println("Preparing to create an Auction with Limited Number of Bids for each User/Client Bidder from JSON Object...");
 
@@ -744,7 +712,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction, null);
+		this.addOpenedAuction(newAuction);
 
 
 		return Response.status(Status.ACCEPTED).build();
@@ -753,8 +721,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	@Override
 	public Response openAuctionWithLimitedNumberOfBids(String auctionWithLimitedNumberBidsJSONString)
-		   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-		   		  RepositoryException {
+		   throws SQLException {
 
 		System.out.println("Preparing to create an Auction with Limited Number of Bids from JSON Object...");
 
@@ -792,7 +759,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		this.addOpenedAuction(newAuction, null);
+		this.addOpenedAuction(newAuction);
 
 
 		return Response.status(Status.ACCEPTED).build();
@@ -801,7 +768,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	
 	@Override
-	public Response closeAuction(String openedAuctionID) throws SQLException, RepositoryException {
+	public Response closeAuction(String openedAuctionID) throws SQLException {
 
 		System.out.println("Preparing to close an Auction...");		
 
@@ -853,7 +820,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	@Override
 	public Response addBidToOpenedProductAuction(String openedAuctionID, String bidForOpenedProductAuctionJSONString) 
-		   throws SQLException, RepositoryException {
+		   throws SQLException {
 
 		System.out.println("Preparing to add a Bid to a current Opened Product's Auction occurring, at this moment, from JSON Object...");
 
