@@ -36,7 +36,7 @@ public class AuctionServerTLSConfigurationReader {
 		System.out.println();
 		System.out.println();
 
-		System.out.println("Configured/Setted the following TLS Configurations...");
+		System.out.println("Configured/Setted the following TLS Configurations for the Auction Server...");
 
 		System.out.println();
 

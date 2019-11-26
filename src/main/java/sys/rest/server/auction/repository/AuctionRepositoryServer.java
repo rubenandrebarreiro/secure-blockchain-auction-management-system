@@ -1,6 +1,7 @@
 package main.java.sys.rest.server.auction.repository;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -38,9 +39,12 @@ import main.java.resources.auction.Auction;
 import main.java.resources.auction.utils.AuctionBidTypes;
 import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
+import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
 public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
+	private AuctionServerTLSConfigurationReader auctionServerTLSConfigurationReader;
+	
 	private Gson gsonObject;
 
 	private Dao<Auction, String> allProductsAuctionsRepositoryDao;
@@ -59,7 +63,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	
 	
 	
-	public AuctionRepositoryServer() {
+	public AuctionRepositoryServer() throws FileNotFoundException {
 		
 		this.gsonObject = new Gson();
 		
@@ -67,15 +71,13 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		
 		this.createAuctionRepositoriesDao();
 		
+		this.auctionServerTLSConfigurationReader = new AuctionServerTLSConfigurationReader();
+		
 	}
 
-	public static void main(String[] args) throws NoSuchAlgorithmException {
+	public static void main(String[] args) throws NoSuchAlgorithmException, FileNotFoundException {
 
 		int port = 8080;
-		
-		String[] configurationCipherSuites = {"TLS_RSA_WITH_AES_256_CBC_SHA256"};
-        String[] configurationProtocols = {"TLSv1.2"};
-		
 		
 		//String secret = args[0];
 		
@@ -83,7 +85,9 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		URI baseUri = UriBuilder.fromUri("https://0.0.0.0/").port(port).build();
 
 		ResourceConfig config = new ResourceConfig();
-		config.register( new AuctionRepositoryServer() );
+		
+		AuctionRepositoryServer auctionRepositoryServer = new AuctionRepositoryServer();
+		config.register( auctionRepositoryServer );
 
 
 		final SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -103,8 +107,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 				
 				params.setSSLParameters(sslparams);
 				
-				params.setProtocols(configurationProtocols);
-				params.setCipherSuites(configurationCipherSuites);
+				params.setProtocols(auctionRepositoryServer.getAvailableTLSVersions());
+				params.setCipherSuites(auctionRepositoryServer.getAvailableTLSCiphersuites());
 		    }
 		});
 		
@@ -112,6 +116,19 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		System.out.println("Auction Repository Server ready @ " + baseUri);
 	
 	}
+	
+	public String[] getAvailableTLSVersions() {
+		return this.auctionServerTLSConfigurationReader.getAvailableTLSVersions();
+	}
+	
+	public String[] getAvailableTLSCiphersuites() {
+		return this.auctionServerTLSConfigurationReader.getAvailableTLSCiphersuites();
+	}
+	
+	public String[] getAvailableTLSAuthenticationModes() {
+		return this.auctionServerTLSConfigurationReader.getAvailableTLSAuthenticationModes();
+	}
+	
 	
 	private void createAuctionRepositoriesDao() {
 		
