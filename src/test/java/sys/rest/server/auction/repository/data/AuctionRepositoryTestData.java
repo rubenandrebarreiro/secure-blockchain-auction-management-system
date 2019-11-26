@@ -93,7 +93,7 @@ public class AuctionRepositoryTestData {
 			+ "\"numMaxAuctionBidsAllowed\":10000000,"
 			+ "\"auctionTimestampStart\":1574554899900,"
 			+ "\"auctionTimestampLimit\":1579654899839,"
-			+ "\"auctionIsOpen\":false,"
+			+ "\"auctionIsOpen\":true,"
 			+ "\"productID\":10,"
 			+ "\"productName\":\"Space Rocket\","
 			+ "\"productOwnerUserClientID\":\"Elon Musk\"}";

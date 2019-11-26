@@ -288,6 +288,10 @@ public class TestAuctionJDBC {
     	.post("/open-normal-auction")
         .then()  	
         .statusCode(Status.ACCEPTED.getStatusCode());
+    	// Close this last auction
+    	put("/close-auction/auction0006")
+    	.then()
+        .statusCode(Status.ACCEPTED.getStatusCode());
     	
     	//Not a normal Bid
     	given()
@@ -323,6 +327,71 @@ public class TestAuctionJDBC {
     
     @Test
     @Order(14)
+    public void testGetAllOpenedAuctionsFromUser() {
+    	Auction testAuction1 = buildAuction(AuctionRepositoryTestData.auction0004);
+    	Auction testAuction2 = buildAuction(AuctionRepositoryTestData.auction0005);
+
+        get("/opened/by-product-owner-user/Elon Musk")
+        .then()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("auctionID[1]", equalTo(testAuction1.getAuctionID()))
+        .body("auctionSerialNumber[1]", equalTo(testAuction1.getAuctionSerialNumber()))
+        .body("auctionDescription[1]", equalTo(testAuction1.getAuctionDescription()))
+        .body("auctionBidType[1]", equalTo( (int) testAuction1.getAuctionBidType()))
+        .body("currentBidValue[1]", equalTo( (float) testAuction1.getCurrentBidValue()))
+        .body("minAmountBidValue[1]", equalTo( (float) testAuction1.getMinAmountBidValue()))
+        .body("maxAmountBidValue[1]", equalTo( (float) testAuction1.getMaxAmountBidValue()))
+        .body("numMaxAuctionBidsAllowed[1]", equalTo(testAuction1.getNumMaxAuctionBidsAllowed()))
+        .body("auctionTimestampStart[1]", equalTo(testAuction1.getAuctionTimestampStart()))
+        .body("auctionTimestampLimit[1]", equalTo(testAuction1.getAuctionTimestampLimit()))
+        .body("auctionIsOpen[1]", equalTo(testAuction1.verifyIfAuctionIsOpen()))
+        .body("productID[1]", equalTo(testAuction1.getProductID()))
+        .body("productName[1]", equalTo(testAuction1.getProductName()))
+        .body("productOwnerUserClientID[1]", equalTo(testAuction1.getProductOwnerUserClientID()))
+        .body("auctionID[0]", equalTo(testAuction2.getAuctionID()))
+        .body("auctionSerialNumber[0]", equalTo(testAuction2.getAuctionSerialNumber()))
+        .body("auctionDescription[0]", equalTo(testAuction2.getAuctionDescription()))
+        .body("auctionBidType[0]", equalTo( (int) testAuction2.getAuctionBidType()))
+        .body("currentBidValue[0]", equalTo( (float) testAuction2.getCurrentBidValue()))
+        .body("minAmountBidValue[0]", equalTo( (float) testAuction2.getMinAmountBidValue()))
+        .body("maxAmountBidValue[0]", equalTo( (float) testAuction2.getMaxAmountBidValue()))
+        .body("numMaxAuctionBidsAllowed[0]", equalTo(testAuction2.getNumMaxAuctionBidsAllowed()))
+        .body("auctionTimestampStart[0]", equalTo(testAuction2.getAuctionTimestampStart()))
+        .body("auctionTimestampLimit[0]", equalTo(testAuction2.getAuctionTimestampLimit()))
+        .body("auctionIsOpen[0]", equalTo(testAuction2.verifyIfAuctionIsOpen()))
+        .body("productID[0]", equalTo(testAuction2.getProductID()))
+        .body("productName[0]", equalTo(testAuction2.getProductName()))
+        .body("productOwnerUserClientID[0]", equalTo(testAuction2.getProductOwnerUserClientID()));
+
+
+    }
+    
+    @Test
+    @Order(15)
+    public void testGetAllClosedAuctionsFromUser() {
+    	Auction testAuction = buildAuction(AuctionRepositoryTestData.auction0006);
+        get("/closed/by-product-owner-user/Elon Musk")
+        .then()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("auctionID.size()", equalTo(1))
+        .body("auctionID[0]", equalTo(testAuction.getAuctionID()))
+        .body("auctionSerialNumber[0]", equalTo(testAuction.getAuctionSerialNumber()))
+        .body("auctionDescription[0]", equalTo(testAuction.getAuctionDescription()))
+        .body("auctionBidType[0]", equalTo( (int) testAuction.getAuctionBidType()))
+        .body("currentBidValue[0]", equalTo( (float) testAuction.getCurrentBidValue()))
+        .body("minAmountBidValue[0]", equalTo( (float) testAuction.getMinAmountBidValue()))
+        .body("maxAmountBidValue[0]", equalTo( (float) testAuction.getMaxAmountBidValue()))
+        .body("numMaxAuctionBidsAllowed[0]", equalTo(testAuction.getNumMaxAuctionBidsAllowed()))
+        .body("auctionTimestampStart[0]", equalTo(testAuction.getAuctionTimestampStart()))
+        .body("auctionTimestampLimit[0]", equalTo(testAuction.getAuctionTimestampLimit()))
+        .body("auctionIsOpen[0]", equalTo(!testAuction.verifyIfAuctionIsOpen()))
+        .body("productID[0]", equalTo(testAuction.getProductID()))
+        .body("productName[0]", equalTo(testAuction.getProductName()))
+        .body("productOwnerUserClientID[0]", equalTo(testAuction.getProductOwnerUserClientID()));
+    }
+    
     
     private Auction buildAuction(String json) {
     	return gson.fromJson(json, Auction.class);
