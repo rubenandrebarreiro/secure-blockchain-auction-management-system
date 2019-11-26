@@ -19,7 +19,7 @@ public class Client implements ClientAPI {
 		int port = 8082;
 		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
 		ResourceConfig config = new ResourceConfig();
-		config.register( new AuctionRepositoryServer((byte)1));
+		config.register( new AuctionRepositoryServer() );
 		
 		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
