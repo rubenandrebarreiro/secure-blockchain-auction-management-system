@@ -104,9 +104,9 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		String databaseAllBidsRepositoryURL = "jdbc:sqlite:res/database/all-bids.db";
 		
-		String databaseOpenedBidsRepositoryURL = "jdbc:sqlite:res/database/all-bids.db";
+		String databaseOpenedBidsRepositoryURL = "jdbc:sqlite:res/database/opened-bids.db";
 
-		String databaseClosedBidsRepositoryURL = "jdbc:sqlite:res/database/all-bids.db";
+		String databaseClosedBidsRepositoryURL = "jdbc:sqlite:res/database/closed-bids.db";
 
 
 		try {
