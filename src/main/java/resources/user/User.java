@@ -16,14 +16,19 @@ public class User {
 	private String userLastName;
 	@DatabaseField
 	private String userEmail;
+	@DatabaseField
+	private String userHomeAddress;
+	@DatabaseField
+	private String userBankNIB;
 	
 	public User() {
-		// TODO Auto-generated constructor stub
+		// Empty/Obsolete constructor
 	}
 	
 	public User(String userPeerID, String userPassword,
 			    String userFirstName, String userLastName,
-			    String userEmail) {
+			    String userEmail, String userHomeAddress,
+			    String userBankNIB) {
 		
 		this.userPeerID = userPeerID;
 		this.userPassword = userPassword;
@@ -32,7 +37,11 @@ public class User {
 		this.userLastName = userLastName;
 		
 		this.userEmail = userEmail;
+		
+		this.userHomeAddress = userHomeAddress;
+		this.userBankNIB = userBankNIB;
 	}
+	
 	
 	public String getUserPeerID() {
 		return this.userPeerID;
@@ -73,4 +82,21 @@ public class User {
 	public void setUserEmail(String userEmail) {
 		this.userEmail = userEmail;
 	}
+	
+	public String getUserHomeAddress() {
+		return this.userHomeAddress;
+	}
+	
+	public void setUserHomeAddress(String userHomeAddress) {
+		this.userHomeAddress = userHomeAddress;
+	}
+	
+	public String getUserBankNIB() {
+		return this.userBankNIB;
+	}
+	
+	public void setUserBankNIB(String userBankNIB) {
+		this.userBankNIB = userBankNIB;
+	}
+
 }
