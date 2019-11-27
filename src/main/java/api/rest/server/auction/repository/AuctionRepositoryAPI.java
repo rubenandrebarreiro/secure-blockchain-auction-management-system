@@ -2,12 +2,6 @@ package main.java.api.rest.server.auction.repository;
 
 import java.sql.SQLException;
 
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.jcr.ValueFormatException;
-import javax.jcr.lock.LockException;
-import javax.jcr.nodetype.ConstraintViolationException;
-import javax.jcr.version.VersionException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
@@ -19,70 +13,62 @@ public interface AuctionRepositoryAPI {
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public Response openNormalAuction(String normalAuctionJSONString)
-    	   throws SQLException, PathNotFoundException, VersionException, ConstraintViolationException,
-    	   		  LockException, RepositoryException;
+    	   throws SQLException;
 	
 	@POST
     @Path("/open-auction-min-initial-bid-value")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public Response openAuctionWithMinimumInitialBidValue(String auctionWithMinInitialBidValueJSONString)
-    	   throws SQLException, PathNotFoundException, VersionException, ConstraintViolationException,
-    	   		  LockException, RepositoryException;
+    	   throws SQLException;
 	
 	@POST
     @Path("/open-auction-min-amount-bid-value")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public Response openAuctionWithMinimumAmountBidValue(String auctionWithMinAmountBidValueJSONString)
-    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException, 
-    	   		  RepositoryException;
+    	   throws SQLException;
 	
 	@POST
     @Path("/open-auction-max-amount-bid-value")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public Response openAuctionWithMaximumAmountBidValue(String auctionWithMaxAmountBidValueJSONString)
-    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-    	          RepositoryException;
+    	   throws SQLException;
 	
 	@POST
     @Path("/open-auction-min-and-max-amount-bid-value")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public Response openAuctionWithMinimumAndMaximumAmountBidValue(String auctionWithMinAndMaxAmountBidValueJSONString)
-    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-    	          RepositoryException;
+    	   throws SQLException;
 	
 	@POST
     @Path("/open-auction-limited-set-user-client-bidders")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public Response openAuctionWithLimitedSetUserClientBidders(String auctionWithLimitedSetUserClientBiddersJSONString)
-    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-    	          RepositoryException;
+    	   throws SQLException;
 	
 	@POST
     @Path("/open-auction-limited-number-bids-for-each-user-client-bidder")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public Response openAuctionWithLimitedNumberBidsForEachUserClientBidder(String auctionWithLimitedNumberBidsForEachUserClientBidderJSONString)
-    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-    	          RepositoryException;
+    	   throws SQLException;
 	
 	@POST
     @Path("/open-auction-limited-number-bids")
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public Response openAuctionWithLimitedNumberOfBids(String auctionWithLimitedNumberBidsJSONString)
-    	   throws SQLException, ValueFormatException, VersionException, LockException, ConstraintViolationException,
-    	          RepositoryException;
+    	   throws SQLException;
 	
 	@PUT
 	@Path("/close-auction/{auction-id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response closeAuction(@PathParam("auction-id") String openedAuctionID)
-		   throws SQLException, RepositoryException;
+		   throws SQLException;
 	
 	@POST
     @Path("/add-bid-to-opened-auction/{auction-id}")
@@ -90,7 +76,7 @@ public interface AuctionRepositoryAPI {
 	@Produces(MediaType.APPLICATION_JSON)
     public Response addBidToOpenedProductAuction
     	 (@PathParam("auction-id") String openedAuctionID, String bidForAuctionJSONString)
-    	   throws SQLException, RepositoryException;
+    	   throws SQLException;
 	
 	@GET
 	@Path("/all")

@@ -2,8 +2,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>simple-secure-blockchain-auctoin-managment-system</groupId>
-	<artifactId>simple-secure-blockchain-auctoin-managment-system</artifactId>
+	<groupId>secure-blockchain-auction-management-system</groupId>
+	<artifactId>secure-blockchain-auction-management-system</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,24 +19,24 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M4</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.junit.jupiter</groupId>
+						<artifactId>junit-jupiter-engine</artifactId>
+						<version>5.6.0-M1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>javax.jcr</groupId>
-			<artifactId>jcr</artifactId>
-			<version>2.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>javax.persistence-api</artifactId>
 			<version>2.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jackrabbit</groupId>
-			<artifactId>jackrabbit-core</artifactId>
-			<version>2.19.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -47,6 +47,12 @@
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-common</artifactId>
 			<version>2.29.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.net.httpserver</groupId>
+			<artifactId>http</artifactId>
+			<version>20070405</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
