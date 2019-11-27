@@ -125,7 +125,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		    KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance
 		    									 (auctionRepositoryServer.getKeyManagerFactoryInstance());
 	        
-		    
+		    char[] ctPass = "something".toCharArray(); // TODO - change/verify this
 		    keyManagerFactory.init(keyStore, ctPass);
 	        
 			SSLContext sslContext = SSLContext.getInstance
