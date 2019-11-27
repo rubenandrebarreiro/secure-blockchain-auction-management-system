@@ -1,7 +1,6 @@
 package main.java.sys.rest.server.auction;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.HashMap;
 
@@ -31,7 +30,7 @@ public class AuctionServer implements AuctionServerAPI{
 
 	private int currentAuctionID;
 	private int currentSerialNumber;
-	
+
 	private Gson gson;
 	private final CloseableHttpClient httpClient;
 
@@ -45,26 +44,26 @@ public class AuctionServer implements AuctionServerAPI{
 
 		System.out.println("Auction Server ready @ " + baseUri);
 	}
-	
+
 	public AuctionServer() {
-		
+
 		currentAuctionID = 0;
 		currentSerialNumber = 0;
-		
+
 		gson = new Gson();
 		httpClient = HttpClients.createDefault();
 	}
 
 	@Override
 	public void createAuction(String clientAuctionInformation) throws ClientProtocolException, IOException {
-		System.out.println("[" + this.getClass().getCanonicalName() + "]" +
-							"Received request to create a new Auction!");
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to create a new Auction!");
 		String result;
 
 		UserAuctionInfo userAuctionInfo = gson.fromJson(clientAuctionInformation, UserAuctionInfo.class);
 		User user = userAuctionInfo.getUser();
 		String auctionDescription = userAuctionInfo.getDescription();
-		
+
 		HttpPost post = new HttpPost(AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-normal-auction");
 		// TODO Change some values
 		Auction newAuction = new Auction(
@@ -75,18 +74,22 @@ public class AuctionServer implements AuctionServerAPI{
 				1,
 				"ProductNameTest", 
 				user.getUserFirstName() + " " + user.getUserLastName());
-		
+
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Created auction:\n" + 
+				newAuction);	
+
 		String serializedNewAuction = gson.toJson(newAuction);
 		post.setEntity(new StringEntity(serializedNewAuction));
 
 		CloseableHttpResponse response = null;
 		response = httpClient.execute(post);
-		
+
 		result = EntityUtils.toString(response.getEntity());
 
 		System.out.println(result);
 	}
-	
-	
-	
+
+
+
 }

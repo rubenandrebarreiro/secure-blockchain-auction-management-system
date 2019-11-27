@@ -10,12 +10,10 @@ import java.util.HashMap;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.http.ParseException;
-import org.apache.http.client.methods.*;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Dsl;
+import org.asynchttpclient.ListenableFuture;
+import org.asynchttpclient.Response;
 import org.bouncycastle.util.encoders.Hex;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -34,16 +32,16 @@ public class Client implements ClientAPI {
 	private static final String CREATE_AUCTION = "create";
 	private static final String HELP = "help";
 	private static final String EXIT = "exit";
-	
+
 	private static final String HASH_ALGORITHM = "SHA-256";
-	
+
 	private static final String AUCTION_SERVER_ADDRESS = "http://localhost:8081/auction-server";
 	private static final String USER_DATABASE_JDBC_PATH = "jdbc:sqlite:res/database/client/users.db";
 
 	private User currentUser;
 
 	private Gson gson;
-	private final CloseableHttpClient httpClient;
+	private AsyncHttpClient httpClient;
 	private Dao<User, String> userDao;
 
 	private BufferedReader br;
@@ -73,21 +71,21 @@ public class Client implements ClientAPI {
 			e1.printStackTrace();
 		}
 
-		httpClient = HttpClients.createDefault();
+		httpClient = Dsl.asyncHttpClient();
 
 		br = new BufferedReader(new InputStreamReader(System.in));
 		String line = null;
 
 		currentUser = login();
-		
+
 		try {
 			while((line = br.readLine()) != null)
 			{
-				
+
 				if(currentUser == null) {
 					currentUser = login();
 				}
-				
+
 				switch (line) {
 				case CREATE_AUCTION:
 					createAuction();
@@ -112,25 +110,28 @@ public class Client implements ClientAPI {
 		}
 	}
 
-	private void createAuction() {
-		HttpPost post = new HttpPost(AUCTION_SERVER_ADDRESS + "/open-normal-auction");
+	private void createAuction() throws IOException {
 		String result = null;
 
+		System.out.println("Enter product description: ");
+		UserAuctionInfo userAuctionInfo = new UserAuctionInfo(currentUser, br.readLine());
+		String postData = gson.toJson(userAuctionInfo);
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.preparePost(AUCTION_SERVER_ADDRESS + "/open-normal-auction")
+				.setBody(postData)
+				.execute();
+
+		Response r = null;
 		try {
-			System.out.println("Enter product description: ");
-			UserAuctionInfo userAuctionInfo = new UserAuctionInfo(currentUser, br.readLine());
-			String postData = gson.toJson(userAuctionInfo);
-			
-			post.setEntity(new StringEntity(postData));
-
-			CloseableHttpResponse response = null;
-			response = httpClient.execute(post);
-
-			result = EntityUtils.toString(response.getEntity());
-		} catch (ParseException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
 		}
+
+		result = r.getResponseBody();
 
 		System.out.println(result);
 	}
@@ -142,7 +143,7 @@ public class Client implements ClientAPI {
 			String id = br.readLine();
 			System.out.print("Enter user " + id + " password: ");
 			String password = br.readLine();
-			
+
 			MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
 			digest.update(password.getBytes());
 			byte[] digestData = digest.digest();
@@ -161,12 +162,12 @@ public class Client implements ClientAPI {
 
 		return result;
 	}
-	
+
 	private void helpScreen() {
 		System.out.println("HELP SCREEN");
 		System.out.println(CREATE_AUCTION);
 		System.out.println(HELP);
 		System.out.println(EXIT);
 	}
-	
+
 }
