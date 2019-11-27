@@ -8,6 +8,10 @@ import java.util.Scanner;
 
 public class AuctionServerTLSConfigurationReader {
 
+	private static final String SSL_CONTEXT_INSTANCE_START = "<SSL_CONTEXT_INSTANCE>";
+
+	private static final String SSL_CONTEXT_INSTANCE_END = "</SSL_CONTEXT_INSTANCE>";
+	
 	private static final String TLS_VERSION_SEPARATOR_START = "<TLS_ENABLED_VERSION>";
 
 	private static final String TLS_VERSION_SEPARATOR_END = "</TLS_ENABLED_VERSION>";
@@ -21,6 +25,8 @@ public class AuctionServerTLSConfigurationReader {
 	private static final String AUTH_MODE_END = "</TLS_ENABLED_AUTH_MODE>";
 
 
+	private String sslContextInstance;
+	
 	private String[] availableTLSVersions;
 
 	private String[] availableTLSCiphersuites;
@@ -29,7 +35,8 @@ public class AuctionServerTLSConfigurationReader {
 
 	
 	
-	public AuctionServerTLSConfigurationReader() throws FileNotFoundException {
+	public AuctionServerTLSConfigurationReader(String tlsConfigurationsFilePath) 
+		   throws FileNotFoundException {
 
 		this.readTLSConfigurations();
 
@@ -88,11 +95,39 @@ public class AuctionServerTLSConfigurationReader {
 		System.out.println();
 
 		Scanner auctionServerTLSConfigurationFileReader = new Scanner(auctionServerTLSConfigurationFile);
-
+		
 		while( auctionServerTLSConfigurationFileReader.hasNextLine() ) {
 
 			String nextLine = auctionServerTLSConfigurationFileReader.nextLine();
 
+			if(nextLine.equalsIgnoreCase(SSL_CONTEXT_INSTANCE_START)) {
+
+				System.out.println
+				(String.format("Reading the Available Configurations for "
+						+ "the SSL Context Instance for the Auction Server..."));
+
+				System.out.println();
+				
+				nextLine = auctionServerTLSConfigurationFileReader.nextLine();
+
+				while(auctionServerTLSConfigurationFileReader.hasNextLine() && 
+						!nextLine.equalsIgnoreCase(SSL_CONTEXT_INSTANCE_END)) {
+
+					nextLine = nextLine.trim();
+
+					System.out.println(String.format("- Reading a new SSL Context Instance: %s!!!", nextLine));
+					
+					this.sslContextInstance = nextLine;
+
+					nextLine = auctionServerTLSConfigurationFileReader.nextLine();
+
+				}
+			
+				System.out.println();
+				System.out.println();
+
+			}
+			
 			if(nextLine.equalsIgnoreCase(TLS_VERSION_SEPARATOR_START)) {
 
 				System.out.println
@@ -192,17 +227,37 @@ public class AuctionServerTLSConfigurationReader {
 
 	}
 
+	
+	public String getSSLContextInstance() {
+		return sslContextInstance;
+	}
 
+	public void setSSLContextInstance(String sslContextInstance) {
+		this.sslContextInstance = sslContextInstance;
+	}
+	
 	public String[] getAvailableTLSVersions() {
-		return this.availableTLSVersions;
+		return availableTLSVersions;
+	}
+
+	public void setAvailableTLSVersions(String[] availableTLSVersions) {
+		this.availableTLSVersions = availableTLSVersions;
 	}
 
 	public String[] getAvailableTLSCiphersuites() {
-		return this.availableTLSCiphersuites;
+		return availableTLSCiphersuites;
+	}
+
+	public void setAvailableTLSCiphersuites(String[] availableTLSCiphersuites) {
+		this.availableTLSCiphersuites = availableTLSCiphersuites;
 	}
 
 	public String[] getAvailableTLSAuthenticationModes() {
-		return this.availableTLSAuthenticationModes;
+		return availableTLSAuthenticationModes;
 	}
 
+	public void setAvailableTLSAuthenticationModes(String[] availableTLSAuthenticationModes) {
+		this.availableTLSAuthenticationModes = availableTLSAuthenticationModes;
+	}
+	
 }
