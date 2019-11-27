@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.HashMap;
 
@@ -28,6 +27,7 @@ import com.j256.ormlite.support.ConnectionSource;
 
 import main.java.api.rest.client.ClientAPI;
 import main.java.resources.user.User;
+import main.java.resources.user.UserAuctionInfo;
 
 public class Client implements ClientAPI {
 
@@ -36,6 +36,9 @@ public class Client implements ClientAPI {
 	private static final String EXIT = "exit";
 	
 	private static final String HASH_ALGORITHM = "SHA-256";
+	
+	private static final String AUCTION_SERVER_ADDRESS = "http://localhost:8081/auction-server";
+	private static final String USER_DATABASE_JDBC_PATH = "jdbc:sqlite:res/database/client/users.db";
 
 	private User currentUser;
 
@@ -43,6 +46,7 @@ public class Client implements ClientAPI {
 	private final CloseableHttpClient httpClient;
 	private Dao<User, String> userDao;
 
+	private BufferedReader br;
 
 	public static void main(String[] args) {
 		int port = 8082;
@@ -55,10 +59,9 @@ public class Client implements ClientAPI {
 		System.out.println("Client ready @ " + baseUri);
 	}
 
-	@SuppressWarnings("null")
 	public Client() {
 
-		String userRepository = "jdbc:sqlite:res/database/client/users.db";
+		String userRepository = USER_DATABASE_JDBC_PATH;
 		gson = new Gson();
 
 		ConnectionSource connectionSource;
@@ -72,15 +75,17 @@ public class Client implements ClientAPI {
 
 		httpClient = HttpClients.createDefault();
 
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		br = new BufferedReader(new InputStreamReader(System.in));
 		String line = null;
 
+		currentUser = login();
+		
 		try {
 			while((line = br.readLine()) != null)
 			{
 				
 				if(currentUser == null) {
-					currentUser = login(br.readLine(), br.readLine());
+					currentUser = login();
 				}
 				
 				switch (line) {
@@ -89,10 +94,7 @@ public class Client implements ClientAPI {
 					break;
 
 				case HELP:
-					System.out.println("HELP SCREEN");
-					System.out.println(CREATE_AUCTION);
-					System.out.println(HELP);
-					System.out.println(EXIT);
+					helpScreen();
 					break;
 
 				case EXIT:
@@ -100,10 +102,7 @@ public class Client implements ClientAPI {
 					break;
 
 				default:
-					System.out.println("HELP SCREEN");
-					System.out.println(CREATE_AUCTION);
-					System.out.println(HELP);
-					System.out.println(EXIT);
+					helpScreen();
 					break;
 				}
 			}
@@ -114,12 +113,15 @@ public class Client implements ClientAPI {
 	}
 
 	private void createAuction() {
-		HttpPost post = new HttpPost("http://localhost:8080/open-normal-auction");
-		String currentUserAsJson = gson.toJson(currentUser);
+		HttpPost post = new HttpPost(AUCTION_SERVER_ADDRESS + "/open-normal-auction");
 		String result = null;
 
 		try {
-			post.setEntity(new StringEntity(currentUserAsJson));
+			System.out.println("Enter product description: ");
+			UserAuctionInfo userAuctionInfo = new UserAuctionInfo(currentUser, br.readLine());
+			String postData = gson.toJson(userAuctionInfo);
+			
+			post.setEntity(new StringEntity(postData));
 
 			CloseableHttpResponse response = null;
 			response = httpClient.execute(post);
@@ -133,10 +135,14 @@ public class Client implements ClientAPI {
 		System.out.println(result);
 	}
 
-	private User login(String id, String password) {
+	private User login() {
 		User result = null;
-
 		try {
+			System.out.print("Enter user identifiction: ");
+			String id = br.readLine();
+			System.out.print("Enter user " + id + " password: ");
+			String password = br.readLine();
+			
 			MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
 			digest.update(password.getBytes());
 			byte[] digestData = digest.digest();
@@ -155,4 +161,12 @@ public class Client implements ClientAPI {
 
 		return result;
 	}
+	
+	private void helpScreen() {
+		System.out.println("HELP SCREEN");
+		System.out.println(CREATE_AUCTION);
+		System.out.println(HELP);
+		System.out.println(EXIT);
+	}
+	
 }
