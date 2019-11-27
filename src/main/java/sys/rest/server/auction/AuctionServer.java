@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.http.client.ClientProtocolException;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.asynchttpclient.ListenableFuture;
-import org.asynchttpclient.Response;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -53,11 +53,10 @@ public class AuctionServer implements AuctionServerAPI{
 	}
 
 	@Override
-	public void createAuction(String clientAuctionInformation) throws ClientProtocolException, IOException {
+	public Response createAuction(String clientAuctionInformation) throws ClientProtocolException, IOException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to create a new Auction!");
-		String result;
-
+		
 		UserAuctionInfo userAuctionInfo = gson.fromJson(clientAuctionInformation, UserAuctionInfo.class);
 		User user = userAuctionInfo.getUser();
 		String auctionDescription = userAuctionInfo.getDescription();
@@ -79,13 +78,13 @@ public class AuctionServer implements AuctionServerAPI{
 
 		String serializedNewAuction = gson.toJson(newAuction);
 
-		ListenableFuture<Response> future;
+		ListenableFuture<org.asynchttpclient.Response> future;
 
 		future = httpClient.preparePost(AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-normal-auction")
 				.setBody(serializedNewAuction)
 				.execute();
 
-		Response r = null;
+		org.asynchttpclient.Response r = null;
 		try {
 			r = future.get();
 		} catch (Exception e) {
@@ -93,9 +92,10 @@ public class AuctionServer implements AuctionServerAPI{
 					"Error getting response!");
 		}
 
-		result = r.getResponseBody();
-
-		System.out.println(result);
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + r.getStatusText());
+		
+		return Response.status(r.getStatusCode()).build();
 	}
 
 

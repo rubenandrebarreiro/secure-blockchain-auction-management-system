@@ -131,7 +131,7 @@ public class Client implements ClientAPI {
 					"Error getting response!");
 		}
 
-		result = r.getResponseBody();
+		result = r.getStatusText();
 
 		System.out.println(result);
 	}

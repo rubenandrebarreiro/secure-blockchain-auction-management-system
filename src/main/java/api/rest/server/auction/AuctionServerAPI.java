@@ -16,7 +16,7 @@ public interface AuctionServerAPI {
 	@POST
 	@Path("/open-normal-auction")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void createAuction(String clientAuctionInformation) throws UnsupportedEncodingException, ClientProtocolException, IOException;
+	public Response createAuction(String clientAuctionInformation) throws UnsupportedEncodingException, ClientProtocolException, IOException;
 	
 	
 }
