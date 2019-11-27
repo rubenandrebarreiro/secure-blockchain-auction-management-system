@@ -3,3 +3,8 @@
 res/
 
 .settings/
+
+**\*.exe
+**\*.dll
+**\*.jks
+**\*.db
