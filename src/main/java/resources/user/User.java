@@ -19,7 +19,7 @@ public class User {
 	@DatabaseField
 	private String userHomeAddress;
 	@DatabaseField
-	private String userBankNIB;
+	private String userBankAccountNIB;
 	
 	public User() {
 		// Empty/Obsolete constructor
@@ -28,7 +28,7 @@ public class User {
 	public User(String userPeerID, String userPassword,
 			    String userFirstName, String userLastName,
 			    String userEmail, String userHomeAddress,
-			    String userBankNIB) {
+			    String userBankAccountNIB) {
 		
 		this.userPeerID = userPeerID;
 		this.userPassword = userPassword;
@@ -39,7 +39,7 @@ public class User {
 		this.userEmail = userEmail;
 		
 		this.userHomeAddress = userHomeAddress;
-		this.userBankNIB = userBankNIB;
+		this.userBankAccountNIB = userBankAccountNIB;
 	}
 	
 	
@@ -91,12 +91,12 @@ public class User {
 		this.userHomeAddress = userHomeAddress;
 	}
 	
-	public String getUserBankNIB() {
-		return this.userBankNIB;
+	public String getUserBankAccountNIB() {
+		return this.userBankAccountNIB;
 	}
 	
-	public void setUserBankNIB(String userBankNIB) {
-		this.userBankNIB = userBankNIB;
+	public void setUserBankNIB(String userBankAccountNIB) {
+		this.userBankAccountNIB = userBankAccountNIB;
 	}
 
 }
