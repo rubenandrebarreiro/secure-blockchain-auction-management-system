@@ -30,8 +30,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import com.google.gson.Gson;
 
-import com.google.gson.Gson;
-
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
