@@ -43,11 +43,15 @@ import main.java.resources.auction.Auction;
 import main.java.resources.auction.utils.AuctionBidTypes;
 import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
+import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
 public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 	private AuctionServerTLSConfigurationReader auctionServerTLSConfigurationReader;
+	
+	private AuctionServerKeyStoreConfigurationReader auctionServerKeyStoreConfigurationReader;
+	
 	
 	private Gson gsonObject;
 
@@ -67,7 +71,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	
 	
 	
-	public AuctionRepositoryServer() throws FileNotFoundException {
+	public AuctionRepositoryServer(String tlsConfigurationsFilePath, String keyStoreConfigurationsFilePath)
+		   throws FileNotFoundException {
 		
 		this.gsonObject = new Gson();
 		
@@ -75,34 +80,60 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		
 		this.createAuctionRepositoriesDao();
 		
-		this.auctionServerTLSConfigurationReader = new AuctionServerTLSConfigurationReader();
+		this.auctionServerTLSConfigurationReader = new AuctionServerTLSConfigurationReader
+				                                      (tlsConfigurationsFilePath);
+		
+		this.auctionServerKeyStoreConfigurationReader = new AuctionServerKeyStoreConfigurationReader
+				                                           (keyStoreConfigurationsFilePath);
 		
 	}
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, FileNotFoundException {
 
-		String ksName = args[0];    // serverkeystore
-		char[] ksPass = args[1].toCharArray();   // password da keystore
-		char[] ctPass = args[2].toCharArray();  // password entry
-		int port= Integer.parseInt(args[3]);
+		if(args.length != 3) {
+			
+			System.err.println
+				(String.format
+						("Usage: java AuctionRepositoryServer <port> "
+					   + "<tls-configurations-file-path> <key-store-configurations-file-path>")
+				);
+			
+			System.exit(1);
+		}
+		
+		int port = Integer.parseInt(args[0]);
+		
+		String tlsConfigurationsFilePath = args[1];
+		String keyStoreConfigurationsFilePath = args[2];
+	
 		
 		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
 
 		ResourceConfig config = new ResourceConfig();
 		
-		AuctionRepositoryServer auctionRepositoryServer = new AuctionRepositoryServer();
+		AuctionRepositoryServer auctionRepositoryServer = new AuctionRepositoryServer
+															 (tlsConfigurationsFilePath,
+															  keyStoreConfigurationsFilePath);
+		
 		config.register( auctionRepositoryServer );
 		
 		try {
 			
-			KeyStore ks = KeyStore.getInstance("JKS");
-		    ks.load(new FileInputStream(ksName), ksPass);
+			KeyStore keyStore = KeyStore.getInstance(auctionRepositoryServer.getKeyStoreInstance());
+		    keyStore.load(new FileInputStream
+		    		   (auctionRepositoryServer.getKeyStoreFileLocationPath()), 
+		    		    auctionRepositoryServer.getKeyStorePassword().toCharArray());
 	        
-		    KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-	        kmf.init(ks, ctPass);
+		    KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance
+		    									 (auctionRepositoryServer.getKeyManagerFactoryInstance());
 	        
-			SSLContext sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(kmf.getKeyManagers(), null, null);
+		    
+		    keyManagerFactory.init(keyStore, ctPass);
+	        
+			SSLContext sslContext = SSLContext.getInstance
+								   (auctionRepositoryServer.getAvailableSSLContextInstance());
+			
+			sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
 			
 			
 			HttpServer auctionRepositoryHTTPSServer = JdkHttpServerFactory.createHttpServer(baseUri, config, sslContext);
@@ -131,6 +162,10 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 	}
 	
+	public String getAvailableSSLContextInstance() {
+		return this.auctionServerTLSConfigurationReader.getSSLContextInstance();
+	}
+	
 	public String[] getAvailableTLSVersions() {
 		return this.auctionServerTLSConfigurationReader.getAvailableTLSVersions();
 	}
@@ -143,6 +178,21 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		return this.auctionServerTLSConfigurationReader.getAvailableTLSAuthenticationModes();
 	}
 	
+	public String getKeyStoreFileLocationPath() {
+		return this.auctionServerKeyStoreConfigurationReader.getKeyStoreFileLocationPath();
+	}
+
+	public String getKeyStorePassword() {
+		return this.auctionServerKeyStoreConfigurationReader.getKeyStorePassword();
+	}
+	
+	public String getKeyStoreInstance() {
+		return this.auctionServerKeyStoreConfigurationReader.getKeyStoreInstance();
+	}
+
+	public String getKeyManagerFactoryInstance() {
+		return this.auctionServerKeyStoreConfigurationReader.getKeyManagerFactoryInstance();
+	}
 	
 	private void createAuctionRepositoriesDao() {
 		
