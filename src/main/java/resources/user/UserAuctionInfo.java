@@ -1,23 +1,21 @@
 package main.java.resources.user;
 
-import main.java.sys.rest.client.Client;
-
 public class UserAuctionInfo {
 
-	private Client client;
+	private User user;
 	private String description;
 	
-	public UserAuctionInfo(Client client, String description) {
-		this.client = client;
+	public UserAuctionInfo(User currentUser, String description) {
+		this.user = currentUser;
 		this.description = description;
 	}
 	
-	public Client getClient() {
-		return client;
+	public User getUser() {
+		return user;
 	}
 	
-	public void setClient(Client client) {
-		this.client = client;
+	public void setUser(User client) {
+		this.user = client;
 	}
 	
 	public String getDescription() {
