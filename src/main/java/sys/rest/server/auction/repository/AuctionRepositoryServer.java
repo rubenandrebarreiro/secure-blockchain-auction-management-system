@@ -82,8 +82,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	public static void main(String[] args) throws NoSuchAlgorithmException, FileNotFoundException {
 
 		String ksName = args[0];    // serverkeystore
-		char[]  ksPass = args[1].toCharArray();   // password da keystore
-		char[]  ctPass = args[2].toCharArray();  // password entry
+		char[] ksPass = args[1].toCharArray();   // password da keystore
+		char[] ctPass = args[2].toCharArray();  // password entry
 		int port= Integer.parseInt(args[3]);
 		
 		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
