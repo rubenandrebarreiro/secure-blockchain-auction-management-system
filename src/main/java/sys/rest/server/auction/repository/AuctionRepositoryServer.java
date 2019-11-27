@@ -94,6 +94,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		config.register( auctionRepositoryServer );
 		
 		try {
+			
 			KeyStore ks = KeyStore.getInstance("JKS");
 		    ks.load(new FileInputStream(ksName), ksPass);
 	        
