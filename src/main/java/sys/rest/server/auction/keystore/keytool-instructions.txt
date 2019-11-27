@@ -1,0 +1,95 @@
+A) Available CLIENTS/USERS of the System:
+    1. Eduardo Silva
+    2. Henrique Joao
+    3. Joao Leite
+    4. Ludwig Kripphal
+    5. Luis Caires
+    6. Matthias Knorr
+    7. Ruben Barreiro
+    8. Ruy Costa
+
+
+
+B) PASSWORDS and their HASH CODES in SHA-256 for the Available Clients/Users of the System
+   (Only the Hash Code of the Passwords in SHA-256 will be kept in the Database for the Clients/Users):
+
+    1. eduardo1920 (Hash Code in SHA-256: 43ad624532bf40eef30f3980e07125325d8c580590859e909e7e95cb6ef22dac)
+    2. henrique1920 (Hash Code in SHA-256: 5e5d6817006bb721feb006e7a43ac154b013e3c50ea094a44b18b3654aa1b307)
+    3. joao1920 (Hash Code in SHA-256: 1a3e1e0002281e6ce5eb23bbee8ebb90710f1b948e14bdac3f86070c4809af7e)
+    4. ludwig1920 (Hash Code in SHA-256: cda818b75c7355b475916daf9e3f3b00b1cf325814cb3acc0929bfa7c92226c5)
+    5. luis1920 (Hash Code in SHA-256: 8ceb1680bcf5d60500077bc64a85cb2e60731a5c18914acc2748804c088ce671)
+    6. matthias1920 (Hash Code in SHA-256: e96229328e21c66c7f3cc11071ce9c1d2b8aba017cb85b504d26751459223024)
+    7. ruben1920 (Hash Code in SHA-256: bcbb12521a12cb9b21f11b37c9911b61b5557f7af2f25f2633522dcffad2b398)
+    8. ruy1920 (Hash Code in SHA-256: 1089e3a3c46682406e43dabb17aa7e8647c866941e5b5fb7796017313bbd4964)
+
+
+
+C) INSTRUCTIONS FOR GENERATE KEY PAIRS (PUBLIC-KEY, PRIVATE-KEY) for the Clients/Users of the System:
+
+    1. Eduardo Silva:
+      ./keytool -genkeypair -alias ec-eduardo-571 -keyalg EC -keystore auction-server.jks -keysize 571 -storepass fctnova1920 -keypass 43ad624532bf40eef30f3980e07125325d8c580590859e909e7e95cb6ef22dac -validity 365 -dname "CN=Eduardo Silva, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+      ./keytool -genkeypair -alias ec-eduardo-409 -keyalg EC -keystore auction-server.jks -keysize 409 -storepass fctnova1920 -keypass 43ad624532bf40eef30f3980e07125325d8c580590859e909e7e95cb6ef22dac -validity 365 -dname "CN=Eduardo Silva, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+    2. Henrique Joao:
+      ./keytool -genkeypair -alias rsa-henrique-2048 -keyalg RSA -keystore auction-server.jks -keysize 2048 -storepass fctnova1920 -keypass 5e5d6817006bb721feb006e7a43ac154b013e3c50ea094a44b18b3654aa1b307 -validity 365 -dname "CN=Henrique Joao, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+      ./keytool -genkeypair -alias rsa-henrique-4096 -keyalg RSA -keystore auction-server.jks -keysize 4096 -storepass fctnova1920 -keypass 5e5d6817006bb721feb006e7a43ac154b013e3c50ea094a44b18b3654aa1b307 -validity 365 -dname "CN=Henrique Joao, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+    3. Joao Leite:
+      ./keytool -genkeypair -alias dsa-joao-2048 -keyalg DSA -keystore auction-server.jks -keysize 2048 -storepass fctnova1920 -keypass 1a3e1e0002281e6ce5eb23bbee8ebb90710f1b948e14bdac3f86070c4809af7e -validity 365 -dname "CN=Joao Leite, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+      ./keytool -genkeypair -alias dsa-joao-3072 -keyalg DSA -keystore auction-server.jks -keysize 3072 -storepass fctnova1920 -keypass 1a3e1e0002281e6ce5eb23bbee8ebb90710f1b948e14bdac3f86070c4809af7e -validity 365 -dname "CN=Joao Leite, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+    4. Ludwig Kripphal:
+      ./keytool -genkeypair -alias ec-ludwig-521 -keyalg EC -keystore auction-server.jks -keysize 521 -storepass fctnova1920 -keypass cda818b75c7355b475916daf9e3f3b00b1cf325814cb3acc0929bfa7c92226c5 -validity 365 -dname "CN=Ludwig Kripphal, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+      ./keytool -genkeypair -alias ec-ludwig-384 -keyalg EC -keystore auction-server.jks -keysize 384 -storepass fctnova1920 -keypass cda818b75c7355b475916daf9e3f3b00b1cf325814cb3acc0929bfa7c92226c5 -validity 365 -dname "CN=Ludwig Kripphal, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+    5. Luis Caires:
+      ./keytool -genkeypair -alias rsa-luis-2048 -keyalg RSA -keystore auction-server.jks -keysize 2048 -storepass fctnova1920 -keypass 8ceb1680bcf5d60500077bc64a85cb2e60731a5c18914acc2748804c088ce671 -validity 365 -dname "CN=Luis Caires, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+      ./keytool -genkeypair -alias rsa-luis-1024 -keyalg RSA -keystore auction-server.jks -keysize 1024 -storepass fctnova1920 -keypass 8ceb1680bcf5d60500077bc64a85cb2e60731a5c18914acc2748804c088ce671 -validity 365 -dname "CN=Luis Caires, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+    6. Matthias Knorr:
+      ./keytool -genkeypair -alias dsa-matthias-2048 -keyalg DSA -keystore auction-server.jks -keysize 2048 -storepass fctnova1920 -keypass e96229328e21c66c7f3cc11071ce9c1d2b8aba017cb85b504d26751459223024 -validity 365 -dname "CN=Matthias Knorr, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+      ./keytool -genkeypair -alias dsa-matthias-1024 -keyalg DSA -keystore auction-server.jks -keysize 1024 -storepass fctnova1920 -keypass e96229328e21c66c7f3cc11071ce9c1d2b8aba017cb85b504d26751459223024 -validity 365 -dname "CN=Matthias Knorr, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+    7. Ruben Barreiro:
+      ./keytool -genkeypair -alias rsa-ruben-2048 -keyalg RSA -keystore auction-server.jks -keysize 2048 -storepass fctnova1920 -keypass bcbb12521a12cb9b21f11b37c9911b61b5557f7af2f25f2633522dcffad2b398 -validity 365 -dname "CN=Ruben Barreiro, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+      ./keytool -genkeypair -alias rsa-ruben-1024 -keyalg RSA -keystore auction-server.jks -keysize 1024 -storepass fctnova1920 -keypass bcbb12521a12cb9b21f11b37c9911b61b5557f7af2f25f2633522dcffad2b398 -validity 365 -dname "CN=Ruben Barreiro, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+    8. Ruy Costa:
+      ./keytool -genkeypair -alias dsa-ruy-2048 -keyalg DSA -keystore auction-server.jks -keysize 2048 -storepass fctnova1920 -keypass 1089e3a3c46682406e43dabb17aa7e8647c866941e5b5fb7796017313bbd4964 -validity 365 -dname "CN=Ruy Costa, OU=DM @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+      ./keytool -genkeypair -alias dsa-ruy-1024 -keyalg DSA -keystore auction-server.jks -keysize 1024 -storepass fctnova1920 -keypass 1089e3a3c46682406e43dabb17aa7e8647c866941e5b5fb7796017313bbd4964 -validity 365 -dname "CN=Ruy Costa, OU=DM @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+
+
+D) INSTRUCTIONS FOR GENERATE CERTIFICATES for the Clients/Users of the System:
+
+    1. Eduardo Silva:
+      ./keytool -export -alias ec-eduardo-571 -keystore auction-server.jks -file eduardo-certificate.cer
+
+    2. Henrique Joao:
+      ./keytool -export -alias rsa-henrique-2048 -keystore auction-server.jks -file henrique-certificate.cer
+
+    3. Joao Leite:
+      ./keytool -export -alias dsa-joao-2048 -keystore auction-server.jks -file joao-certificate.cer
+
+    4. Ludwig Kripphal:
+      ./keytool -export -alias ec-ludwig-384 -keystore auction-server.jks -file ludwig-certificate.cer
+
+    5. Luis Caires:
+      ./keytool -export -alias rsa-luis-1024 -keystore auction-server.jks -file luis-certificate.cer
+
+    6. Matthias Knorr:
+      ./keytool -export -alias dsa-matthias-1024 -keystore auction-server.jks -file matthias-certificate.cer
+
+    7. Ruben Barreiro:
+      ./keytool -export -alias rsa-ruben-2048 -keystore auction-server.jks -file ruben-certificate.cer
+
+    8. Ruy Costa:
+      ./keytool -export -alias dsa-ruy-1024 -keystore auction-server.jks -file ruy-certificate.cer
