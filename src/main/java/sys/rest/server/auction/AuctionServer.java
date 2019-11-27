@@ -7,12 +7,10 @@ import java.util.HashMap;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Dsl;
+import org.asynchttpclient.ListenableFuture;
+import org.asynchttpclient.Response;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -32,7 +30,7 @@ public class AuctionServer implements AuctionServerAPI{
 	private int currentSerialNumber;
 
 	private Gson gson;
-	private final CloseableHttpClient httpClient;
+	private AsyncHttpClient httpClient;
 
 	public static void main(String[] args) {
 		int port = 8081;
@@ -51,7 +49,7 @@ public class AuctionServer implements AuctionServerAPI{
 		currentSerialNumber = 0;
 
 		gson = new Gson();
-		httpClient = HttpClients.createDefault();
+		httpClient = Dsl.asyncHttpClient();
 	}
 
 	@Override
@@ -64,7 +62,6 @@ public class AuctionServer implements AuctionServerAPI{
 		User user = userAuctionInfo.getUser();
 		String auctionDescription = userAuctionInfo.getDescription();
 
-		HttpPost post = new HttpPost(AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-normal-auction");
 		// TODO Change some values
 		Auction newAuction = new Auction(
 				String.valueOf(currentAuctionID++), currentSerialNumber++,
@@ -77,15 +74,26 @@ public class AuctionServer implements AuctionServerAPI{
 
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Created auction:\n" + 
-				newAuction);	
+				newAuction);
+
 
 		String serializedNewAuction = gson.toJson(newAuction);
-		post.setEntity(new StringEntity(serializedNewAuction));
 
-		CloseableHttpResponse response = null;
-		response = httpClient.execute(post);
+		ListenableFuture<Response> future;
 
-		result = EntityUtils.toString(response.getEntity());
+		future = httpClient.preparePost(AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-normal-auction")
+				.setBody(serializedNewAuction)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getResponseBody();
 
 		System.out.println(result);
 	}
