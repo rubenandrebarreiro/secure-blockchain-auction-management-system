@@ -1,4 +1,7 @@
-A) Available CLIENTS/USERS of the System:
+A) PASSWORD for the KeyStore:
+    - fctnova1920
+
+B) Available CLIENTS/USERS of the System:
     1. Eduardo Silva
     2. Henrique Joao
     3. Joao Leite
@@ -10,7 +13,7 @@ A) Available CLIENTS/USERS of the System:
 
 
 
-B) PASSWORDS and their HASH CODES in SHA-256 for the Available Clients/Users of the System
+C) PASSWORDS and their HASH CODES in SHA-256 for the Available Clients/Users of the System
    (Only the Hash Code of the Passwords in SHA-256 will be kept in the Database for the Clients/Users):
 
     1. eduardo1920 (Hash Code in SHA-256: 43ad624532bf40eef30f3980e07125325d8c580590859e909e7e95cb6ef22dac)
@@ -24,7 +27,7 @@ B) PASSWORDS and their HASH CODES in SHA-256 for the Available Clients/Users of 
 
 
 
-C) INSTRUCTIONS FOR GENERATE KEY PAIRS (PUBLIC-KEY, PRIVATE-KEY) for the Clients/Users of the System:
+D) INSTRUCTIONS FOR GENERATE KEY PAIRS (PUBLIC-KEY, PRIVATE-KEY) for the Clients/Users of the System:
 
     1. Eduardo Silva:
       ./keytool -genkeypair -alias ec-eduardo-571 -keyalg EC -keystore auction-server.jks -keysize 571 -storepass fctnova1920 -keypass 43ad624532bf40eef30f3980e07125325d8c580590859e909e7e95cb6ef22dac -validity 365 -dname "CN=Eduardo Silva, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
@@ -68,7 +71,7 @@ C) INSTRUCTIONS FOR GENERATE KEY PAIRS (PUBLIC-KEY, PRIVATE-KEY) for the Clients
 
 
 
-D) INSTRUCTIONS FOR GENERATE CERTIFICATES for the Clients/Users of the System:
+E) INSTRUCTIONS FOR GENERATE CERTIFICATES for the Clients/Users of the System:
 
     1. Eduardo Silva:
       ./keytool -export -alias ec-eduardo-571 -keystore auction-server.jks -file eduardo-certificate.cer
