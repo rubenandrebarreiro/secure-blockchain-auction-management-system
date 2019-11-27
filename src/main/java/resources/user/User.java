@@ -3,6 +3,8 @@ package main.java.resources.user;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import main.java.blockchain.structure.MerkleTree;
+
 @DatabaseTable(tableName = "users")
 public class User {
 	
@@ -20,6 +22,10 @@ public class User {
 	private String userHomeAddress;
 	@DatabaseField
 	private String userBankAccountNIB;
+	
+	// TODO - confirmar
+	private MerkleTree blockchainHashesMerkleTree;
+	
 	
 	public User() {
 		// Empty/Obsolete constructor
@@ -40,6 +46,8 @@ public class User {
 		
 		this.userHomeAddress = userHomeAddress;
 		this.userBankAccountNIB = userBankAccountNIB;
+		
+		this.blockchainHashesMerkleTree = new MerkleTree(); // TODO - ver como usar merkle tree
 	}
 	
 	
