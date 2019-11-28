@@ -528,7 +528,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	@Override
 	public Response openAuctionWithMaximumAmountBidValue(String auctionWithMaxAmountBidValueJSONString) throws SQLException {
 
-		System.out.println("Preparing to create an Auction with Minimum Amount Bid Value from JSON Object...");
+		System.out.println("Preparing to create an Auction with Maximum Amount Bid Value from JSON Object...");
 
 		Auction newAuction = this.gsonObject.fromJson(auctionWithMaxAmountBidValueJSONString, Auction.class);
 
