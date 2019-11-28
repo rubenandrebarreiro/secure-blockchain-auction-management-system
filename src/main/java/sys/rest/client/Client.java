@@ -171,8 +171,10 @@ public class Client implements ClientAPI {
 			e.printStackTrace();
 		}
 
-		System.out.println("Got user: " + result.getUserPeerID());
-
+		System.out.println("Welcome " + result.getUserPeerID());
+		System.out.println();
+		helpScreen();
+		
 		return result;
 	}
 
