@@ -28,7 +28,8 @@ import main.java.resources.user.UserAuctionInfo;
 
 public class Client implements ClientAPI {
 
-	private static final String CREATE_AUCTION = "create";
+	private static final String AUCTION_CREATE = "create";
+	private static final String AUCTION_CLOSE = "close";
 	private static final String HELP = "help";
 	private static final String EXIT = "exit";
 
@@ -86,10 +87,12 @@ public class Client implements ClientAPI {
 				}
 
 				switch (line) {
-				case CREATE_AUCTION:
+				case AUCTION_CREATE:
 					createAuction();
 					break;
-
+				case AUCTION_CLOSE:
+					closeAuction();
+					break;
 				case HELP:
 					helpScreen();
 					break;
@@ -109,6 +112,33 @@ public class Client implements ClientAPI {
 		}
 	}
 
+	private User login() {
+		User result = null;
+		try {
+			System.out.print("Enter user identifiction: ");
+			String id = br.readLine();
+			System.out.print("Enter user " + id + " password: ");
+			String password = br.readLine();
+
+			MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
+			digest.update(password.getBytes());
+			byte[] digestData = digest.digest();
+			String hashResult = new String(Hex.toHexString(digestData));
+
+			HashMap<String, Object> fieldValues = new HashMap<>();
+			fieldValues.put("userPeerID", id);
+			fieldValues.put("userPassword", hashResult);
+			result = userDao.queryForFieldValues(fieldValues).get(0);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.out.println("Got user: " + result.getUserPeerID());
+
+		return result;
+	}
+
 	private void createAuction() throws IOException {
 		String result = null;
 		String url = AUCTION_SERVER_ADDRESS + "/open-auction";
@@ -117,21 +147,21 @@ public class Client implements ClientAPI {
 		String productDescription = br.readLine();
 		System.out.println(
 				"	1: NORMAL_BIDS,\n" + 
-				"	2: MIN_INITIAL_VALUE_BID\n" + 
-				"	3: MIN_AMOUNT_VALUE_BID\n" + 
-				"	4: MAX_AMOUNT_VALUE_BID\n" + 
-				"	5: MIN_MAX_AMOUNT_VALUE_BID\n" + 
-				"	6: LIMITED_SET_CLIENT_BIDDERS\n" + 
-				"	7: LIMITED_NUMBER_BIDS_FOR_EACH_CLIENT\n" + 
-				"	8: LIMITED_NUMBER_BIDS\n" + 
+						"	2: MIN_INITIAL_VALUE_BID\n" + 
+						"	3: MIN_AMOUNT_VALUE_BID\n" + 
+						"	4: MAX_AMOUNT_VALUE_BID\n" + 
+						"	5: MIN_MAX_AMOUNT_VALUE_BID\n" + 
+						"	6: LIMITED_SET_CLIENT_BIDDERS\n" + 
+						"	7: LIMITED_NUMBER_BIDS_FOR_EACH_CLIENT\n" + 
+						"	8: LIMITED_NUMBER_BIDS\n" + 
 				"	9: LIMITED_TIME_BIDS");
 		System.out.println();
 		System.out.println("Enter bid type: ");
 		byte bidType = new Byte(br.readLine());
 		UserAuctionInfo userAuctionInfo;
-		
+
 		String line;
-		
+
 		switch (bidType) {
 		case 1:
 			userAuctionInfo = new UserAuctionInfo(currentUser,
@@ -273,7 +303,7 @@ public class Client implements ClientAPI {
 					-1L);
 			break;
 		}
-		
+
 		String postData = gson.toJson(userAuctionInfo);
 
 		ListenableFuture<Response> future;
@@ -295,36 +325,34 @@ public class Client implements ClientAPI {
 		System.out.println(result);
 	}
 
-	private User login() {
-		User result = null;
+	private void closeAuction() throws IOException {
+		String result;
+		System.out.println("Enter auctionID to close: ");
+		String auctionIDToClose = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/close-auction/" + auctionIDToClose;
+		System.out.println(url);
+		ListenableFuture<Response> future;
+
+		future = httpClient.preparePut(url)
+				.execute();
+
+		Response r = null;
 		try {
-			System.out.print("Enter user identifiction: ");
-			String id = br.readLine();
-			System.out.print("Enter user " + id + " password: ");
-			String password = br.readLine();
-
-			MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
-			digest.update(password.getBytes());
-			byte[] digestData = digest.digest();
-			String hashResult = new String(Hex.toHexString(digestData));
-
-			HashMap<String, Object> fieldValues = new HashMap<>();
-			fieldValues.put("userPeerID", id);
-			fieldValues.put("userPassword", hashResult);
-			result = userDao.queryForFieldValues(fieldValues).get(0);
+			r = future.get();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
 		}
 
-		System.out.println("Got user: " + result.getUserPeerID());
+		result = r.getStatusText();
 
-		return result;
+		System.out.println(result);
 	}
 
 	private void helpScreen() {
 		System.out.println("HELP SCREEN");
-		System.out.println(CREATE_AUCTION);
+		System.out.println(AUCTION_CREATE);
+		System.out.println(AUCTION_CLOSE);
 		System.out.println(HELP);
 		System.out.println(EXIT);
 	}

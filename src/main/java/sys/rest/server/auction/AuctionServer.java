@@ -2,6 +2,10 @@ package main.java.sys.rest.server.auction;
 
 import java.io.IOException;
 import java.net.URI;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -9,6 +13,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.asynchttpclient.ListenableFuture;
+import org.asynchttpclient.Param;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -127,7 +132,7 @@ public class AuctionServer implements AuctionServerAPI{
 		try {
 			r = future.get();
 		} catch (Exception e) {
-			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+			System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
 					"Error getting response!");
 		}
 
@@ -135,5 +140,134 @@ public class AuctionServer implements AuctionServerAPI{
 				"Response: " + r.getStatusText());
 		
 		return Response.status(r.getStatusCode()).build();
+	}
+
+	@Override
+	public Response closeAuction(String openedAuctionID) throws SQLException {	
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to close an existing Auction!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/close-auction/" + openedAuctionID;
+		
+		ListenableFuture<org.asynchttpclient.Response> future;
+
+		future = httpClient.preparePut(url)
+				.execute();
+
+		org.asynchttpclient.Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
+					"Error getting response!");
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + r.getStatusText());
+		
+		return Response.status(r.getStatusCode()).build();
+	}
+
+	@Override
+	public Response addBidToOpenedProductAuction(String openedAuctionID, String bidForAuctionJSONString)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listAllProductsAuctions() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listOpenedProductsAuctions() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listClosedProductsAuctions() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listAllProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listOpenedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listClosedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response findProductAuctionByID(String auctionID) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response findOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response findClosedProductAuctionByID(String closedAuctionID) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listAllBidsOfProductAuctionByID(String auctionID) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listAllBidsOfOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listAllBidsOfClosedProductAuctionByID(String closedAuctionID) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listAllBidsMadeByBidderUserClientInProductAuctionByID(String auctionID, String bidderUserClientID)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(String openedAuctionID,
+			String bidderUserClientID) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(String closedAuctionID,
+			String bidderUserClientID) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
