@@ -57,16 +57,24 @@ public class AuctionServer implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to create a new Auction!");
 		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-normal-auction";
+		
 		UserAuctionInfo userAuctionInfo = gson.fromJson(clientAuctionInformation, UserAuctionInfo.class);
 		User user = userAuctionInfo.getUser();
 		String auctionDescription = userAuctionInfo.getDescription();
 
 		// TODO Change some values
 		Auction newAuction = new Auction(
-				String.valueOf(currentAuctionID++), currentSerialNumber++,
-				auctionDescription, (byte)1,
-				(double)0, (double)0, (double)100, new HashMap<String, Integer>(), 100,
-				System.currentTimeMillis() + 100000,
+				String.valueOf(currentAuctionID++), 
+				currentSerialNumber++,
+				auctionDescription, 
+				userAuctionInfo.getBidType(),
+				userAuctionInfo.getCurrentBidValue(), 
+				userAuctionInfo.getMinAmountBidValue(), 
+				userAuctionInfo.getMaxAmountBidValue(), 
+				(HashMap<String, Integer>)userAuctionInfo.getNumAuctionBidsForEachUserClient(), 
+				userAuctionInfo.getNumMaxAuctionBidsAllowed(),
+				userAuctionInfo.getAuctionTimestampLimit(),
 				1,
 				"ProductNameTest", 
 				user.getUserFirstName() + " " + user.getUserLastName());
@@ -80,7 +88,40 @@ public class AuctionServer implements AuctionServerAPI{
 
 		ListenableFuture<org.asynchttpclient.Response> future;
 
-		future = httpClient.preparePost(AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-normal-auction")
+		switch (newAuction.getAuctionBidType()) {
+		case 1:
+			url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-normal-auction";
+			break;
+		case 2:
+			url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-auction-min-initial-bid-value";
+			break;
+		case 3:
+			url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-auction-min-amount-bid-value";
+			break;
+		case 4:
+			url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-auction-max-amount-bid-value";
+			break;
+		case 5:
+			url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-auction-min-and-max-amount-bid-value";
+			break;
+		case 6:
+			url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-auction-limited-set-user-client-bidders";
+			break;
+		case 7:
+			url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-auction-limited-number-bids-for-each-user-client-bidder";
+			break;
+		case 8:
+			url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-auction-limited-number-bids";
+			break;
+		case 9:
+			// TODO this url does not exist yet on the repository!
+			url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/open-normal-auction";
+			break;
+		default:
+			break;
+		}
+		
+		future = httpClient.preparePost(url)
 				.setBody(serializedNewAuction)
 				.execute();
 
@@ -97,7 +138,4 @@ public class AuctionServer implements AuctionServerAPI{
 		
 		return Response.status(r.getStatusCode()).build();
 	}
-
-
-
 }

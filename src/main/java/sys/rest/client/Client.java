@@ -7,6 +7,7 @@ import java.net.URI;
 import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -112,14 +113,173 @@ public class Client implements ClientAPI {
 
 	private void createAuction() throws IOException {
 		String result = null;
+		String url = AUCTION_SERVER_ADDRESS + "/open-auction";
 
 		System.out.println("Enter product description: ");
-		UserAuctionInfo userAuctionInfo = new UserAuctionInfo(currentUser, br.readLine());
+		String productDescription = br.readLine();
+		System.out.println(
+				"	1: NORMAL_BIDS,\n" + 
+				"	2: MIN_INITIAL_VALUE_BID\n" + 
+				"	3: MIN_AMOUNT_VALUE_BID\n" + 
+				"	4: MAX_AMOUNT_VALUE_BID\n" + 
+				"	5: MIN_MAX_AMOUNT_VALUE_BID\n" + 
+				"	6: LIMITED_SET_CLIENT_BIDDERS\n" + 
+				"	7: LIMITED_NUMBER_BIDS_FOR_EACH_CLIENT\n" + 
+				"	8: LIMITED_NUMBER_BIDS\n" + 
+				"	9: LIMITED_TIME_BIDS");
+		System.out.println();
+		System.out.println("Enter bid type: ");
+		byte bidType = new Byte(br.readLine());
+		UserAuctionInfo userAuctionInfo;
+		
+		String line;
+		
+		switch (bidType) {
+		case 1:
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					0.0,
+					0.0,
+					0.0,
+					null,
+					Integer.MAX_VALUE,
+					-1L);
+			break;
+		case 2:
+			System.out.println("Enter minimum initial bid value: ");
+			line = br.readLine();
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					new Double(line),
+					0.0,
+					0.0,
+					null,
+					Integer.MAX_VALUE,
+					-1L);
+			break;
+		case 3:
+			System.out.println("Enter minimum amount bid value: ");
+			line = br.readLine();
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					0.0,
+					new Double(line),
+					0.0,
+					null,
+					Integer.MAX_VALUE,
+					-1L);
+			break;
+		case 4:
+			System.out.println("Enter maximum amount bid value: ");
+			line = br.readLine();
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					0.0,
+					0.0,
+					new Double(line),
+					null,
+					Integer.MAX_VALUE,
+					-1L);
+			break;
+		case 5:
+			System.out.println("Enter minimum amount bid value: ");
+			String min = br.readLine();
+			System.out.println("Enter maximum amount bid value: ");
+			String max = br.readLine();
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					0.0,
+					new Double(min),
+					new Double(max),
+					null,
+					Integer.MAX_VALUE,
+					-1L);
+			break;
+		case 6:
+			Map<String, Integer> limitedUsersMap = new HashMap<>();
+			System.out.println("Enter userIDs that can bid, seperated by newlines: ");
+			while ( !(line = br.readLine()).equals("") ) {
+				limitedUsersMap.put(line, Integer.MAX_VALUE);
+			}
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					0.0,
+					0.0,
+					0.0,
+					limitedUsersMap,
+					Integer.MAX_VALUE,
+					-1L);
+			break;
+		case 7:
+			Map<String, Integer> limitedUsersBidNumberMap = new HashMap<>();
+			System.out.println("Enter userIDs that can bid, seperated by newlines: ");
+			String user;
+			while ( !(user = br.readLine()).equals("") ) {
+				System.out.println("Enter " + user + " bid limit: ");
+				limitedUsersBidNumberMap.put(user, Integer.parseInt(br.readLine()));
+			}
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					0.0,
+					0.0,
+					0.0,
+					limitedUsersBidNumberMap,
+					Integer.MAX_VALUE,
+					-1L);
+			break;
+		case 8:
+			System.out.println("Enter max number of bids: ");
+			line = br.readLine();
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					0.0,
+					0.0,
+					0.0,
+					null,
+					Integer.parseInt(line),
+					-1L);
+			break;
+		case 9:
+			// TODO this url does not exist yet on the repository!
+			System.out.println("Enter timelimit: ");
+			line = br.readLine();
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					0.0,
+					0.0,
+					0.0,
+					null,
+					Integer.MAX_VALUE,
+					Long.parseLong(line));
+			break;
+		default:
+			url = AUCTION_SERVER_ADDRESS + "/open-auction";
+			userAuctionInfo = new UserAuctionInfo(currentUser,
+					productDescription,
+					bidType,
+					0.0,
+					0.0,
+					0.0,
+					null,
+					Integer.MAX_VALUE,
+					-1L);
+			break;
+		}
+		
 		String postData = gson.toJson(userAuctionInfo);
 
 		ListenableFuture<Response> future;
 
-		future = httpClient.preparePost(AUCTION_SERVER_ADDRESS + "/open-normal-auction")
+		future = httpClient.preparePost(url)
 				.setBody(postData)
 				.execute();
 
