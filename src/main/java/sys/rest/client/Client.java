@@ -77,7 +77,6 @@ public class Client implements ClientAPI {
 			connectionSource = new JdbcConnectionSource(userRepository);
 			userDao = DaoManager.createDao(connectionSource, User.class);
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -147,7 +146,6 @@ public class Client implements ClientAPI {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -170,7 +168,6 @@ public class Client implements ClientAPI {
 			fieldValues.put("userPassword", hashResult);
 			result = userDao.queryForFieldValues(fieldValues).get(0);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
