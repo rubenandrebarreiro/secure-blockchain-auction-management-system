@@ -2,8 +2,6 @@ package main.java.sys.rest.server.auction;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -72,7 +70,7 @@ public class AuctionServer implements AuctionServerAPI{
 				userAuctionInfo.getCurrentBidValue(), 
 				userAuctionInfo.getMinAmountBidValue(), 
 				userAuctionInfo.getMaxAmountBidValue(), 
-				(HashMap<String, Integer>)userAuctionInfo.getNumAuctionBidsForEachUserClient(), 
+				userAuctionInfo.getNumAuctionBidsForEachUserClient(), 
 				userAuctionInfo.getNumMaxAuctionBidsAllowed(),
 				userAuctionInfo.getAuctionTimestampLimit(),
 				1,

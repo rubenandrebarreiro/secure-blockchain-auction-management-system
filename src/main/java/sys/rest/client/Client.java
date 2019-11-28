@@ -7,8 +7,6 @@ import java.net.URI;
 import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Map;
-
 import javax.ws.rs.core.UriBuilder;
 
 import org.asynchttpclient.AsyncHttpClient;
@@ -201,7 +199,7 @@ public class Client implements ClientAPI {
 					-1L);
 			break;
 		case 6:
-			Map<String, Integer> limitedUsersMap = new HashMap<>();
+			HashMap<String, Integer> limitedUsersMap = new HashMap<>();
 			System.out.println("Enter userIDs that can bid, seperated by newlines: ");
 			while ( !(line = br.readLine()).equals("") ) {
 				limitedUsersMap.put(line, Integer.MAX_VALUE);
@@ -217,12 +215,13 @@ public class Client implements ClientAPI {
 					-1L);
 			break;
 		case 7:
-			Map<String, Integer> limitedUsersBidNumberMap = new HashMap<>();
+			HashMap<String, Integer> limitedUsersBidNumberMap = new HashMap<>();
 			System.out.println("Enter userIDs that can bid, seperated by newlines: ");
 			String user;
 			while ( !(user = br.readLine()).equals("") ) {
 				System.out.println("Enter " + user + " bid limit: ");
 				limitedUsersBidNumberMap.put(user, Integer.parseInt(br.readLine()));
+				System.out.println("Another user: ");
 			}
 			userAuctionInfo = new UserAuctionInfo(currentUser,
 					productDescription,

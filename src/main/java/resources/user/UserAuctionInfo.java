@@ -1,6 +1,6 @@
 package main.java.resources.user;
 
-import java.util.Map;
+import java.util.HashMap;
 
 public class UserAuctionInfo {
 
@@ -10,12 +10,12 @@ public class UserAuctionInfo {
 	private double currentBidValue;
 	private double minAmountBidValue;
 	private double maxAmountBidValue;
-	private Map<String, Integer> numAuctionBidsForEachUserClient;
+	private HashMap<String, Integer> numAuctionBidsForEachUserClient;
 	private int numMaxAuctionBidsAllowed;
 	private long auctionTimestampLimit;
 
 	public UserAuctionInfo(User user, String description, byte bidType, double currentBidValue,
-			double minAmountBidValue, double maxAmountBidValue, Map<String, Integer> numAuctionBidsForEachUserClient,
+			double minAmountBidValue, double maxAmountBidValue, HashMap<String, Integer> numAuctionBidsForEachUserClient,
 			int numMaxAuctionBidsAllowed, long auctionTimestampLimit) {
 		this.user = user;
 		this.description = description;
@@ -76,11 +76,11 @@ public class UserAuctionInfo {
 		this.maxAmountBidValue = maxAmountBidValue;
 	}
 
-	public Map<String, Integer> getNumAuctionBidsForEachUserClient() {
+	public HashMap<String, Integer> getNumAuctionBidsForEachUserClient() {
 		return numAuctionBidsForEachUserClient;
 	}
 
-	public void setNumAuctionBidsForEachUserClient(Map<String, Integer> numAuctionBidsForEachUserClient) {
+	public void setNumAuctionBidsForEachUserClient(HashMap<String, Integer> numAuctionBidsForEachUserClient) {
 		this.numAuctionBidsForEachUserClient = numAuctionBidsForEachUserClient;
 	}
 
