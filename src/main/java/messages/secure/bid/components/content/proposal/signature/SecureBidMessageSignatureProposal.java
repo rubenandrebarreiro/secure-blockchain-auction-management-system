@@ -11,6 +11,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -218,8 +219,15 @@ public class SecureBidMessageSignatureProposal {
 					this.getIsBidSerializedHashedChallengeMade() && this.getIsBidSerializedHashedChallengeCiphered() && 
 						this.getIsBidDigitalSigned() );
 		
-		
-		
+		if(isPossibleToBuildSecureBidMessageSignatureReceived) {
+			
+			this.undoDigitalSignatureOfSerializedHashedChallengeEncryptedBid();
+			
+			this.decryptSerializedHashedChallengeBid();
+			
+			this.solveCryptoPuzzleForBidChallenge();
+			
+		}
 	}
 
 	public void doSerializationOfBid() {
@@ -291,7 +299,7 @@ public class SecureBidMessageSignatureProposal {
 		}
 	}
 	
-	public void solveCryptoPuzzleChallenge() {
+	public void solveCryptoPuzzleForBidChallenge() {
 		// TODO - solve it
 	}
 	
@@ -360,6 +368,7 @@ public class SecureBidMessageSignatureProposal {
 				this.bidSerializedHashedChallengeCiphered = 
 						secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher.doFinal(this.bidSerializedHashedChallenge);
 				
+				
 				this.setIsBidSerializedHashedChallengeCiphered(true);		
 				
 			}
@@ -403,7 +412,121 @@ public class SecureBidMessageSignatureProposal {
 	}
 	
 	private void decryptSerializedHashedChallengeBid() {
+	
+		boolean isPossibleToDecryptBidSerializedHashedChallenge = 
+				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
+						this.getIsBidSerializedHashedChallengeMade() &&
+							this.getIsBidSerializedHashedChallengeCiphered() && !this.getIsBidDigitalSigned() );
 		
+		if(isPossibleToDecryptBidSerializedHashedChallenge) {
+			
+			byte[] secretKeyBytes = null;
+			
+			try {
+				
+				String symmetricEncryptionAlgorithm = "AES";
+				String symmetricEncryptionMode = "CBC";
+		 	    String symmetricEncryptionPadding = "NoPadding";
+				
+				
+				// Set the Secret Key and its specifications,
+		 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
+				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
+				
+				
+				String provider = "BC";
+				Cipher secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher = 
+						Cipher.getInstance(String.format("%s/%s/%s",
+										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
+								           provider );
+				
+				byte[] initialisationVectorBytes = null;
+			
+				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
+					
+					// Algorithms that don't need IV (Initialisation Vector): ECB
+					// The parameter specifications for the IV (Initialisation Vector)	
+					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
+					
+					// Showing the randomly defined IV (Initialisation Vector)
+					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] - IV (Initialisation Vector) is:\n- " 
+									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
+					
+					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
+					secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
+						.init(Cipher.DECRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
+				}
+				else {
+					
+					// Algorithms that need IV (Initialisation Vector)
+					// The parameter specifications for the IV (Initialisation Vector)
+					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
+					
+					secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
+						.init(Cipher.DECRYPT_MODE, secretKeySpecifications);
+					
+				}
+				
+				int sizeOfBidSerializedHashedChallengeCiphered = 
+						this.bidSerializedHashedChallengeCiphered.length;
+				
+			  	// The Plain Text of the bytes of the data input received through the communication channel
+			  	this.bidSerializedHashedChallenge = new byte[ secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
+			  	                                                .getOutputSize(sizeOfBidSerializedHashedChallengeCiphered) ];
+			    
+			  	int sizeOfBidSerializedHashedChallenge = secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
+				  									     .update(this.bidSerializedHashedChallengeCiphered, 
+				  										   	     0, sizeOfBidSerializedHashedChallengeCiphered,
+				  											     this.bidSerializedHashedChallenge, 0);
+			  	
+			  	secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
+			  									   .doFinal(this.bidSerializedHashedChallenge, sizeOfBidSerializedHashedChallenge);
+			    
+			  	
+				this.setIsBidSerializedHashedChallengeCiphered(true);		
+				
+			}
+			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
+				System.err.println("- Cryptographic Algorithm not found!!!");
+				noSuchAlgorithmException.printStackTrace();
+			}
+			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
+				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
+				invalidAlgorithmParameterException.printStackTrace();
+			}
+			catch (NoSuchProviderException noSuchProviderException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
+				System.err.println("- Cryptograhic Provider not found!!!");
+				noSuchProviderException.printStackTrace();
+			}
+			catch (NoSuchPaddingException noSuchPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
+				System.err.println("- Padding Method not found!!!");
+				noSuchPaddingException.printStackTrace();
+			}
+			catch (BadPaddingException badPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
+				System.err.println("- Bad/Wrong Padding Method in use!!!");
+				badPaddingException.printStackTrace();
+			}
+			catch (InvalidKeyException invalidKeyException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
+				System.err.println("- Invalid Cryptographic Algorithm's Secret Key!!!");
+				invalidKeyException.printStackTrace();
+			}
+			catch (IllegalBlockSizeException illegalBlockSizeException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
+				System.err.println("- Illegal Cryptographic Algorithm's Block Size!!!");
+				illegalBlockSizeException.printStackTrace();
+			}
+			catch (ShortBufferException shortBufferException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
+				System.err.println("- The Buffer in use, during the Deciphering process it's not correct!!!");
+				shortBufferException.printStackTrace();
+			}
+		}
 	}
 	
 	private void doDigitalSignatureOfSerializedHashedChallengeEncryptedBid() {
@@ -442,13 +565,56 @@ public class SecureBidMessageSignatureProposal {
 			// From the position corresponding to the length of Bid's Serialization to
 			// the corresponding of the length of the Hash Challenge of the Bid's Serialization Ciphered
 			System.arraycopy(bidSerializedHashedChallengeCiphered, 0, this.bidDigitalSigned, serializationOffset, bidSerializedHashedChallengeCiphered.length);
-		
+			
+			
 			this.setIsBidDigitalSigned(true);
 			
 		}
 	}
 	
-	private void undoSignatureSerializedHashedChallengeEncryptedBid() {
+	private void undoDigitalSignatureOfSerializedHashedChallengeEncryptedBid() {
 		
+		boolean isPossibleToUndoBidSerializedHashedChallengeEncryptedSigned = 
+				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
+						this.getIsBidSerializedHashedChallengeMade() &&
+							this.getIsBidSerializedHashedChallengeCiphered() && this.getIsBidDigitalSigned() );
+		
+		if(isPossibleToUndoBidSerializedHashedChallengeEncryptedSigned) {
+			
+			byte[] bidDigitalSigned = this.getBidDigitalSigned();
+			int sizeOfBidDigitalSigned = bidDigitalSigned.length;
+			
+			this.bidSerialized = new byte[ this.getSizeOfBidSerialized() ];
+			this.bidSerializedHashedChallengeCiphered = 
+					new byte[ ( sizeOfBidDigitalSigned - this.getSizeOfBidSerialized() ) ];
+			
+			
+			// Operations to Fill a Byte Array, with the following parameters:
+			// 1) src - The source of the array to be copied
+			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
+			// 3) dest - The destination of the array to be copied
+			// 4) destPos - The position of the array where will be placed the new copy,
+			//              representing the first element where new data will be placed
+			// 5) length - The length of the data to be copied from the source array to the destination array
+			
+			// The offset related to fulfilment of the serialization process
+			int serializationOffset = 0;
+			
+			// Fills the byte array of the Bid's Serialization with
+			// the correspondent bytes from the Bid Digital Signed,
+			// From the initial position to the corresponding to the length of Bid's Serialization
+			System.arraycopy(bidDigitalSigned, serializationOffset, this.bidSerialized, 0, this.bidSerialized.length);
+			serializationOffset += this.bidSerialized.length;
+			
+			// Fills the byte array of the Bid's Serialization Ciphered with
+			// the correspondent bytes from the Hash Challenge of the Bid Digital Signed,
+			// From the position corresponding to the length of Bid's Serialization to
+			// the corresponding of the length of the Hash Challenge of the Bid's Serialization Ciphered
+			System.arraycopy(bidDigitalSigned, serializationOffset, this.bidSerializedHashedChallengeCiphered, 0, this.bidSerializedHashedChallengeCiphered.length);
+			
+			
+			this.setIsBidDigitalSigned(false);
+		
+		}
 	}
 }
