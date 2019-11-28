@@ -405,9 +405,9 @@ public class SecureBidMessageSignatureProposal {
 		if(isPossibleToSignBidSerializedHashedChallengeEncrypted) {
 			
 			byte[] bidSerialized = this.getBidSerialized();
-			byte[] bidSerializedHashedCiphered = this.getBidSerializedHashedChallengeCiphered();
+			byte[] bidSerializedHashedChallengeCiphered = this.getBidSerializedHashedChallengeCiphered();
 			
-			int sizeOfBidDigitalSigned = (bidSerialized.length + bidSerializedHashedCiphered.length);
+			int sizeOfBidDigitalSigned = (bidSerialized.length + bidSerializedHashedChallengeCiphered.length);
 			
 			this.bidDigitalSigned = new byte[sizeOfBidDigitalSigned];
 			
@@ -427,10 +427,10 @@ public class SecureBidMessageSignatureProposal {
 			System.arraycopy(bidSerialized, 0, this.bidDigitalSigned, serializationOffset, bidSerialized.length);
 			serializationOffset += bidSerialized.length;
 			
-			// Fills the byte array of the Bid Digital Signed with the Hash of the Bid's Serialization Ciphered,
+			// Fills the byte array of the Bid Digital Signed with the Hash Challenge of the Bid's Serialization Ciphered,
 			// From the position corresponding to the length of Bid's Serialization to
-			// the corresponding of the length of the Hash of the Bid's Serialization Ciphered
-			System.arraycopy(bidSerializedHashedCiphered, 0, this.bidDigitalSigned, serializationOffset, bidSerializedHashedCiphered.length);
+			// the corresponding of the length of the Hash Challenge of the Bid's Serialization Ciphered
+			System.arraycopy(bidSerializedHashedChallengeCiphered, 0, this.bidDigitalSigned, serializationOffset, bidSerializedHashedChallengeCiphered.length);
 		
 			this.setIsBidDigitalSigned(true);
 			
