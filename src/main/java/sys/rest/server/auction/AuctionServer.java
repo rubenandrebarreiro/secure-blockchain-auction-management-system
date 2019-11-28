@@ -3,9 +3,6 @@ package main.java.sys.rest.server.auction;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
@@ -13,7 +10,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 import org.asynchttpclient.ListenableFuture;
-import org.asynchttpclient.Param;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -162,7 +158,7 @@ public class AuctionServer implements AuctionServerAPI{
 					"Error getting response!");
 		}
 		
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
 				"Response: " + r.getStatusText());
 		
 		return Response.status(r.getStatusCode()).build();
@@ -177,20 +173,74 @@ public class AuctionServer implements AuctionServerAPI{
 
 	@Override
 	public Response listAllProductsAuctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all Auctions!");
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all";
+		ListenableFuture<org.asynchttpclient.Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		org.asynchttpclient.Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
+				"Response: " + r.getStatusText());
+		
+		return Response.status(r.getStatusCode()).build();
 	}
 
 	@Override
 	public Response listOpenedProductsAuctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all opened Auctions!");
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened";
+		ListenableFuture<org.asynchttpclient.Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		org.asynchttpclient.Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
+				"Response: " + r.getStatusText());
+		
+		return Response.status(r.getStatusCode()).build();
 	}
 
 	@Override
 	public Response listClosedProductsAuctions() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all closed Auctions!");
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed";
+		ListenableFuture<org.asynchttpclient.Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		org.asynchttpclient.Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
+				"Response: " + r.getStatusText());
+		
+		return Response.status(r.getStatusCode()).build();
 	}
 
 	@Override
@@ -216,20 +266,74 @@ public class AuctionServer implements AuctionServerAPI{
 
 	@Override
 	public Response findProductAuctionByID(String auctionID) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get Auction with id" + auctionID + "!");
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + auctionID;
+		ListenableFuture<org.asynchttpclient.Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		org.asynchttpclient.Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
+				"Response: " + r.getStatusText());
+		
+		return Response.status(r.getStatusCode()).build();
 	}
 
 	@Override
 	public Response findOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get opened Auction with id" + openedAuctionID + "!");
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/" + openedAuctionID;
+		ListenableFuture<org.asynchttpclient.Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		org.asynchttpclient.Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
+				"Response: " + r.getStatusText());
+		
+		return Response.status(r.getStatusCode()).build();
 	}
 
 	@Override
 	public Response findClosedProductAuctionByID(String closedAuctionID) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get opened Auction with id" + closedAuctionID + "!");
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/" + closedAuctionID;
+		ListenableFuture<org.asynchttpclient.Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		org.asynchttpclient.Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
+				"Response: " + r.getStatusText());
+		
+		return Response.status(r.getStatusCode()).build();
 	}
 
 	@Override

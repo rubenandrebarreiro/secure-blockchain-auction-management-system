@@ -28,8 +28,15 @@ import main.java.resources.user.UserAuctionInfo;
 
 public class Client implements ClientAPI {
 
-	private static final String AUCTION_CREATE = "create";
-	private static final String AUCTION_CLOSE = "close";
+	private static final String AUCTION_CREATE = "create auction";
+	private static final String AUCTION_CLOSE = "close auction";
+	private static final String BID_CREATE = "create bid";
+	private static final String LIST_ALL = "list all";
+	private static final String LIST_OPEN = "list open";
+	private static final String LIST_CLOSED = "list closed";
+	private static final String LIST_BY_AUCTIONID = "list all user";
+	private static final String LIST_OPEN_BY_AUCTIONID = "list open user";
+	private static final String LIST_CLOSED_BY_AUCTIONID = "list closed user";
 	private static final String HELP = "help";
 	private static final String EXIT = "exit";
 
@@ -93,6 +100,27 @@ public class Client implements ClientAPI {
 				case AUCTION_CLOSE:
 					closeAuction();
 					break;
+				case BID_CREATE:
+					createBid();
+					break;
+				case LIST_ALL:
+					listAll();
+					break;
+				case LIST_OPEN:
+					listOpen();
+					break;
+				case LIST_CLOSED:
+					listClosed();
+					break;
+				case LIST_BY_AUCTIONID:
+					listAllByAuctionID();
+					break;
+				case LIST_CLOSED_BY_AUCTIONID:
+					listClosedByAuctionID();
+					break;
+				case LIST_OPEN_BY_AUCTIONID:
+					listOpenByAuctionID();
+				break;
 				case HELP:
 					helpScreen();
 					break;
@@ -349,10 +377,162 @@ public class Client implements ClientAPI {
 		System.out.println(result);
 	}
 
+	private void createBid() throws IOException{
+		// TODO
+		String result;
+		System.out.println("Enter auctionID to bid: ");
+		String auctionID = br.readLine();
+		System.out.println("Enter bid amount: ");
+		String bidAmount = br.readLine();
+		
+		String url = AUCTION_SERVER_ADDRESS + "/add-bid-to-opened-auction/)" + auctionID;
+	}
+	
+	private void listAll() {
+		String url = AUCTION_SERVER_ADDRESS + "/all";
+		String result;
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	private void listOpen() {
+		String url = AUCTION_SERVER_ADDRESS + "/opened";
+		String result;
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	private void listClosed() {
+		String url = AUCTION_SERVER_ADDRESS + "/closed";
+		String result;
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+
+	}
+
+	private void listAllByAuctionID() throws IOException {
+		String result;
+		String userID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/all/" + userID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	private void listOpenByAuctionID() throws IOException {
+		String result;
+		String userID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/opened/" + userID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	private void listClosedByAuctionID() throws IOException {
+		String result;
+		String userID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/closed/" + userID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	
 	private void helpScreen() {
 		System.out.println("HELP SCREEN");
 		System.out.println(AUCTION_CREATE);
 		System.out.println(AUCTION_CLOSE);
+		System.out.println(BID_CREATE);
+		System.out.println(LIST_ALL);
+		System.out.println(LIST_OPEN);
+		System.out.println(LIST_CLOSED);
+		System.out.println(LIST_BY_AUCTIONID);
+		System.out.println(LIST_OPEN_BY_AUCTIONID);
+		System.out.println(LIST_CLOSED_BY_AUCTIONID);
 		System.out.println(HELP);
 		System.out.println(EXIT);
 	}
