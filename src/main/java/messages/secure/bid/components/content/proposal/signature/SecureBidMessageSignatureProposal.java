@@ -210,6 +210,17 @@ public class SecureBidMessageSignatureProposal {
 		}
 
 	}
+	
+	public void buildSecureBidMessageSignatureReceived() {
+		
+		boolean isPossibleToBuildSecureBidMessageSignatureReceived = 
+				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
+					this.getIsBidSerializedHashedChallengeMade() && this.getIsBidSerializedHashedChallengeCiphered() && 
+						this.getIsBidDigitalSigned() );
+		
+		
+		
+	}
 
 	public void doSerializationOfBid() {
 		
@@ -273,7 +284,7 @@ public class SecureBidMessageSignatureProposal {
 			int sizeOfChallenge = random.nextInt(this.bidSerializedHashedChallenge.length - 1);
 			
 			for(int i = sizeOfChallenge; i < sizeOfChallenge; i++) {
-				this.bidSerializedHashedChallenge[i] = 0;
+				this.bidSerializedHashedChallenge[i] = -1;
 			}
 			
 			this.setIsBidSerializedHashedChallengeMade(true);			
