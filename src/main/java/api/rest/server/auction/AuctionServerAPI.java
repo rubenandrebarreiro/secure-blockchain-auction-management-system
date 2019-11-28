@@ -101,7 +101,6 @@ public interface AuctionServerAPI {
     @Produces(MediaType.APPLICATION_JSON)
  	public Response listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(@PathParam("auction-id") String openedAuctionID,
  																				@PathParam("bidder-user-client-id") String bidderUserClientID) throws SQLException;
-	
 	@GET
 	@Path("/closed/{auction-id}/bids/{bidder-user-client-id}")
     @Produces(MediaType.APPLICATION_JSON)

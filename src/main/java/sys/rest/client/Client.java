@@ -34,9 +34,12 @@ public class Client implements ClientAPI {
 	private static final String LIST_ALL = "list all";
 	private static final String LIST_OPEN = "list open";
 	private static final String LIST_CLOSED = "list closed";
-	private static final String LIST_BY_AUCTIONID = "list all user";
-	private static final String LIST_OPEN_BY_AUCTIONID = "list open user";
-	private static final String LIST_CLOSED_BY_AUCTIONID = "list closed user";
+	private static final String LIST_BY_USERID = "list all userID";
+	private static final String LIST_OPEN_BY_USERID = "list open userID";
+	private static final String LIST_CLOSED_BY_USERID = "list closed userID";
+	private static final String LIST_BY_AUCTIONID = "list all auctionID";
+	private static final String LIST_OPEN_BY_AUCTIONID = "list open auctionID";
+	private static final String LIST_CLOSED_BY_AUCTIONID = "list closed auctionID";
 	private static final String HELP = "help";
 	private static final String EXIT = "exit";
 
@@ -111,6 +114,15 @@ public class Client implements ClientAPI {
 					break;
 				case LIST_CLOSED:
 					listClosed();
+					break;
+				case LIST_BY_USERID:
+					listAllByUserID();
+					break;
+				case LIST_OPEN_BY_USERID:
+					listOpenByUserID();
+					break;
+				case LIST_CLOSED_BY_USERID:
+					listClosedByUserID();
 					break;
 				case LIST_BY_AUCTIONID:
 					listAllByAuctionID();
@@ -451,11 +463,81 @@ public class Client implements ClientAPI {
 		System.out.println(result);
 
 	}
+	
+	private void listAllByUserID() throws IOException{
+		String result;
+		System.out.println("Enter userID: ");
+		String userID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/all/by-product-owner-user/" + userID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);	}
+	
+	private void listOpenByUserID() throws IOException{
+		String result;
+		System.out.println("Enter userID: ");
+		String userID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/opened/by-product-owner-user/" + userID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);	}
+	
+	private void listClosedByUserID() throws IOException{
+		String result;
+		System.out.println("Enter userID: ");
+		String userID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/closed/by-product-owner-user/" + userID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);	}
 
 	private void listAllByAuctionID() throws IOException {
 		String result;
-		String userID = br.readLine();
-		String url = AUCTION_SERVER_ADDRESS + "/all/" + userID;
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/all/" + auctionID;
 
 		ListenableFuture<Response> future;
 
@@ -477,8 +559,9 @@ public class Client implements ClientAPI {
 	
 	private void listOpenByAuctionID() throws IOException {
 		String result;
-		String userID = br.readLine();
-		String url = AUCTION_SERVER_ADDRESS + "/opened/" + userID;
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/opened/" + auctionID;
 
 		ListenableFuture<Response> future;
 
@@ -500,8 +583,9 @@ public class Client implements ClientAPI {
 	
 	private void listClosedByAuctionID() throws IOException {
 		String result;
-		String userID = br.readLine();
-		String url = AUCTION_SERVER_ADDRESS + "/closed/" + userID;
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/closed/" + auctionID;
 
 		ListenableFuture<Response> future;
 
@@ -530,6 +614,9 @@ public class Client implements ClientAPI {
 		System.out.println(LIST_ALL);
 		System.out.println(LIST_OPEN);
 		System.out.println(LIST_CLOSED);
+		System.out.println(LIST_BY_USERID);
+		System.out.println(LIST_OPEN_BY_USERID);
+		System.out.println(LIST_CLOSED_BY_USERID);
 		System.out.println(LIST_BY_AUCTIONID);
 		System.out.println(LIST_OPEN_BY_AUCTIONID);
 		System.out.println(LIST_CLOSED_BY_AUCTIONID);
