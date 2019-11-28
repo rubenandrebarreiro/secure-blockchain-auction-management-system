@@ -347,7 +347,7 @@ public class SecureBidMessageSignatureProposal {
 				}
 				
 				this.bidSerializedHashedChallengeCiphered = 
-						secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher.doFinal(this.bidSerializedHashed);
+						secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher.doFinal(this.bidSerializedHashedChallenge);
 				
 				this.setIsBidSerializedHashedChallengeCiphered(true);		
 				
