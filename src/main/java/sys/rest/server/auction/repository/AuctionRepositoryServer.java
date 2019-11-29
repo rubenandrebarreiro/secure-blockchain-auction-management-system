@@ -3,6 +3,7 @@ package main.java.sys.rest.server.auction.repository;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.ServerSocket;
 import java.net.URI;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -105,8 +108,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		String keyStoreConfigurationsFilePath = args[2];
 	
 		
-		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
-
+		URI baseUri = UriBuilder.fromUri("https://0.0.0.0/").port(port).build();
+		
 		ResourceConfig config = new ResourceConfig();
 		
 		AuctionRepositoryServer auctionRepositoryServer = new AuctionRepositoryServer
@@ -124,7 +127,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	        
 		    KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance
 		    									 (auctionRepositoryServer.getKeyManagerFactoryInstance());
-	        
+		    
 		    char[] ctPass = "something".toCharArray(); // TODO - change/verify this
 		    keyManagerFactory.init(keyStore, ctPass);
 	        
@@ -132,6 +135,20 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 								   (auctionRepositoryServer.getAvailableSSLContextInstance());
 			
 			sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+			
+			// TODO - Do Hybrid Version
+			
+			SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
+			
+			ServerSocket sslServerSocket = sslServerSocketFactory.createServerSocket(port);
+			
+			( (SSLServerSocket)sslServerSocket ).setEnabledProtocols(auctionRepositoryServer.getAvailableTLSVersions());
+			( (SSLServerSocket)sslServerSocket ).setEnabledCipherSuites(auctionRepositoryServer.getAvailableTLSCiphersuites());
+			
+			( (SSLServerSocket)sslServerSocket )
+			.setNeedClientAuth(auctionRepositoryServer.getAvailableSSLContextInstance() == "TLS" ? true : false);
+			
+			
 			
 			
 			HttpServer auctionRepositoryHTTPSServer = JdkHttpServerFactory.createHttpServer(baseUri, config, sslContext);
