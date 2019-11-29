@@ -244,7 +244,7 @@ public class SecureBidMessageSignatureProposal {
 		
 		boolean isPossibleToEncryptBidSerializedHashed = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
+						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
 	
 		if(isPossibleToEncryptBidSerializedHashed) {
 			
