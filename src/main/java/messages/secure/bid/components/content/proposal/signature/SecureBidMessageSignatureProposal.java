@@ -32,15 +32,9 @@ public class SecureBidMessageSignatureProposal {
 
 	private boolean isBidSerializedHashed;
 	
+	private byte[] bidSerializedHashedCiphered;
 
-	private byte[] bidSerializedHashedChallenge;
-
-	private boolean isBidSerializedHashedChallengeMade;
-	
-	
-	private byte[] bidSerializedHashedChallengeCiphered;
-
-	private boolean isBidSerializedHashedChallengeCiphered;
+	private boolean isBidSerializedHashedCiphered;
 
 	private byte[] bidDigitalSigned;
 
@@ -57,12 +51,9 @@ public class SecureBidMessageSignatureProposal {
 
 		this.bidSerializedHashed = null;
 		this.isBidSerializedHashed = false;
-
-		this.bidSerializedHashedChallenge = null;
-		this.isBidSerializedHashedChallengeMade = false;
 		
-		this.bidSerializedHashedChallengeCiphered = null;
-		this.isBidSerializedHashedChallengeCiphered = false;
+		this.bidSerializedHashedCiphered = null;
+		this.isBidSerializedHashedCiphered = false;
 
 		this.bidDigitalSigned = null;
 		this.isBidDigitalSigned = false;
@@ -74,12 +65,9 @@ public class SecureBidMessageSignatureProposal {
 		this.bidDigitalSigned = bidDigitalSigned;
 		this.isBidDigitalSigned = true;
 
-		this.bidSerializedHashedChallengeCiphered = null;
-		this.isBidSerializedHashedChallengeCiphered = true;
+		this.bidSerializedHashedCiphered = null;
+		this.isBidSerializedHashedCiphered = true;
 
-		this.bidSerializedHashedChallenge = null;
-		this.isBidSerializedHashedChallengeMade = false;
-		
 		this.bidSerializedHashed = null;
 		this.isBidSerializedHashed = true;
 
@@ -138,37 +126,21 @@ public class SecureBidMessageSignatureProposal {
 	public void setIsBidSerializedHashed(boolean isBidSerializedHashed) {
 		this.isBidSerializedHashed = isBidSerializedHashed;
 	}
-
-	public byte[] getBidSerializedHashedChallenge() {
-		return this.bidSerializedHashedChallenge;
+	
+	public byte[] getBidSerializedHashedCiphered() {
+		return this.bidSerializedHashedCiphered;
 	}
 
-	public void setBidSerializedHashedChallenge(byte[] bidSerializedHashedChallenge) {
-		this.bidSerializedHashedChallenge = bidSerializedHashedChallenge;
+	public void setBidSerializedHashedCiphered(byte[] bidSerializedHashedCiphered) {
+		this.bidSerializedHashedCiphered = bidSerializedHashedCiphered;
 	}
 
-	public boolean getIsBidSerializedHashedChallengeMade() {
-		return this.isBidSerializedHashedChallengeMade;
+	public boolean getIsBidSerializedHashedCiphered() {
+		return this.isBidSerializedHashedCiphered;
 	}
 
-	public void setIsBidSerializedHashedChallengeMade(boolean isBidSerializedHashedChallengeMade) {
-		this.isBidSerializedHashedChallengeMade = isBidSerializedHashedChallengeMade;
-	}
-
-	public byte[] getBidSerializedHashedChallengeCiphered() {
-		return this.bidSerializedHashedChallengeCiphered;
-	}
-
-	public void setBidSerializedHashedChallengeCiphered(byte[] bidSerializedHashedChallengeCiphered) {
-		this.bidSerializedHashedChallengeCiphered = bidSerializedHashedChallengeCiphered;
-	}
-
-	public boolean getIsBidSerializedHashedChallengeCiphered() {
-		return this.isBidSerializedHashedChallengeCiphered;
-	}
-
-	public void setIsBidSerializedHashedChallengeCiphered(boolean isBidSerializedHashedChallengeCiphered) {
-		this.isBidSerializedHashedChallengeCiphered = isBidSerializedHashedChallengeCiphered;
+	public void setIsBidSerializedHashedCiphered(boolean isBidSerializedHashedCiphered) {
+		this.isBidSerializedHashedCiphered = isBidSerializedHashedCiphered;
 	}
 
 	public byte[] getBidDigitalSigned() {
@@ -193,18 +165,15 @@ public class SecureBidMessageSignatureProposal {
 
 		boolean isPossibleToBuildSecureBidMessageSignatureToSend = 
 				( !this.getIsBidSerialized() && !this.getIsBidSerializedHashed() && 
-					!this.getIsBidSerializedHashedChallengeMade() && !this.getIsBidSerializedHashedChallengeCiphered() && 
-						!this.getIsBidDigitalSigned() );	
+					!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );	
 
 		if(isPossibleToBuildSecureBidMessageSignatureToSend) {
 
 			this.doSerializationOfBid();
 
 			this.doHashOfSerializedBid();
-			
-			this.doChallengeForSerializedHashedBid();
-			
-			this.encryptSerializedHashedChallengeBid();
+						
+			this.encryptSerializedHashedBid();
 
 			this.doDigitalSignatureOfSerializedHashedChallengeEncryptedBid();
 			
@@ -216,16 +185,13 @@ public class SecureBidMessageSignatureProposal {
 		
 		boolean isPossibleToBuildSecureBidMessageSignatureReceived = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-					this.getIsBidSerializedHashedChallengeMade() && this.getIsBidSerializedHashedChallengeCiphered() && 
-						this.getIsBidDigitalSigned() );
+						this.getIsBidSerializedHashedCiphered() && this.getIsBidDigitalSigned() );
 		
 		if(isPossibleToBuildSecureBidMessageSignatureReceived) {
 			
 			this.undoDigitalSignatureOfSerializedHashedChallengeEncryptedBid();
 			
 			this.decryptSerializedHashedChallengeBid();
-			
-			this.solveCryptoPuzzleForBidChallenge();
 			
 		}
 	}
@@ -234,8 +200,7 @@ public class SecureBidMessageSignatureProposal {
 		
 		boolean isPossibleToDoSerializationOfBid = 
 				( !this.getIsBidSerialized() && !this.getIsBidSerializedHashed() && 
-						!this.getIsBidSerializedHashedChallengeMade() && !this.getIsBidSerializedHashedChallengeCiphered() && 
-							!this.getIsBidDigitalSigned() );	
+						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );	
 			
 		if(isPossibleToDoSerializationOfBid) {
 			
@@ -257,8 +222,7 @@ public class SecureBidMessageSignatureProposal {
 
 		boolean isPossibleToDoHashOfBidSerialized = 
 				( this.getIsBidSerialized() && !this.getIsBidSerializedHashed() && 
-						!this.getIsBidSerializedHashedChallengeMade() && !this.getIsBidSerializedHashedChallengeCiphered() && 
-							!this.getIsBidDigitalSigned() );	
+						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );	
 		
 		if(isPossibleToDoHashOfBidSerialized) {
 
@@ -275,42 +239,13 @@ public class SecureBidMessageSignatureProposal {
 		return true;
 	}
 	
-	public void doChallengeForSerializedHashedBid() throws NoSuchAlgorithmException {
-
-		boolean isPossibleToDoChallengeForBidSerializedHashed = 
-				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-					!this.getIsBidSerializedHashedChallengeMade() &&
-						!this.getIsBidSerializedHashedChallengeCiphered() && !this.getIsBidDigitalSigned() );
-
-		if(isPossibleToDoChallengeForBidSerializedHashed) {
-			
-			Random random = new Random();
-			
-			this.bidSerializedHashedChallenge = this.bidSerializedHashed;
-			
-			// At least one byte unknown for the challenge
-			int sizeOfChallenge = random.nextInt(this.bidSerializedHashedChallenge.length - 1);
-			
-			for(int i = sizeOfChallenge; i < sizeOfChallenge; i++) {
-				this.bidSerializedHashedChallenge[i] = -1;
-			}
-			
-			this.setIsBidSerializedHashedChallengeMade(true);			
-		}
-	}
-	
-	public void solveCryptoPuzzleForBidChallenge() {
-		// TODO - solve it
-	}
-	
-	private void encryptSerializedHashedChallengeBid()
+	private void encryptSerializedHashedBid()
 			throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException,
 			       InvalidKeyException, InvalidAlgorithmParameterException {
 		
 		boolean isPossibleToEncryptBidSerializedHashedChallenge = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						this.getIsBidSerializedHashedChallengeMade() &&
-							!this.getIsBidSerializedHashedChallengeCiphered() && !this.getIsBidDigitalSigned() );
+						this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
 	
 		if(isPossibleToEncryptBidSerializedHashedChallenge) {
 			
@@ -353,6 +288,7 @@ public class SecureBidMessageSignatureProposal {
 					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
 					secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher
 						.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
+					
 				}
 				else {
 					
@@ -365,11 +301,11 @@ public class SecureBidMessageSignatureProposal {
 					
 				}
 				
-				this.bidSerializedHashedChallengeCiphered = 
-						secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher.doFinal(this.bidSerializedHashedChallenge);
+				this.bidSerializedHashedCiphered = 
+						secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher.doFinal(this.bidSerializedHashed);
 				
 				
-				this.setIsBidSerializedHashedChallengeCiphered(true);		
+				this.setIsBidSerializedHashedCiphered(true);		
 				
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
@@ -415,8 +351,7 @@ public class SecureBidMessageSignatureProposal {
 	
 		boolean isPossibleToDecryptBidSerializedHashedChallenge = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						this.getIsBidSerializedHashedChallengeMade() &&
-							this.getIsBidSerializedHashedChallengeCiphered() && !this.getIsBidDigitalSigned() );
+						this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
 		
 		if(isPossibleToDecryptBidSerializedHashedChallenge) {
 			
@@ -467,23 +402,23 @@ public class SecureBidMessageSignatureProposal {
 					
 				}
 				
-				int sizeOfBidSerializedHashedChallengeCiphered = 
-						this.bidSerializedHashedChallengeCiphered.length;
+				int sizeOfBidSerializedHashedCiphered = 
+						this.bidSerializedHashedCiphered.length;
 				
 			  	// The Plain Text of the bytes of the data input received through the communication channel
-			  	this.bidSerializedHashedChallenge = new byte[ secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
-			  	                                                .getOutputSize(sizeOfBidSerializedHashedChallengeCiphered) ];
+			  	this.bidSerializedHashed = new byte[ secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
+			  	                                                .getOutputSize(sizeOfBidSerializedHashedCiphered) ];
 			    
 			  	int sizeOfBidSerializedHashedChallenge = secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
-				  									     .update(this.bidSerializedHashedChallengeCiphered, 
-				  										   	     0, sizeOfBidSerializedHashedChallengeCiphered,
-				  											     this.bidSerializedHashedChallenge, 0);
+				  									     .update(this.bidSerializedHashedCiphered, 
+				  										   	     0, sizeOfBidSerializedHashedCiphered,
+				  											     this.bidSerializedHashed, 0);
 			  	
 			  	secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
-			  									   .doFinal(this.bidSerializedHashedChallenge, sizeOfBidSerializedHashedChallenge);
+			  									   .doFinal(this.bidSerializedHashed, sizeOfBidSerializedHashedChallenge);
 			    
 			  	
-				this.setIsBidSerializedHashedChallengeCiphered(true);		
+				this.setIsBidSerializedHashedCiphered(true);		
 				
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
@@ -531,17 +466,16 @@ public class SecureBidMessageSignatureProposal {
 	
 	private void doDigitalSignatureOfSerializedHashedChallengeEncryptedBid() {
 		
-		boolean isPossibleToSignBidSerializedHashedChallengeEncrypted = 
+		boolean isPossibleToSignBidSerializedHashedEncrypted = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						this.getIsBidSerializedHashedChallengeMade() &&
-							this.getIsBidSerializedHashedChallengeCiphered() && !this.getIsBidDigitalSigned() );
+						this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
 		
-		if(isPossibleToSignBidSerializedHashedChallengeEncrypted) {
+		if(isPossibleToSignBidSerializedHashedEncrypted) {
 			
 			byte[] bidSerialized = this.getBidSerialized();
-			byte[] bidSerializedHashedChallengeCiphered = this.getBidSerializedHashedChallengeCiphered();
+			byte[] bidSerializedHashedCiphered = this.getBidSerializedHashedCiphered();
 			
-			int sizeOfBidDigitalSigned = (bidSerialized.length + bidSerializedHashedChallengeCiphered.length);
+			int sizeOfBidDigitalSigned = (bidSerialized.length + bidSerializedHashedCiphered.length);
 			
 			this.bidDigitalSigned = new byte[sizeOfBidDigitalSigned];
 			
@@ -564,7 +498,7 @@ public class SecureBidMessageSignatureProposal {
 			// Fills the byte array of the Bid Digital Signed with the Hash Challenge of the Bid's Serialization Ciphered,
 			// From the position corresponding to the length of Bid's Serialization to
 			// the corresponding of the length of the Hash Challenge of the Bid's Serialization Ciphered
-			System.arraycopy(bidSerializedHashedChallengeCiphered, 0, this.bidDigitalSigned, serializationOffset, bidSerializedHashedChallengeCiphered.length);
+			System.arraycopy(bidSerializedHashedCiphered, 0, this.bidDigitalSigned, serializationOffset, bidSerializedHashedCiphered.length);
 			
 			
 			this.setIsBidDigitalSigned(true);
@@ -576,8 +510,7 @@ public class SecureBidMessageSignatureProposal {
 		
 		boolean isPossibleToUndoBidSerializedHashedChallengeEncryptedSigned = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						this.getIsBidSerializedHashedChallengeMade() &&
-							this.getIsBidSerializedHashedChallengeCiphered() && this.getIsBidDigitalSigned() );
+						this.getIsBidSerializedHashedCiphered() && this.getIsBidDigitalSigned() );
 		
 		if(isPossibleToUndoBidSerializedHashedChallengeEncryptedSigned) {
 			
@@ -585,7 +518,7 @@ public class SecureBidMessageSignatureProposal {
 			int sizeOfBidDigitalSigned = bidDigitalSigned.length;
 			
 			this.bidSerialized = new byte[ this.getSizeOfBidSerialized() ];
-			this.bidSerializedHashedChallengeCiphered = 
+			this.bidSerializedHashedCiphered = 
 					new byte[ ( sizeOfBidDigitalSigned - this.getSizeOfBidSerialized() ) ];
 			
 			
@@ -610,7 +543,7 @@ public class SecureBidMessageSignatureProposal {
 			// the correspondent bytes from the Hash Challenge of the Bid Digital Signed,
 			// From the position corresponding to the length of Bid's Serialization to
 			// the corresponding of the length of the Hash Challenge of the Bid's Serialization Ciphered
-			System.arraycopy(bidDigitalSigned, serializationOffset, this.bidSerializedHashedChallengeCiphered, 0, this.bidSerializedHashedChallengeCiphered.length);
+			System.arraycopy(bidDigitalSigned, serializationOffset, this.bidSerializedHashedCiphered, 0, this.bidSerializedHashedCiphered.length);
 			
 			
 			this.setIsBidDigitalSigned(false);
