@@ -14,6 +14,8 @@ import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bouncycastle.util.Arrays;
+
 import main.java.common.utils.CommonUtils;
 import main.java.resources.bid.Bid;
 
@@ -26,10 +28,16 @@ public class SecureBidMessageSignatureProposal {
 	private boolean isBidSerialized;
 
 	private int sizeOfBidSerialized;
+	
+	private int sizeOfBidderUserClientID;
 
 	private byte[] bidSerializedHashed;
 
 	private boolean isBidSerializedHashed;
+	
+	private boolean isBidSerializedHashedVerified;
+	
+	private boolean isBidSerializedHashedValid;
 	
 	private byte[] bidSerializedHashedCiphered;
 
@@ -50,6 +58,8 @@ public class SecureBidMessageSignatureProposal {
 
 		this.bidSerializedHashed = null;
 		this.isBidSerializedHashed = false;
+		this.isBidSerializedHashedVerified = false;
+		this.isBidSerializedHashedValid = false;
 		
 		this.bidSerializedHashedCiphered = null;
 		this.isBidSerializedHashedCiphered = false;
@@ -59,7 +69,7 @@ public class SecureBidMessageSignatureProposal {
 
 	}
 
-	public SecureBidMessageSignatureProposal(byte[] bidDigitalSigned, int sizeOfBidSerialized) {
+	public SecureBidMessageSignatureProposal(byte[] bidDigitalSigned, int sizeOfBidSerialized, int sizeOfBidderUserClientID) {
 
 		this.bidDigitalSigned = bidDigitalSigned;
 		this.isBidDigitalSigned = true;
@@ -69,10 +79,14 @@ public class SecureBidMessageSignatureProposal {
 
 		this.bidSerializedHashed = null;
 		this.isBidSerializedHashed = true;
-
+		this.isBidSerializedHashedVerified = false;
+		this.isBidSerializedHashedValid = false;
+		
 		this.bidSerialized = null;
 		this.isBidSerialized = true;
+		
 		this.sizeOfBidSerialized = sizeOfBidSerialized;
+		this.sizeOfBidderUserClientID = sizeOfBidderUserClientID;
 
 		this.bid = null;
 
@@ -125,7 +139,23 @@ public class SecureBidMessageSignatureProposal {
 	public void setIsBidSerializedHashed(boolean isBidSerializedHashed) {
 		this.isBidSerializedHashed = isBidSerializedHashed;
 	}
-	
+
+	public boolean getIsBidSerializedHashedVerified() {
+		return this.isBidSerializedHashedVerified;
+	}
+
+	public void setIsBidSerializedHashedVerified(boolean isBidSerializedHashedVerified) {
+		this.isBidSerializedHashedVerified = isBidSerializedHashedVerified;
+	}
+
+	public boolean getIsBidSerializedHashedValid() {
+		return this.isBidSerializedHashedValid;
+	}
+
+	public void setIsBidSerializedHashedValid(boolean isBidSerializedHashedValid) {
+		this.isBidSerializedHashedValid = isBidSerializedHashedValid;
+	}
+		
 	public byte[] getBidSerializedHashedCiphered() {
 		return this.bidSerializedHashedCiphered;
 	}
@@ -180,7 +210,7 @@ public class SecureBidMessageSignatureProposal {
 
 	}
 	
-	public void buildSecureBidMessageSignatureReceived() {
+	public void buildSecureBidMessageSignatureReceived() throws NoSuchAlgorithmException {
 		
 		boolean isPossibleToBuildSecureBidMessageSignatureReceived = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
@@ -192,6 +222,9 @@ public class SecureBidMessageSignatureProposal {
 			
 			this.decryptSerializedHashedBid();
 			
+			if(this.checkIfHashOfSerializedBidIsValid()) {
+				this.undoSerializationOfBid();
+			}
 		}
 	}
 
@@ -205,7 +238,7 @@ public class SecureBidMessageSignatureProposal {
 			
 			this.bid.doSerialization();
 			
-			this.bidSerialized = this.bid.getSerializedBytes();
+			this.bidSerialized = this.bid.getBidSerializedBytes();
 			
 			this.setIsBidSerialized(true);
 			
@@ -214,7 +247,28 @@ public class SecureBidMessageSignatureProposal {
 	}
 
 	public void undoSerializationOfBid() {
-
+		
+		boolean isPossibleToUndoSerializationOfBid = 
+				( this.getIsBidSerialized() && !this.getIsBidSerializedHashed() && 
+						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );	
+		
+		if(isPossibleToUndoSerializationOfBid) {
+			
+			boolean isBidSerializedHashedVerifiedAndValid = 
+				( this.getIsBidSerializedHashedVerified() && this.getIsBidSerializedHashedValid() );
+			
+			if(isBidSerializedHashedVerifiedAndValid) {
+				
+				this.bid = new Bid(this.bidSerialized);
+				
+				this.bid.undoSerialization(this.sizeOfBidderUserClientID);
+				
+				this.setIsBidSerialized(false);
+				
+			}
+			
+		}
+		
 	}
 
 	public void doHashOfSerializedBid() throws NoSuchAlgorithmException {
@@ -233,9 +287,31 @@ public class SecureBidMessageSignatureProposal {
 		
 	}
 
-	public boolean checkHashOfSerializedBid(Bid bidToCompare) {
-		// TODO - to complete
-		return true;
+	public boolean checkIfHashOfSerializedBidIsValid() throws NoSuchAlgorithmException {
+		
+		boolean isPossibleToCheckHashOfBidSerialized = 
+				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() &&
+						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
+		
+		if(isPossibleToCheckHashOfBidSerialized) {
+			
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			byte[] bidSerializedHashedToCompare = messageDigest.digest(this.bidSerialized);
+			
+			this.isBidSerializedHashedValid = Arrays.areEqual(this.bidSerializedHashed, 
+															  bidSerializedHashedToCompare) ? 
+																	  true : false;
+			
+			
+			this.setIsBidSerializedHashedVerified(true);
+			this.setIsBidSerializedHashed(false);
+			
+			
+			return this.isBidSerializedHashedValid;
+			
+		}
+		
+		return false;
 	}
 	
 	private void encryptSerializedHashedBid()
@@ -417,7 +493,7 @@ public class SecureBidMessageSignatureProposal {
 			  									   .doFinal(this.bidSerializedHashed, sizeOfBidSerializedHashed);
 			    
 			  	
-				this.setIsBidSerializedHashedCiphered(true);		
+				this.setIsBidSerializedHashedCiphered(false);		
 				
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
