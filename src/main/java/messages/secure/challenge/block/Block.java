@@ -6,23 +6,23 @@ import main.java.resources.bid.Bid;
 
 public class Block {
 
-	private Bid[] bidsToMinerate;
+	private Bid[] bidsToMine;
 	
 	private byte[] blockSerialized;
 	
-	public Block(Bid[] bidsToMinerate) {
+	public Block(Bid[] bidsToMine) {
 		
-		this.bidsToMinerate = bidsToMinerate;
+		this.bidsToMine = bidsToMine;
 		this.blockSerialized = null;
 		
 	}
 
-	public Bid[] getBidsToMinerate() {
-		return bidsToMinerate;
+	public Bid[] getBidsToMine() {
+		return bidsToMine;
 	}
 
-	public void setBidsToMinerate(Bid[] bidsToMinerate) {
-		this.bidsToMinerate = bidsToMinerate;
+	public void setBidsToMine(Bid[] bidsToMine) {
+		this.bidsToMine = bidsToMine;
 	}
 
 	public byte[] getBlockSerialized() {
@@ -49,18 +49,18 @@ public class Block {
 		int serializationOffset = 0;
 		
 		
-		for(Bid bid : bidsToMinerate) {
+		for(Bid bidToMine : bidsToMine) {
 
-			bid.doSerialization();
+			bidToMine.doSerialization();
 			
 			if(this.blockSerialized == null) {
 					
-				this.blockSerialized = bid.getBidSerializedBytes();
+				this.blockSerialized = bidToMine.getBidSerializedBytes();
 				
 			}
 			else {
 			
-				byte[] serializedBidBytes = bid.getBidSerializedBytes();
+				byte[] serializedBidBytes = bidToMine.getBidSerializedBytes();
 				
 				int sizeOfSerializedBid = serializedBidBytes.length;
 				
