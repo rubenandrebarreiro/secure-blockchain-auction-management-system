@@ -292,6 +292,20 @@ public class CommonUtils {
 	}
 	
 	/**
+     * Returns and converts a Double Number, from a given Byte Array.
+     * 
+     * @param doubleNumberByteArray a given Byte Array to be converted
+     * 
+     * @return and converts a Double Number, from a given Byte Array
+     */
+	public static double fromByteArrayToDouble(byte[] doubleNumberByteArray) {
+		ByteBuffer byteBuffer = ByteBuffer.wrap(doubleNumberByteArray);
+		double doubleNumberDeserialized = byteBuffer.order(ByteOrder.nativeOrder()).getDouble();
+		
+		return doubleNumberDeserialized;
+	}
+	
+	/**
      * Returns and converts a Long Number, from a given Byte Array.
      * 
      * @param longNumberByteArray a given Byte Array to be converted
