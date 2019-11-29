@@ -10,13 +10,15 @@ public class Block {
 	
 	private byte[] blockSerialized;
 	
+	
 	public Block(Bid[] bidsToMine) {
 		
 		this.bidsToMine = bidsToMine;
 		this.blockSerialized = null;
 		
 	}
-
+	
+	
 	public Bid[] getBidsToMine() {
 		return bidsToMine;
 	}
