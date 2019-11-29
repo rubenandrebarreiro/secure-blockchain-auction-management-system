@@ -74,8 +74,8 @@ public class ChallengeMessageMetaHeader {
 		if(!this.isChallengeMessageMetaHeaderSerialized) {
 			
 			int sizeOfChallengeMessageMetaHeaderSerialized = ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) + 
-					   ( CommonUtils.SHORT_IN_BYTES_LENGTH ) +
-					   ( 2 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+															   ( CommonUtils.SHORT_IN_BYTES_LENGTH ) +
+															   ( 2 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 
 			this.challengeMessageMetaHeaderSerialized = new byte[ sizeOfChallengeMessageMetaHeaderSerialized ];
 			
@@ -138,11 +138,43 @@ public class ChallengeMessageMetaHeader {
 	}
 	
 	
-	private void undoChallengeMessageMetaHeaderSerialized() {
+	public void undoChallengeMessageMetaHeaderSerialized() {
 		
 		if(this.isChallengeMessageMetaHeaderSerialized) {
 			
-			// TODO
+			byte[] sizeOfBlockSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			byte[] sizeOfBlockChallengeInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			
+			// Operations to Fill a Byte Array, with the following parameters:
+			// 1) src - The source of the array to be copied
+			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
+			// 3) dest - The destination of the array to be copied
+			// 4) destPos - The position of the array where will be placed the new copy,
+			//              representing the first element where new data will be placed
+			// 5) length - The length of the data to be copied from the source array to the destination array
+			
+			// The offset related to fulfilment of the serialization process
+			int serializationOffset = 0;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			serializationOffset += CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH;
+			System.arraycopy(this.challengeMessageMetaHeaderSerialized, serializationOffset, sizeOfBlockSerializedInBytes, 0, sizeOfBlockSerializedInBytes.length);
+			serializationOffset += CommonUtils.INTEGER_IN_BYTES_LENGTH;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			serializationOffset += CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH;
+			System.arraycopy(this.challengeMessageMetaHeaderSerialized, serializationOffset, sizeOfBlockChallengeInBytes, 0, sizeOfBlockChallengeInBytes.length);
+			
+			
+			this.sizeOfBlockSerialized = CommonUtils.fromByteArrayToInt(sizeOfBlockSerializedInBytes);
+			this.sizeOfBlockChallenge = CommonUtils.fromByteArrayToInt(sizeOfBlockChallengeInBytes);
+			
 			
 			this.setIsChallengeMessageMetaHeaderSerialized(false);
 			
