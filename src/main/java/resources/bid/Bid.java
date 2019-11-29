@@ -16,6 +16,9 @@ public class Bid {
 	private double bidValue;
 	@DatabaseField
 	private long bidTimestamp;
+	@DatabaseField
+	private boolean isBidMined;
+	
 	
 	private byte[] bidSerializedBytes;
 
@@ -33,9 +36,20 @@ public class Bid {
 		this.bidValue = bidValue;
 		this.bidTimestamp = System.currentTimeMillis();
 
+		this.isBidMined = false;
+		
+		this.bidSerializedBytes = null;
+		
 	}
 	
 	public Bid(byte[] bidSerializedBytes) {
+		
+		this.bidID = -1L;
+		this.bidderUserClientID = null;
+		this.bidValue = -1.0;
+		this.bidTimestamp = -1L;
+		
+		this.isBidMined = false;
 		
 		this.bidSerializedBytes = bidSerializedBytes;
 		
@@ -72,6 +86,14 @@ public class Bid {
 
 	public void setBidTimestamp(long bidTimestamp) {
 		this.bidTimestamp = bidTimestamp;
+	}
+
+	public boolean getIsBidMined() {
+		return this.isBidMined;
+	}
+
+	public void setIsBidMined(boolean isBidMined) {
+		this.isBidMined = isBidMined;
 	}
 	
 	public byte[] getBidSerializedBytes() {
@@ -178,4 +200,5 @@ public class Bid {
 		this.bidTimestamp = CommonUtils.fromByteArrayToLong(bidTimestampSerialized);
 		
 	}
+	
 }
