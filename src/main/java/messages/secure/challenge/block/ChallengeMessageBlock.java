@@ -13,7 +13,7 @@ public class ChallengeMessageBlock {
 	
 	private int numBytesBlockChallenge;
 	
-	private byte[] blockChallengeMessage;
+	private byte[] blockChallengeMessageSerialized;
 	
 	
 	public ChallengeMessageBlock(Block block) {
@@ -22,7 +22,7 @@ public class ChallengeMessageBlock {
 		this.blockChallenge = null;
 		this.numBytesBlockChallenge = 0;
 		
-		this.blockChallengeMessage = null;
+		this.blockChallengeMessageSerialized = null;
 		
 	}
 	
@@ -50,12 +50,12 @@ public class ChallengeMessageBlock {
 		this.numBytesBlockChallenge = numBytesBlockChallenge;
 	}
 	
-	public byte[] getBlockChallengeMessage() {
-		return this.blockChallengeMessage;
+	public byte[] getBlockChallengeMessageSerialized() {
+		return this.blockChallengeMessageSerialized;
 	}
 	
-	public void setBlockChallengeMessage(byte[] blockChallengeMessage) {
-		this.blockChallengeMessage = blockChallengeMessage;
+	public void setBlockChallengeMessageSerialized(byte[] blockChallengeMessageSerialized) {
+		this.blockChallengeMessageSerialized = blockChallengeMessageSerialized;
 	}
 	
 	public void createChallengeToSolve() throws NoSuchAlgorithmException {
@@ -86,7 +86,7 @@ public class ChallengeMessageBlock {
 		
 		int sizeOfBlockChallengeMessage = ( blockSerialized.length + blockChallenge.length );
 		
-		this.blockChallengeMessage = new byte[ sizeOfBlockChallengeMessage ];
+		this.blockChallengeMessageSerialized = new byte[ sizeOfBlockChallengeMessage ];
 		
 		// Operations to Fill a Byte Array, with the following parameters:
 		// 1) src - The source of the array to be copied
@@ -103,14 +103,14 @@ public class ChallengeMessageBlock {
 		// the correspondent bytes from the current Bid serialized,
 		// From the position corresponding to the length of the previous Bid's Serialization to
 		// the position corresponding to the length of the current Bid's Serialization
-		System.arraycopy(blockSerialized, 0, this.blockChallengeMessage, serializationOffset, blockSerialized.length);
+		System.arraycopy(blockSerialized, 0, this.blockChallengeMessageSerialized, serializationOffset, blockSerialized.length);
 		serializationOffset += blockSerialized.length;
 		
 		// Fills the byte array of the Block's Serialization with
 		// the correspondent bytes from the current Bid serialized,
 		// From the position corresponding to the length of the previous Bid's Serialization to
 		// the position corresponding to the length of the current Bid's Serialization
-		System.arraycopy(blockChallenge, 0, this.blockChallengeMessage, serializationOffset, blockChallenge.length);
+		System.arraycopy(blockChallenge, 0, this.blockChallengeMessageSerialized, serializationOffset, blockChallenge.length);
 		
 	}
 }
