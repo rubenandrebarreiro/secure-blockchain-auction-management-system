@@ -541,11 +541,11 @@ public class SecureBidMessageSignatureProposal {
 	
 	private void doDigitalSignatureOfSerializedHashedEncryptedBid() {
 		
-		boolean isPossibleToSignBidSerializedHashedEncrypted = 
+		boolean isPossibleToSignSerializedHashedEncryptedBid = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
 						this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
 		
-		if(isPossibleToSignBidSerializedHashedEncrypted) {
+		if(isPossibleToSignSerializedHashedEncryptedBid) {
 			
 			byte[] bidSerialized = this.getBidSerialized();
 			byte[] bidSerializedHashedCiphered = this.getBidSerializedHashedCiphered();
