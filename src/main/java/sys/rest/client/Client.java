@@ -63,34 +63,63 @@ public class Client implements ClientAPI {
 	private SSLSocket socket;
 
 	public static void main(String[] args) {
-		int port = 8082;
-		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
-		ResourceConfig config = new ResourceConfig();
-		config.register( new Client() );
+		
+		if(args.length != 6) {
 
-		JdkHttpServerFactory.createHttpServer(baseUri, config);
+			System.err.println
+			(String.format
+					("Usage: java AuctionRepositoryServer <url> <port> "
+							+ "<key-store-file-path> <key-store-password>"
+							+ "<trust-store-file-path> <trust-store-password>"
+							)
+					);
 
-		System.out.println("Client ready @ " + baseUri);
+			System.exit(1);
+		}
+		
+		String url = args[0];
+		int serverPort = Integer.parseInt(args[1]);
+		
+		String keyStoreFilePath = args[2];
+		String keyStorePassword = args[3];
+		
+		String trustStoreFilePath = args[4];
+		String trustStorePassword = args[5];
+		
+//		int port = 8082;
+//		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
+//		ResourceConfig config = new ResourceConfig();
+//		config.register( new Client(serverPort, trustStoreFilePath, keyStoreFilePath) );
 
+//		JdkHttpServerFactory.createHttpServer(baseUri, config);
+
+//		System.out.println("Client ready @ " + baseUri);
+		
+		new Client(url, serverPort,
+				keyStoreFilePath, keyStorePassword,
+				trustStoreFilePath, keyStorePassword);
+		
+		System.out.println("Client ready!");
 	}
 
-	public Client() {
+	public Client(String url, int serverPort,
+			String keyStorePath, String keyStorePassword,
+			String trustStorePath, String trustStorePassword) {
 
 		//SSL Connection
 
 		try {
-			System.setProperty("javax.net.ssl.trustStore", "res/keystore/truststores/eduardoTruststore.jks");
-			System.setProperty("javax.net.ssl.trustStorePassword", "eduardo1920");
-			System.setProperty("javax.net.ssl.keyStore", "res/keystore/keystores/eduardoKeystore.jks");
-			System.setProperty("javax.net.ssl.keyStorePassword", "eduardo1920");
+			System.setProperty("javax.net.ssl.keyStore", keyStorePath);
+			System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
+			System.setProperty("javax.net.ssl.trustStore", trustStorePath);
+			System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
 			
 			System.setProperty("javax.net.debug", "SSL,handshake");
 			
 			SSLContext sslContext = SSLContext.getDefault();
 			
 		    SSLSocketFactory factory = sslContext.getSocketFactory();
-		    socket = (SSLSocket)factory.createSocket("192.168.1.6", 8443);
-//		    socket.setEnabledProtocols(new String[] { "TLSv1.2" });
+		    socket = (SSLSocket)factory.createSocket(url, serverPort);
 //		    socket.setSoTimeout(1000);
 		    socket.startHandshake();
 		} catch (Exception e) {
