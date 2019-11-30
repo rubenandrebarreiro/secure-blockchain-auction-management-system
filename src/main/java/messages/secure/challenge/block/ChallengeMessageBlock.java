@@ -1,8 +1,8 @@
 package main.java.messages.secure.challenge.block;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 
+import main.java.common.utils.CommonUtils;
 import main.java.resources.block.Block;
 
 public class ChallengeMessageBlock {
@@ -11,8 +11,6 @@ public class ChallengeMessageBlock {
 
 	private byte[] blockChallenge;
 	
-	private int numBytesBlockChallenge;
-	
 	private byte[] blockChallengeMessageSerialized;
 	
 	
@@ -20,7 +18,6 @@ public class ChallengeMessageBlock {
 		
 		this.block = block;
 		this.blockChallenge = null;
-		this.numBytesBlockChallenge = 0;
 		
 		this.blockChallengeMessageSerialized = null;
 		
@@ -42,14 +39,6 @@ public class ChallengeMessageBlock {
 		this.blockChallenge = blockChallenge;
 	}
 	
-	public int getNumBytesBlockChallenge() {
-		return this.numBytesBlockChallenge;
-	}
-	
-	public void setNumBytesBlockChallenge(int numBytesBlockChallenge) {
-		this.numBytesBlockChallenge = numBytesBlockChallenge;
-	}
-	
 	public byte[] getBlockChallengeMessageSerialized() {
 		return this.blockChallengeMessageSerialized;
 	}
@@ -60,12 +49,6 @@ public class ChallengeMessageBlock {
 	
 	public void createChallengeToSolve() throws NoSuchAlgorithmException {
 		
-		Random random = new Random();
-		
-		while(this.numBytesBlockChallenge == 0) {
-			this.numBytesBlockChallenge = random.nextInt(5);
-		}
-		
 		this.block.doBlockSerialization();
 		
 		this.block.doHashOfBlockOfBidsToMine();
@@ -73,7 +56,7 @@ public class ChallengeMessageBlock {
 		
 		this.blockChallenge = this.block.getBlockSerializedHashed();
 		
-		for(int currentByteBlockChallenge = this.numBytesBlockChallenge; currentByteBlockChallenge > 0; currentByteBlockChallenge--) {
+		for(int currentByteBlockChallenge = CommonUtils.NUM_BYTES_CHALLENGE; currentByteBlockChallenge > 0; currentByteBlockChallenge--) {
 			this.blockChallenge[blockChallenge.length - currentByteBlockChallenge] = (byte) -1;
 		}
 		
