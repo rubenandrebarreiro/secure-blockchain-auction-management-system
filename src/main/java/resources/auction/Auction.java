@@ -86,7 +86,7 @@ public class Auction {
 		case 4:
 			this.currentBidValue = 0.0;
 			this.minAmountBidValue = 0.0;
-			this.maxAmountBidValue = 0.0;
+			this.maxAmountBidValue = maxAmountBidValue;
 			this.numAuctionBidsForEachUserClient = null;
 			this.numMaxAuctionBidsAllowed = Integer.MAX_VALUE;
 			this.auctionTimestampLimit = -1L;
