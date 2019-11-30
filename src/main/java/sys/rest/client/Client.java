@@ -7,6 +7,10 @@ import java.net.URI;
 import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.HashMap;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.ws.rs.core.UriBuilder;
 
 import org.asynchttpclient.AsyncHttpClient;
@@ -28,7 +32,18 @@ import main.java.resources.user.UserAuctionInfo;
 
 public class Client implements ClientAPI {
 
-	private static final String CREATE_AUCTION = "create";
+	private static final String AUCTION_CREATE = "create auction";
+	private static final String AUCTION_CLOSE = "close auction";
+	private static final String BID_CREATE = "create bid";
+	private static final String LIST_ALL = "list all";
+	private static final String LIST_OPEN = "list open";
+	private static final String LIST_CLOSED = "list closed";
+	private static final String LIST_BY_USERID = "list all userID";
+	private static final String LIST_OPEN_BY_USERID = "list open userID";
+	private static final String LIST_CLOSED_BY_USERID = "list closed userID";
+	private static final String LIST_BY_AUCTIONID = "list all auctionID";
+	private static final String LIST_OPEN_BY_AUCTIONID = "list open auctionID";
+	private static final String LIST_CLOSED_BY_AUCTIONID = "list closed auctionID";
 	private static final String HELP = "help";
 	private static final String EXIT = "exit";
 
@@ -44,6 +59,8 @@ public class Client implements ClientAPI {
 	private Dao<User, String> userDao;
 
 	private BufferedReader br;
+	
+	private SSLSocket socket;
 
 	public static void main(String[] args) {
 		int port = 8082;
@@ -54,10 +71,34 @@ public class Client implements ClientAPI {
 		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
 		System.out.println("Client ready @ " + baseUri);
+
 	}
 
 	public Client() {
 
+		//SSL Connection
+
+		try {
+			System.setProperty("javax.net.ssl.trustStore", "res/keystore/truststores/eduardoTruststore.jks");
+			System.setProperty("javax.net.ssl.trustStorePassword", "eduardo1920");
+			System.setProperty("javax.net.ssl.keyStore", "res/keystore/keystores/eduardoKeystore.jks");
+			System.setProperty("javax.net.ssl.keyStorePassword", "eduardo1920");
+			
+			System.setProperty("javax.net.debug", "SSL,handshake");
+			
+			SSLContext sslContext = SSLContext.getDefault();
+			
+		    SSLSocketFactory factory = sslContext.getSocketFactory();
+		    socket = (SSLSocket)factory.createSocket("192.168.1.6", 8443);
+//		    socket.setEnabledProtocols(new String[] { "TLSv1.2" });
+//		    socket.setSoTimeout(1000);
+		    socket.startHandshake();
+		} catch (Exception e) {
+			System.err.println("Error setting up TLS connection/socket!");
+			e.getMessage();
+			e.printStackTrace();
+		}
+		
 		String userRepository = USER_DATABASE_JDBC_PATH;
 		gson = new Gson();
 
@@ -66,7 +107,6 @@ public class Client implements ClientAPI {
 			connectionSource = new JdbcConnectionSource(userRepository);
 			userDao = DaoManager.createDao(connectionSource, User.class);
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
@@ -86,10 +126,42 @@ public class Client implements ClientAPI {
 				}
 
 				switch (line) {
-				case CREATE_AUCTION:
+				case AUCTION_CREATE:
 					createAuction();
 					break;
-
+				case AUCTION_CLOSE:
+					closeAuction();
+					break;
+				case BID_CREATE:
+					createBid();
+					break;
+				case LIST_ALL:
+					listAll();
+					break;
+				case LIST_OPEN:
+					listOpen();
+					break;
+				case LIST_CLOSED:
+					listClosed();
+					break;
+				case LIST_BY_USERID:
+					listAllByUserID();
+					break;
+				case LIST_OPEN_BY_USERID:
+					listOpenByUserID();
+					break;
+				case LIST_CLOSED_BY_USERID:
+					listClosedByUserID();
+					break;
+				case LIST_BY_AUCTIONID:
+					listAllByAuctionID();
+					break;
+				case LIST_CLOSED_BY_AUCTIONID:
+					listClosedByAuctionID();
+					break;
+				case LIST_OPEN_BY_AUCTIONID:
+					listOpenByAuctionID();
+				break;
 				case HELP:
 					helpScreen();
 					break;
@@ -104,9 +176,36 @@ public class Client implements ClientAPI {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private User login() {
+		User result = null;
+		try {
+			System.out.print("Enter user identifiction: ");
+			String id = br.readLine();
+			System.out.print("Enter user " + id + " password: ");
+			String password = br.readLine();
+
+			MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
+			digest.update(password.getBytes());
+			byte[] digestData = digest.digest();
+			String hashResult = new String(Hex.toHexString(digestData));
+
+			HashMap<String, Object> fieldValues = new HashMap<>();
+			fieldValues.put("userPeerID", id);
+			fieldValues.put("userPassword", hashResult);
+			result = userDao.queryForFieldValues(fieldValues).get(0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Welcome " + result.getUserPeerID());
+		System.out.println();
+		helpScreen();
+		
+		return result;
 	}
 
 	private void createAuction() throws IOException {
@@ -117,21 +216,21 @@ public class Client implements ClientAPI {
 		String productDescription = br.readLine();
 		System.out.println(
 				"	1: NORMAL_BIDS,\n" + 
-				"	2: MIN_INITIAL_VALUE_BID\n" + 
-				"	3: MIN_AMOUNT_VALUE_BID\n" + 
-				"	4: MAX_AMOUNT_VALUE_BID\n" + 
-				"	5: MIN_MAX_AMOUNT_VALUE_BID\n" + 
-				"	6: LIMITED_SET_CLIENT_BIDDERS\n" + 
-				"	7: LIMITED_NUMBER_BIDS_FOR_EACH_CLIENT\n" + 
-				"	8: LIMITED_NUMBER_BIDS\n" + 
+						"	2: MIN_INITIAL_VALUE_BID\n" + 
+						"	3: MIN_AMOUNT_VALUE_BID\n" + 
+						"	4: MAX_AMOUNT_VALUE_BID\n" + 
+						"	5: MIN_MAX_AMOUNT_VALUE_BID\n" + 
+						"	6: LIMITED_SET_CLIENT_BIDDERS\n" + 
+						"	7: LIMITED_NUMBER_BIDS_FOR_EACH_CLIENT\n" + 
+						"	8: LIMITED_NUMBER_BIDS\n" + 
 				"	9: LIMITED_TIME_BIDS");
 		System.out.println();
 		System.out.println("Enter bid type: ");
 		byte bidType = new Byte(br.readLine());
 		UserAuctionInfo userAuctionInfo;
-		
+
 		String line;
-		
+
 		switch (bidType) {
 		case 1:
 			userAuctionInfo = new UserAuctionInfo(currentUser,
@@ -273,7 +372,7 @@ public class Client implements ClientAPI {
 					-1L);
 			break;
 		}
-		
+
 		String postData = gson.toJson(userAuctionInfo);
 
 		ListenableFuture<Response> future;
@@ -295,36 +394,261 @@ public class Client implements ClientAPI {
 		System.out.println(result);
 	}
 
-	private User login() {
-		User result = null;
+	private void closeAuction() throws IOException {
+		String result;
+		System.out.println("Enter auctionID to close: ");
+		String auctionIDToClose = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/close-auction/" + auctionIDToClose;
+		System.out.println(url);
+		ListenableFuture<Response> future;
+
+		future = httpClient.preparePut(url)
+				.execute();
+
+		Response r = null;
 		try {
-			System.out.print("Enter user identifiction: ");
-			String id = br.readLine();
-			System.out.print("Enter user " + id + " password: ");
-			String password = br.readLine();
-
-			MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
-			digest.update(password.getBytes());
-			byte[] digestData = digest.digest();
-			String hashResult = new String(Hex.toHexString(digestData));
-
-			HashMap<String, Object> fieldValues = new HashMap<>();
-			fieldValues.put("userPeerID", id);
-			fieldValues.put("userPassword", hashResult);
-			result = userDao.queryForFieldValues(fieldValues).get(0);
+			r = future.get();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
 		}
 
-		System.out.println("Got user: " + result.getUserPeerID());
+		result = r.getStatusText();
 
-		return result;
+		System.out.println(result);
 	}
 
+	private void createBid() throws IOException{
+		// TODO
+		String result;
+		System.out.println("Enter auctionID to bid: ");
+		String auctionID = br.readLine();
+		System.out.println("Enter bid amount: ");
+		String bidAmount = br.readLine();
+		
+		String url = AUCTION_SERVER_ADDRESS + "/add-bid-to-opened-auction/)" + auctionID;
+	}
+	
+	private void listAll() {
+		String url = AUCTION_SERVER_ADDRESS + "/all";
+		String result;
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	private void listOpen() {
+		String url = AUCTION_SERVER_ADDRESS + "/opened";
+		String result;
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	private void listClosed() {
+		String url = AUCTION_SERVER_ADDRESS + "/closed";
+		String result;
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+
+	}
+	
+	private void listAllByUserID() throws IOException{
+		String result;
+		System.out.println("Enter userID: ");
+		String userID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/all/by-product-owner-user/" + userID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);	}
+	
+	private void listOpenByUserID() throws IOException{
+		String result;
+		System.out.println("Enter userID: ");
+		String userID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/opened/by-product-owner-user/" + userID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);	}
+	
+	private void listClosedByUserID() throws IOException{
+		String result;
+		System.out.println("Enter userID: ");
+		String userID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/closed/by-product-owner-user/" + userID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);	}
+
+	private void listAllByAuctionID() throws IOException {
+		String result;
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/all/" + auctionID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	private void listOpenByAuctionID() throws IOException {
+		String result;
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/opened/" + auctionID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	private void listClosedByAuctionID() throws IOException {
+		String result;
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		String url = AUCTION_SERVER_ADDRESS + "/closed/" + auctionID;
+
+		ListenableFuture<Response> future;
+
+		future = httpClient.prepareGet(url)
+				.execute();
+
+		Response r = null;
+		try {
+			r = future.get();
+		} catch (Exception e) {
+			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+					"Error getting response!");
+		}
+
+		result = r.getStatusText();
+
+		System.out.println(result);
+	}
+	
+	
 	private void helpScreen() {
 		System.out.println("HELP SCREEN");
-		System.out.println(CREATE_AUCTION);
+		System.out.println(AUCTION_CREATE);
+		System.out.println(AUCTION_CLOSE);
+		System.out.println(BID_CREATE);
+		System.out.println(LIST_ALL);
+		System.out.println(LIST_OPEN);
+		System.out.println(LIST_CLOSED);
+		System.out.println(LIST_BY_USERID);
+		System.out.println(LIST_OPEN_BY_USERID);
+		System.out.println(LIST_CLOSED_BY_USERID);
+		System.out.println(LIST_BY_AUCTIONID);
+		System.out.println(LIST_OPEN_BY_AUCTIONID);
+		System.out.println(LIST_CLOSED_BY_AUCTIONID);
 		System.out.println(HELP);
 		System.out.println(EXIT);
 	}
