@@ -97,7 +97,7 @@ public class Client implements ClientAPI {
 		
 		new Client(url, serverPort,
 				keyStoreFilePath, keyStorePassword,
-				trustStoreFilePath, keyStorePassword);
+				trustStoreFilePath, trustStorePassword);
 		
 		System.out.println("Client ready!");
 	}
