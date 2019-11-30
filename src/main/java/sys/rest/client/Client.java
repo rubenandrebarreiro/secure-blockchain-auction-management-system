@@ -3,8 +3,6 @@ package main.java.sys.rest.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.sql.SQLException;
@@ -73,6 +71,7 @@ public class Client implements ClientAPI {
 		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
 		System.out.println("Client ready @ " + baseUri);
+
 	}
 
 	public Client() {

@@ -3,3 +3,10 @@
 res/database/
 
 .settings/
+
+**\*.exe
+**\*.dll
+**\*.jks
+**\*.db
+**\*.cer
+**\*.crt

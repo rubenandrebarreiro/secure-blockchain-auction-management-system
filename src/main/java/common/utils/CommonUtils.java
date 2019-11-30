@@ -23,6 +23,7 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -291,6 +292,20 @@ public class CommonUtils {
 	}
 	
 	/**
+     * Returns and converts a Double Number, from a given Byte Array.
+     * 
+     * @param doubleNumberByteArray a given Byte Array to be converted
+     * 
+     * @return and converts a Double Number, from a given Byte Array
+     */
+	public static double fromByteArrayToDouble(byte[] doubleNumberByteArray) {
+		ByteBuffer byteBuffer = ByteBuffer.wrap(doubleNumberByteArray);
+		double doubleNumberDeserialized = byteBuffer.order(ByteOrder.nativeOrder()).getDouble();
+		
+		return doubleNumberDeserialized;
+	}
+	
+	/**
      * Returns and converts a Long Number, from a given Byte Array.
      * 
      * @param longNumberByteArray a given Byte Array to be converted
@@ -454,4 +469,30 @@ public class CommonUtils {
 
     	  return secretKey;
       }
+      
+    /**
+  	 * Returns true if the Cipher's Block Mode needs an IV (Initialisation Vector) or not.
+  	 * 
+  	 * NOTE:
+  	 * - The only Cipher's Block Mode that doesn't need an IV (Initialisation Vector) is ECB.
+  	 * 
+  	 * @param blockMode string representation of the Cipher's Block Mode to be verified
+  	 * 
+  	 * @return true if the Cipher's Block Mode needs an IV (Initialisation Vector) or not
+  	 */
+  	public static boolean blockModeRequiresIV(String blockMode) {
+  		return !blockMode.equalsIgnoreCase("ECB");
+  	}
+  	
+  	public static byte[] generateIV(Cipher cipher) {
+		
+  		byte[] initialisationVector = null;
+		
+		SecureRandom random = new SecureRandom();
+		
+		initialisationVector = new byte[cipher.getBlockSize()];
+		random.nextBytes(initialisationVector);
+		
+		return initialisationVector;
+	}
 }
