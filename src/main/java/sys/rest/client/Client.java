@@ -3,10 +3,16 @@ package main.java.sys.rest.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.HashMap;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.ws.rs.core.UriBuilder;
 
 import org.asynchttpclient.AsyncHttpClient;
@@ -55,6 +61,8 @@ public class Client implements ClientAPI {
 	private Dao<User, String> userDao;
 
 	private BufferedReader br;
+	
+	private SSLSocket socket;
 
 	public static void main(String[] args) {
 		int port = 8082;
@@ -69,6 +77,29 @@ public class Client implements ClientAPI {
 
 	public Client() {
 
+		//SSL Connection
+
+		try {
+			System.setProperty("javax.net.ssl.trustStore", "res/keystore/truststores/eduardoTruststore.jks");
+			System.setProperty("javax.net.ssl.trustStorePassword", "eduardo1920");
+			System.setProperty("javax.net.ssl.keyStore", "res/keystore/keystores/eduardoKeystore.jks");
+			System.setProperty("javax.net.ssl.keyStorePassword", "eduardo1920");
+			
+			System.setProperty("javax.net.debug", "SSL,handshake");
+			
+			SSLContext sslContext = SSLContext.getDefault();
+			
+		    SSLSocketFactory factory = sslContext.getSocketFactory();
+		    socket = (SSLSocket)factory.createSocket("192.168.1.6", 8443);
+//		    socket.setEnabledProtocols(new String[] { "TLSv1.2" });
+//		    socket.setSoTimeout(1000);
+		    socket.startHandshake();
+		} catch (Exception e) {
+			System.err.println("Error setting up TLS connection/socket!");
+			e.getMessage();
+			e.printStackTrace();
+		}
+		
 		String userRepository = USER_DATABASE_JDBC_PATH;
 		gson = new Gson();
 
