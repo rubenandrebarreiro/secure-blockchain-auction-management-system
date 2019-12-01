@@ -106,7 +106,8 @@ public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements 
 					
 					CryptoPuzzleSolverForProofOfWork cryptoPuzzleSolverForProofOfWork = 
 							new CryptoPuzzleSolverForProofOfWork( this.strategyForTryToCloseBlockOfBids, 
-																  blockOfOpenBidsForChallenge);
+																  CommonUtils.NUM_BYTES_TO_SOLVE_CHALLENGE,
+																  blockOfOpenBidsForChallenge );
 				
 					cryptoPuzzleSolverForProofOfWork.solveBlockChallenge();
 					

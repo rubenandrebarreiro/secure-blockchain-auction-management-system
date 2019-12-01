@@ -14,7 +14,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 	
 	private byte strategyUsedForCryptoPuzzleSolverForProofOfWork;
 	
-	private int sizeOfBlockChallenge;
+	private int numBytesToSolveChallenge;
 	
 	private Block blockOfOpenBidsForChallengeToCheck;
 	
@@ -23,12 +23,13 @@ public class CryptoPuzzleSolverForProofOfWork {
 	private int numBidsInTheBlockOfOpenBidsForChallenge;
 	
 	
-	public CryptoPuzzleSolverForProofOfWork(byte strategyUsedForCryptoPuzzleSolverForProofOfWork, int sizeOfBlockChallenge,
+	public CryptoPuzzleSolverForProofOfWork(byte strategyUsedForCryptoPuzzleSolverForProofOfWork,
+											int numBytesToSolveChallenge,
 											Block blockOfOpenBidsForChallengeToCheck) throws NoSuchAlgorithmException {
 		
 		this.strategyUsedForCryptoPuzzleSolverForProofOfWork = strategyUsedForCryptoPuzzleSolverForProofOfWork;
 		
-		this.sizeOfBlockChallenge = sizeOfBlockChallenge;
+		this.numBytesToSolveChallenge = numBytesToSolveChallenge;
 		
 		this.blockOfOpenBidsForChallengeToCheck = blockOfOpenBidsForChallengeToCheck;
 		
@@ -42,8 +43,8 @@ public class CryptoPuzzleSolverForProofOfWork {
 		return this.strategyUsedForCryptoPuzzleSolverForProofOfWork;
 	}
 	
-	public int getSizeOfBlockChallenge() {
-		return this.sizeOfBlockChallenge;
+	public int getNumBytesToSolveChallenge() {
+		return this.numBytesToSolveChallenge;
 	}
 	
 	public Block getBlockOfOpenBidsForChallengeToCheck() {
@@ -70,7 +71,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 							this.blockOfOpenBidsForChallengeSerializedHashedToMine.length;
 		
 		
-		if(this.sizeOfBlockChallenge == 3) {
+		if(this.numBytesToSolveChallenge == 3) {
 		
 			this.blockOfOpenBidsForChallengeSerializedHashedToMine
 			 [sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine - 3] = ( (byte) 0 );
@@ -168,7 +169,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 					int sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine = 
 									blockOfOpenBidsForChallengeSerializedHashedToMine.length;
 					
-					if(this.sizeOfBlockChallenge == 2) {
+					if(this.numBytesToSolveChallenge == 2) {
 						
 						blockOfOpenBidsForChallengeSerializedHashedToMine
 							[sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine - 2] = 
@@ -264,7 +265,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 									blockOfOpenBidsForChallengeSerializedHashedToMine.length;
 					
 					
-					if(this.sizeOfBlockChallenge == 2) {
+					if(this.numBytesToSolveChallenge == 2) {
 					
 						blockOfOpenBidsForChallengeSerializedHashedToMine
 							[sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine - 2] = 
@@ -360,7 +361,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 			int sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine = 
 					blockOfOpenBidsForChallengeSerializedHashedToMine.length;
 			
-			if(this.sizeOfBlockChallenge == 3) {
+			if(this.numBytesToSolveChallenge == 3) {
 
 				int attempt3rd = random.nextInt(CommonUtils.NUM_ASCII_TABLE_POSSIBILITIES_IN_CHALLENGE);
 				

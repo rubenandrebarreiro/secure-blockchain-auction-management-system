@@ -53,7 +53,7 @@ public class CommonUtils {
 	/**
 	 * The number of bytes to guess/mine in the Challenge
 	 */
-	public static final int NUM_BYTES_CHALLENGE = 2;
+	public static final int NUM_BYTES_TO_SOLVE_CHALLENGE = 2;
 	
 	/**
 	 * The number of ASCII Table possibilities in the Challenge
