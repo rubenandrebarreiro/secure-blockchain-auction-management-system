@@ -1,11 +1,8 @@
 package main.java.sys.rest.server.auction.repository;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.net.ServerSocket;
 import java.net.URI;
-import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -14,19 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLParameters;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
-
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpsConfigurator;
-import com.sun.net.httpserver.HttpsParameters;
-import com.sun.net.httpserver.HttpsServer;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -44,8 +31,6 @@ import main.java.resources.auction.Auction;
 import main.java.resources.auction.utils.AuctionBidTypes;
 import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
-import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
-import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
 public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	
