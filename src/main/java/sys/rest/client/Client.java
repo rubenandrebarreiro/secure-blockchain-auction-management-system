@@ -2,12 +2,15 @@ package main.java.sys.rest.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -49,7 +52,7 @@ public class Client implements ClientAPI {
 
 	private static final String HASH_ALGORITHM = "SHA-256";
 
-	private static final String AUCTION_SERVER_ADDRESS = "http://localhost:8081/auction-server";
+	private static final String AUCTION_SERVER_ADDRESS = "https://localhost:8081/auction-server";
 	private static final String USER_DATABASE_JDBC_PATH = "jdbc:sqlite:res/database/client/users.db";
 
 	private User currentUser;
@@ -59,11 +62,11 @@ public class Client implements ClientAPI {
 	private Dao<User, String> userDao;
 
 	private BufferedReader br;
-	
-	private SSLSocket socket;
 
+	private SSLSocket socket;
+	private SSLSocketFactory sf;
 	public static void main(String[] args) {
-		
+
 		if(args.length != 6) {
 
 			System.err.println
@@ -76,30 +79,49 @@ public class Client implements ClientAPI {
 
 			System.exit(1);
 		}
-		
+
 		String url = args[0];
 		int serverPort = Integer.parseInt(args[1]);
-		
+
 		String keyStoreFilePath = args[2];
 		String keyStorePassword = args[3];
-		
+
 		String trustStoreFilePath = args[4];
 		String trustStorePassword = args[5];
-		
+
 //		int port = 8082;
 //		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
 //		ResourceConfig config = new ResourceConfig();
-//		config.register( new Client(serverPort, trustStoreFilePath, keyStoreFilePath) );
-
+//		config.register( 		
+//				new Client(url, serverPort,
+//						keyStoreFilePath, keyStorePassword,
+//						trustStoreFilePath, trustStorePassword));
+//
 //		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
 //		System.out.println("Client ready @ " + baseUri);
-		
-		new Client(url, serverPort,
-				keyStoreFilePath, keyStorePassword,
-				trustStoreFilePath, trustStorePassword);
-		
-		System.out.println("Client ready!");
+
+				new Client(url, serverPort,
+						keyStoreFilePath, keyStorePassword,
+						trustStoreFilePath, trustStorePassword);
+				
+//				System.out.println("Client ready!");
+	}
+	
+	// Taken from https://www.mkyong.com/webservices/jax-ws/java-security-cert-certificateexception-no-name-matching-localhost-found/
+	static {
+	    //for localhost testing only
+	    javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+	    new javax.net.ssl.HostnameVerifier(){
+
+	        public boolean verify(String hostname,
+	                javax.net.ssl.SSLSession sslSession) {
+	            if (hostname.equals("localhost")) {
+	                return true;
+	            }
+	            return false;
+	        }
+	    });
 	}
 
 	public Client(String url, int serverPort,
@@ -113,21 +135,21 @@ public class Client implements ClientAPI {
 			System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
 			System.setProperty("javax.net.ssl.trustStore", trustStorePath);
 			System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
-			
-			System.setProperty("javax.net.debug", "SSL,handshake");
-			
+
+//			System.setProperty("javax.net.debug", "SSL,handshake");
+
 			SSLContext sslContext = SSLContext.getDefault();
-			
-		    SSLSocketFactory factory = sslContext.getSocketFactory();
-		    socket = (SSLSocket)factory.createSocket(url, serverPort);
-//		    socket.setSoTimeout(1000);
-		    socket.startHandshake();
+
+			sf = sslContext.getSocketFactory();
+//			socket = (SSLSocket)sf.createSocket(url, serverPort);
+			//		    socket.setSoTimeout(1000);
+//			socket.startHandshake();
 		} catch (Exception e) {
 			System.err.println("Error setting up TLS connection/socket!");
 			e.getMessage();
 			e.printStackTrace();
 		}
-		
+
 		String userRepository = USER_DATABASE_JDBC_PATH;
 		gson = new Gson();
 
@@ -190,7 +212,7 @@ public class Client implements ClientAPI {
 					break;
 				case LIST_OPEN_BY_AUCTIONID:
 					listOpenByAuctionID();
-				break;
+					break;
 				case HELP:
 					helpScreen();
 					break;
@@ -233,18 +255,19 @@ public class Client implements ClientAPI {
 		System.out.println("Welcome " + result.getUserPeerID());
 		System.out.println();
 		helpScreen();
-		
+
 		return result;
 	}
 
 	private void createAuction() throws IOException {
 		String result = null;
-		String url = AUCTION_SERVER_ADDRESS + "/open-auction";
+		String urlString = AUCTION_SERVER_ADDRESS + "/open-auction";
 
 		System.out.println("Enter product description: ");
 		String productDescription = br.readLine();
 		System.out.println(
-				"	1: NORMAL_BIDS,\n" + 
+				"	"
+						+ "1: NORMAL_BIDS,\n" + 
 						"	2: MIN_INITIAL_VALUE_BID\n" + 
 						"	3: MIN_AMOUNT_VALUE_BID\n" + 
 						"	4: MAX_AMOUNT_VALUE_BID\n" + 
@@ -252,7 +275,8 @@ public class Client implements ClientAPI {
 						"	6: LIMITED_SET_CLIENT_BIDDERS\n" + 
 						"	7: LIMITED_NUMBER_BIDS_FOR_EACH_CLIENT\n" + 
 						"	8: LIMITED_NUMBER_BIDS\n" + 
-				"	9: LIMITED_TIME_BIDS");
+						"	9: LIMITED_TIME_BIDS"
+						+ "");
 		System.out.println();
 		System.out.println("Enter bid type: ");
 		byte bidType = new Byte(br.readLine());
@@ -389,7 +413,7 @@ public class Client implements ClientAPI {
 					Long.parseLong(line));
 			break;
 		default:
-			url = AUCTION_SERVER_ADDRESS + "/open-auction";
+			urlString = AUCTION_SERVER_ADDRESS + "/open-auction";
 			userAuctionInfo = new UserAuctionInfo(currentUser,
 					productDescription,
 					bidType,
@@ -404,23 +428,45 @@ public class Client implements ClientAPI {
 
 		String postData = gson.toJson(userAuctionInfo);
 
-		ListenableFuture<Response> future;
-
-		future = httpClient.preparePost(url)
-				.setBody(postData)
-				.execute();
-
-		Response r = null;
+//		ListenableFuture<Response> future;
+//
+//		future = httpClient.preparePost(url)
+//				.setBody(postData)
+//				.execute();
+//
+//		Response r = null;
+//		try {
+//			r = future.get();
+//		} catch (Exception e) {
+//			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+//					"Error getting response!");
+//		}
+//
+//		result = r.getStatusText();
+	     
+		URL url = new URL("https://localhost:8443/open-auction");
+		HttpsURLConnection con = (HttpsURLConnection)url.openConnection();
+		con.setSSLSocketFactory(sf);
+		con.connect();
+		
+		System.err.println("RESPONSE: " + con.getResponseCode() + " " + con.getResponseMessage());
+		System.err.println("RESPONSE: " + sslReadResponse(con.getInputStream()));
+	}
+	
+	private String sslReadResponse(InputStream socketInStream) {
+		StringBuilder builder = new StringBuilder();
 		try {
-			r = future.get();
+			BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
+			String line = null;
+			while( (line = br.readLine()) != null ) {
+				builder.append(line);
+			}
 		} catch (Exception e) {
-			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-					"Error getting response!");
+			// TODO: handle exception
+			System.err.println("Error building response!");
 		}
 
-		result = r.getStatusText();
-
-		System.out.println(result);
+		return builder.toString();
 	}
 
 	private void closeAuction() throws IOException {
@@ -454,10 +500,10 @@ public class Client implements ClientAPI {
 		String auctionID = br.readLine();
 		System.out.println("Enter bid amount: ");
 		String bidAmount = br.readLine();
-		
+
 		String url = AUCTION_SERVER_ADDRESS + "/add-bid-to-opened-auction/)" + auctionID;
 	}
-	
+
 	private void listAll() {
 		String url = AUCTION_SERVER_ADDRESS + "/all";
 		String result;
@@ -478,7 +524,7 @@ public class Client implements ClientAPI {
 
 		System.out.println(result);
 	}
-	
+
 	private void listOpen() {
 		String url = AUCTION_SERVER_ADDRESS + "/opened";
 		String result;
@@ -499,7 +545,7 @@ public class Client implements ClientAPI {
 
 		System.out.println(result);
 	}
-	
+
 	private void listClosed() {
 		String url = AUCTION_SERVER_ADDRESS + "/closed";
 		String result;
@@ -521,7 +567,7 @@ public class Client implements ClientAPI {
 		System.out.println(result);
 
 	}
-	
+
 	private void listAllByUserID() throws IOException{
 		String result;
 		System.out.println("Enter userID: ");
@@ -544,7 +590,7 @@ public class Client implements ClientAPI {
 		result = r.getStatusText();
 
 		System.out.println(result);	}
-	
+
 	private void listOpenByUserID() throws IOException{
 		String result;
 		System.out.println("Enter userID: ");
@@ -567,7 +613,7 @@ public class Client implements ClientAPI {
 		result = r.getStatusText();
 
 		System.out.println(result);	}
-	
+
 	private void listClosedByUserID() throws IOException{
 		String result;
 		System.out.println("Enter userID: ");
@@ -614,7 +660,7 @@ public class Client implements ClientAPI {
 
 		System.out.println(result);
 	}
-	
+
 	private void listOpenByAuctionID() throws IOException {
 		String result;
 		System.out.println("Enter auctionID: ");
@@ -638,7 +684,7 @@ public class Client implements ClientAPI {
 
 		System.out.println(result);
 	}
-	
+
 	private void listClosedByAuctionID() throws IOException {
 		String result;
 		System.out.println("Enter auctionID: ");
@@ -662,8 +708,8 @@ public class Client implements ClientAPI {
 
 		System.out.println(result);
 	}
-	
-	
+
+
 	private void helpScreen() {
 		System.out.println("HELP SCREEN");
 		System.out.println(AUCTION_CREATE);
