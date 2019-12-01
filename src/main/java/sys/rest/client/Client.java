@@ -4,11 +4,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -54,6 +60,8 @@ public class Client implements ClientAPI {
 
 	private static final String AUCTION_SERVER_ADDRESS = "https://localhost:8081/auction-server";
 	private static final String USER_DATABASE_JDBC_PATH = "jdbc:sqlite:res/database/client/users.db";
+	
+	private static final String ENCONDING = "UTF-8";
 
 	private User currentUser;
 
@@ -507,22 +515,31 @@ public class Client implements ClientAPI {
 	private void listAll() {
 		String url = AUCTION_SERVER_ADDRESS + "/all";
 		String result;
-		ListenableFuture<Response> future;
+		
+		HttpsURLConnection connection = createGetRequest(url, null);
+//		ListenableFuture<Response> future;
 
-		future = httpClient.prepareGet(url)
-				.execute();
+//		future = httpClient.prepareGet(url)
+//				.execute();
+//
+//		Response r = null;
+//		try {
+//			r = future.get();
+//		} catch (Exception e) {
+//			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+//					"Error getting response!");
+//		}
+//
+//		result = r.getStatusText();
 
-		Response r = null;
 		try {
-			r = future.get();
-		} catch (Exception e) {
-			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-					"Error getting response!");
+			connection.connect();
+			System.out.println(connection.getResponseCode() + " " + connection.getResponseMessage());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
-		result = r.getStatusText();
-
-		System.out.println(result);
+		
 	}
 
 	private void listOpen() {
@@ -709,7 +726,6 @@ public class Client implements ClientAPI {
 		System.out.println(result);
 	}
 
-
 	private void helpScreen() {
 		System.out.println("HELP SCREEN");
 		System.out.println(AUCTION_CREATE);
@@ -727,5 +743,99 @@ public class Client implements ClientAPI {
 		System.out.println(HELP);
 		System.out.println(EXIT);
 	}
+	
+	private HttpsURLConnection createGetRequest(String urlString, Map<String, String> params) {
+		URL url = null;
+		HttpsURLConnection result = null;
+		
+		try {
+			url = new URL(addParamsToURL(urlString, params));
+			result = (HttpsURLConnection)url.openConnection();
+			result.setRequestMethod("GET");
+		} catch (MalformedURLException e) {
+			System.err.println("Invalid URL");
+		} catch (IOException e) {
+			System.err.println("Error opening connection");
+		}
+
+		return result;
+	}
+	
+	private byte[] createPostRequest(String urlString, Map<String, String> params) {
+		URL url = null;
+		HttpsURLConnection result = null;
+		
+		try {
+			url = new URL(addParamsToURL(urlString, params));
+			result = (HttpsURLConnection)url.openConnection();
+			result.setRequestMethod("POST");
+		} catch (MalformedURLException e) {
+			System.err.println("Invalid URL");
+		} catch (IOException e) {
+			System.err.println("Error opening connection");
+		}
+
+
+		return null;	}
+	
+	private byte[] createPutRequest(String urlString, Map<String, String> params) {
+		URL url = null;
+		HttpsURLConnection result = null;
+		
+		try {
+			url = new URL(urlString);
+			result = (HttpsURLConnection)url.openConnection();
+			result.setRequestMethod("PUT");
+		} catch (MalformedURLException e) {
+			System.err.println("Invalid URL");
+		} catch (IOException e) {
+			System.err.println("Error opening connection");
+		}
+
+
+		return null;	}
+	
+	private byte[] createDeleteRequest(String urlString, Map<String, String> params) {
+		URL url = null;
+		HttpsURLConnection result = null;
+		
+		try {
+			url = new URL(urlString);
+			result = (HttpsURLConnection)url.openConnection();
+			result.setRequestMethod("DELETE");
+		} catch (MalformedURLException e) {
+			System.err.println("Invalid URL");
+		} catch (IOException e) {
+			System.err.println("Error opening connection");
+		}
+
+
+		return null;	}
+	
+	private String addParamsToURL(String urlString, Map<String, String> params) {
+		StringBuilder builder = new StringBuilder();
+		boolean first = true;
+		try {
+			builder.append(urlString);
+			if(params != null) {
+				Set<Entry<String, String>> entryMap = params.entrySet();
+				if(entryMap.size() != 0) {
+					for (Entry<String, String> entry : entryMap) {
+						if(first) first = false;
+						else builder.append("&");
+						builder.append(URLEncoder.encode(entry.getKey(), ENCONDING));
+						builder.append("=");
+						builder.append(URLEncoder.encode(entry.getValue(), ENCONDING));
+					}
+				}
+			}
+		} catch (UnsupportedEncodingException e) {
+			System.err.println("Error while adding parameters to URL");
+		}
+
+		return builder.toString();
+	}
+	
+//	private String addParamsToBody
 
 }

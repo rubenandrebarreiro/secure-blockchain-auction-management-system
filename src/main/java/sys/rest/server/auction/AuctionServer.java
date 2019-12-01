@@ -56,7 +56,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		int port = 8081;
 
-		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
+		URI baseUri = UriBuilder.fromUri("https://0.0.0.0/").port(port).build();
 		ResourceConfig config = new ResourceConfig();
 		try {
 			config.register( new AuctionServer() );
@@ -80,8 +80,10 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		JdkHttpServerFactory.createHttpServer(baseUri, config);
+//		JdkHttpServerFactory.createHttpServer(baseUri, config);
 
+        JdkHttpServerFactory.createHttpServer(baseUri, config, SSLContext.getDefault(), true);
+		
 		System.out.println("Auction Server ready @ " + baseUri);
 	}
 
@@ -132,14 +134,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public void run() {
 		try {
 			while(true) {
-				responseSocket = (SSLSocket) serverSocket.accept();
-				responseSocket.startHandshake();
-				sslReadRequest(responseSocket.getInputStream());
-				SSLSession session = responseSocket.getSession();
-//				Principal clientID = session.getPeerPrincipal();
-//				System.out.println("Client has been identified as: " + clientID);
-				sslWriteResponse(responseSocket.getOutputStream());
-				responseSocket.close();
+//				responseSocket = (SSLSocket) serverSocket.accept();
+//				responseSocket.startHandshake();
+//				sslReadRequest(responseSocket.getInputStream());
+//				SSLSession session = responseSocket.getSession();
+////				Principal clientID = session.getPeerPrincipal();
+////				System.out.println("Client has been identified as: " + clientID);
+//				sslWriteResponse(responseSocket.getOutputStream());
+//				responseSocket.close();
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
