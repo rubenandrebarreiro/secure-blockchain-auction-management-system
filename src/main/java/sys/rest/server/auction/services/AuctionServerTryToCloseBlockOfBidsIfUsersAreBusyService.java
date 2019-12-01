@@ -15,6 +15,8 @@ import main.java.resources.user.User;
 public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements Runnable {
 
 	private byte strategyForTryToCloseBlockOfBids;
+
+	private byte numBytesToSolveChallengeType;
 	
 	private List<User> usersList;
 	
@@ -22,9 +24,12 @@ public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements 
 	
 	
 	public AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService(byte strategyForTryToCloseBlockOfBids,
+																   byte numBytesToSolveChallengeType,
 															 	   List<User> usersList, List<Bid> openBidsList) {
 		
 		this.strategyForTryToCloseBlockOfBids = strategyForTryToCloseBlockOfBids;
+		this.numBytesToSolveChallengeType = numBytesToSolveChallengeType;
+		
 		this.usersList = usersList;
 		this.openBidsList = openBidsList;
 		
@@ -106,7 +111,7 @@ public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements 
 					
 					CryptoPuzzleSolverForProofOfWork cryptoPuzzleSolverForProofOfWork = 
 							new CryptoPuzzleSolverForProofOfWork( this.strategyForTryToCloseBlockOfBids, 
-																  CommonUtils.NUM_BYTES_TO_SOLVE_CHALLENGE,
+																  this.numBytesToSolveChallengeType,
 																  blockOfOpenBidsForChallenge );
 				
 					cryptoPuzzleSolverForProofOfWork.solveBlockChallenge();

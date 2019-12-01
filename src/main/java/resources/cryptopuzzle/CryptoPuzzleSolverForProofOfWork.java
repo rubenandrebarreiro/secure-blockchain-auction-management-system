@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.bouncycastle.util.Arrays;
 
+import main.java.common.protocols.NumBytesChallengeType;
 import main.java.common.utils.CommonUtils;
 import main.java.resources.block.Block;
 
@@ -14,7 +15,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 	
 	private byte strategyUsedForCryptoPuzzleSolverForProofOfWork;
 	
-	private int numBytesToSolveChallenge;
+	private byte numBytesToSolveChallengeType;
 	
 	private Block blockOfOpenBidsForChallengeToCheck;
 	
@@ -24,12 +25,13 @@ public class CryptoPuzzleSolverForProofOfWork {
 	
 	
 	public CryptoPuzzleSolverForProofOfWork(byte strategyUsedForCryptoPuzzleSolverForProofOfWork,
-											int numBytesToSolveChallenge,
-											Block blockOfOpenBidsForChallengeToCheck) throws NoSuchAlgorithmException {
+											byte numBytesToSolveChallengeType,
+											Block blockOfOpenBidsForChallengeToCheck)
+											throws NoSuchAlgorithmException {
 		
 		this.strategyUsedForCryptoPuzzleSolverForProofOfWork = strategyUsedForCryptoPuzzleSolverForProofOfWork;
 		
-		this.numBytesToSolveChallenge = numBytesToSolveChallenge;
+		this.numBytesToSolveChallengeType = numBytesToSolveChallengeType;
 		
 		this.blockOfOpenBidsForChallengeToCheck = blockOfOpenBidsForChallengeToCheck;
 		
@@ -43,8 +45,8 @@ public class CryptoPuzzleSolverForProofOfWork {
 		return this.strategyUsedForCryptoPuzzleSolverForProofOfWork;
 	}
 	
-	public int getNumBytesToSolveChallenge() {
-		return this.numBytesToSolveChallenge;
+	public byte getNumBytesToSolveChallengeType() {
+		return this.numBytesToSolveChallengeType;
 	}
 	
 	public Block getBlockOfOpenBidsForChallengeToCheck() {
@@ -71,7 +73,8 @@ public class CryptoPuzzleSolverForProofOfWork {
 							this.blockOfOpenBidsForChallengeSerializedHashedToMine.length;
 		
 		
-		if(this.numBytesToSolveChallenge == 3) {
+		if(this.numBytesToSolveChallengeType == NumBytesChallengeType.NUM_BYTES_CHALLENGE_TYPE_3
+												.getNumBytesChallengeType()) {
 		
 			this.blockOfOpenBidsForChallengeSerializedHashedToMine
 			 [sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine - 3] = ( (byte) 0 );
@@ -169,7 +172,8 @@ public class CryptoPuzzleSolverForProofOfWork {
 					int sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine = 
 									blockOfOpenBidsForChallengeSerializedHashedToMine.length;
 					
-					if(this.numBytesToSolveChallenge == 2) {
+					if(this.numBytesToSolveChallengeType == NumBytesChallengeType.NUM_BYTES_CHALLENGE_TYPE_2
+														.getNumBytesChallengeType()) {
 						
 						blockOfOpenBidsForChallengeSerializedHashedToMine
 							[sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine - 2] = 
@@ -265,7 +269,8 @@ public class CryptoPuzzleSolverForProofOfWork {
 									blockOfOpenBidsForChallengeSerializedHashedToMine.length;
 					
 					
-					if(this.numBytesToSolveChallenge == 2) {
+					if(this.numBytesToSolveChallengeType == NumBytesChallengeType.NUM_BYTES_CHALLENGE_TYPE_2
+															.getNumBytesChallengeType()) {
 					
 						blockOfOpenBidsForChallengeSerializedHashedToMine
 							[sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine - 2] = 
@@ -361,7 +366,8 @@ public class CryptoPuzzleSolverForProofOfWork {
 			int sizeOfBlockOfOpenBidsForChallengeSerializedHashedToMine = 
 					blockOfOpenBidsForChallengeSerializedHashedToMine.length;
 			
-			if(this.numBytesToSolveChallenge == 3) {
+			if(this.numBytesToSolveChallengeType == NumBytesChallengeType.NUM_BYTES_CHALLENGE_TYPE_3
+													.getNumBytesChallengeType()) {
 
 				int attempt3rd = random.nextInt(CommonUtils.NUM_ASCII_TABLE_POSSIBILITIES_IN_CHALLENGE);
 				
