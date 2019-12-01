@@ -123,11 +123,14 @@ public class CommonUtils {
 	public static final int DEFAULT_SECURE_MULTICAST_SOCKET_TIMEOUT_MILLIS = 5000;
 	
 	/**
-	 * The Rate Time for verification of the Cleaning Random Nonces Service
+	 * The Rate Time for verification of the Try to Close Block of Bids Service
+	 * (for both, Clients and Auction Server)
 	 */
-	public static final long TRY_TO_CLOSE_BIDS_IF_USERS_ARE_BUSY_SERVICE_VERIFICATION_RATE_TIME = 10000;
+	public static final long TRY_TO_CLOSE_BLOCK_OF_BIDS_SERVICE_VERIFICATION_RATE_TIME = 10000;
 	
-	
+	/**
+	 * The Maximum Number of Bids to Try to Mine
+	 */
 	public static final int MAX_NUM_BIDS_TO_TRY_TO_MINE = 5;
 	
 	/**
