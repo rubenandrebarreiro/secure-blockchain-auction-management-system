@@ -1,5 +1,6 @@
 package main.java.sys.rest.server.auction.services;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -8,17 +9,22 @@ import java.util.stream.Collectors;
 import main.java.common.utils.CommonUtils;
 import main.java.resources.bid.Bid;
 import main.java.resources.block.Block;
+import main.java.resources.cryptopuzzle.CryptoPuzzleSolverForProofOfWork;
 import main.java.resources.user.User;
 
-public class TryToCloseBidsIfUsersAreBusyService implements Runnable {
+public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements Runnable {
 
+	private byte strategyForTryToCloseBlockOfBids;
+	
 	private List<User> usersList;
 	
 	private List<Bid> openBidsList;
 	
 	
-	public TryToCloseBidsIfUsersAreBusyService(List<User> usersList, List<Bid> openBidsList) {
+	public AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService( byte strategyForTryToCloseBlockOfBids,
+															 List<User> usersList, List<Bid> openBidsList ) {
 		
+		this.strategyForTryToCloseBlockOfBids = strategyForTryToCloseBlockOfBids;
 		this.usersList = usersList;
 		this.openBidsList = openBidsList;
 		
@@ -94,9 +100,22 @@ public class TryToCloseBidsIfUsersAreBusyService implements Runnable {
 				}
 				
 				
-				Block block = new Block( ( (Bid[]) chosenOpenBidsToMineList.toArray() ) );
+				Block blockOfOpenBidsForChallenge = new Block( ( (Bid[]) chosenOpenBidsToMineList.toArray() ) );
 				
+				try {
+					
+					CryptoPuzzleSolverForProofOfWork cryptoPuzzleSolverForProofOfWork = 
+							new CryptoPuzzleSolverForProofOfWork( this.strategyForTryToCloseBlockOfBids, 
+																  blockOfOpenBidsForChallenge);
 				
+					cryptoPuzzleSolverForProofOfWork.solveBlockChallenge();
+					
+				}
+				catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+					noSuchAlgorithmException.printStackTrace();
+				}
+				
+				// TODO - Broadcast of ProofOfWorkMessage
 				
 			}
 			
