@@ -39,7 +39,7 @@ import main.java.resources.auction.Auction;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
 
-public class AuctionServer implements AuctionServerAPI{
+public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	private static final String CLIENT_SERVER_ADDRESS = "http://localhost:8082";
 	private static final String AUCTION_SERVER_REPOSITORY_ADDRESS = "http://localhost:8080/products-auctions";
@@ -53,8 +53,9 @@ public class AuctionServer implements AuctionServerAPI{
 	private SSLServerSocket serverSocket;
 	private SSLSocket responseSocket;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		int port = 8081;
+
 		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
 		ResourceConfig config = new ResourceConfig();
 		try {
@@ -88,7 +89,7 @@ public class AuctionServer implements AuctionServerAPI{
 
 		//		System.setProperty(key, value);
 		//		System.setProperty(key, value);
-		System.setProperty("javax.net.debug", "SSL,handshake");
+//		System.setProperty("javax.net.debug", "SSL,handshake");
 
 		System.setProperty("javax.net.ssl.keyStore", "res/keystores/auctionServerKeystore.jks");
 		System.setProperty("javax.net.ssl.keyStorePassword", "auctionServer1920");
@@ -123,27 +124,37 @@ public class AuctionServer implements AuctionServerAPI{
 		serverSocket = (SSLServerSocket)serverSocketFactory.createServerSocket(8443);
 //		serverSocket.setEnabledCipherSuites(sslContext.getServerSocketFactory().getSupportedCipherSuites());
 //		serverSocket.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2", "SSLv3"});
-		serverSocket.setWantClientAuth(true);
+//		serverSocket.setWantClientAuth(true);
 
-		while(true) {
-			responseSocket = (SSLSocket) serverSocket.accept();
-			responseSocket.startHandshake();
-			sslReadRequest(responseSocket.getInputStream());
-			SSLSession session = responseSocket.getSession();
-			Principal clientID = session.getPeerPrincipal();
-			System.out.println("Client has been identified as: " + clientID);
-			sslWriteResponse(responseSocket.getOutputStream());
-			responseSocket.close();
-		}
+		start();
 	}
 
+	public void run() {
+		try {
+			while(true) {
+				responseSocket = (SSLSocket) serverSocket.accept();
+				responseSocket.startHandshake();
+				sslReadRequest(responseSocket.getInputStream());
+				SSLSession session = responseSocket.getSession();
+//				Principal clientID = session.getPeerPrincipal();
+//				System.out.println("Client has been identified as: " + clientID);
+				sslWriteResponse(responseSocket.getOutputStream());
+				responseSocket.close();
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.getMessage();
+			e.printStackTrace();
+		}
+	}
+	
 	private void sslReadRequest(InputStream socketInStream) {
-		System.out.print("Request: ");
+		System.err.print("Request: ");
 		int ch = 0;
 		int lastCh = 0;
 		try {
 			while( (ch = socketInStream.read()) >= 0 && (ch != '\n' && lastCh != '\n') ) {
-				System.out.print((char)ch);
+				System.err.print((char)ch);
 				if(ch != '\n')
 					lastCh = ch;
 			}
@@ -158,15 +169,14 @@ public class AuctionServer implements AuctionServerAPI{
 		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
 		printWriter.print("HTTP/1.1 200 OK\r\n");
 		printWriter.print("Content-Type: text/html\r\n");
-		printWriter.print("\\r\\n");
+		printWriter.print("\r\n");
 		printWriter.print("<html>\r\n");
-		printWriter.print("<head>\r\n");
-		printWriter.print("</head>\r\n");
 		printWriter.print("<body>\r\n");
 		printWriter.print("Porra funciona pah!!\r\n");
 		printWriter.print("</body>\r\n");
-		printWriter.print("<html>\r\n");
+		printWriter.print("</html>\r\n");
 		printWriter.flush();
+		printWriter.close();
 	}
 
 	@Override
