@@ -12,7 +12,7 @@ import main.java.resources.block.Block;
 import main.java.resources.cryptopuzzle.CryptoPuzzleSolverForProofOfWork;
 import main.java.resources.user.User;
 
-public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements Runnable {
+public class TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy implements Runnable {
 
 	private byte strategyForTryToCloseBlockOfBids;
 
@@ -23,9 +23,10 @@ public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements 
 	private List<Bid> openBidsList;
 	
 	
-	public AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService(byte strategyForTryToCloseBlockOfBids,
-																   byte numBytesToSolveChallengeType,
-															 	   List<User> usersList, List<Bid> openBidsList) {
+	public TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy(byte strategyForTryToCloseBlockOfBids,
+																           byte numBytesToSolveChallengeType,
+															 	           List<User> usersList, 
+															 	           List<Bid> openBidsList) {
 		
 		this.strategyForTryToCloseBlockOfBids = strategyForTryToCloseBlockOfBids;
 		this.numBytesToSolveChallengeType = numBytesToSolveChallengeType;
@@ -40,7 +41,7 @@ public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements 
 	public void run() {
 		for(;;) {
 			try {
-				Thread.sleep(CommonUtils.TRY_TO_CLOSE_BIDS_IF_USERS_ARE_BUSY_SERVICE_VERIFICATION_RATE_TIME);
+				Thread.sleep(CommonUtils.TRY_TO_CLOSE_BLOCK_OF_BIDS_SERVICE_VERIFICATION_RATE_TIME);
 			}
 			catch (InterruptedException interruptedException) {
 				interruptedException.printStackTrace();
