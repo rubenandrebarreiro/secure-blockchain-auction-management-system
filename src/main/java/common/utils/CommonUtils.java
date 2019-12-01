@@ -120,7 +120,10 @@ public class CommonUtils {
 	/**
 	 * The Rate Time for verification of the Cleaning Random Nonces Service
 	 */
-	public static final long CLEANING_RANDOM_NONCES_SERVICE_VERIFICATION_RATE_TIME = 10000;
+	public static final long TRY_TO_CLOSE_BIDS_IF_USERS_ARE_BUSY_SERVICE_VERIFICATION_RATE_TIME = 10000;
+	
+	
+	public static final int MAX_NUM_BIDS_TO_TRY_TO_MINE = 5;
 	
 	/**
 	 * The Timeout for triggering the event of Cleaning/Removing old Random Nonces

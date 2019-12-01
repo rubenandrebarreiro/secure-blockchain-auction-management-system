@@ -5,12 +5,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import main.java.resources.bid.Bid;
-import main.java.resources.user.User;
 
 public class Block {
 
-	private long blockID;
-	
 	private Bid[] bidsToMine;
 	
 	private byte[] blockSerialized;
@@ -21,14 +18,10 @@ public class Block {
 	
 	private boolean isBlockSerializedHashed;
 	
-	private User userClientResponsibleToMineTheBlock;
-	
 	private boolean isBlockMinedAndClosed;
 	
 	
-	public Block(long blockID, Bid[] bidsToMine) {
-		
-		this.blockID = blockID;
+	public Block(Bid[] bidsToMine) {
 		
 		this.bidsToMine = bidsToMine;
 		
@@ -38,18 +31,8 @@ public class Block {
 		this.blockSerializedHashed = null;
 		this.isBlockSerializedHashed = false;
 		
-		this.userClientResponsibleToMineTheBlock = null;
-		
 	}
 	
-	
-	public long getBlockID() {
-		return this.blockID;
-	}
-	
-	public void setBlockID(long blockID) {
-		this.blockID = blockID;
-	}
 	
 	public Bid[] getBidsToMine() {
 		return bidsToMine;
@@ -97,14 +80,6 @@ public class Block {
 	
 	public void setIsBlockMinedAndClosed(boolean isBlockMinedAndClosed) {
 		this.isBlockMinedAndClosed = isBlockMinedAndClosed;
-	}
-	
-	public User getUserClientResponsibleToMineTheBlock() {
-		return userClientResponsibleToMineTheBlock;
-	}
-	
-	public void setUserClientResponsibleToMineTheBlock(User userClientResponsibleToMineTheBlock) {
-		this.userClientResponsibleToMineTheBlock = userClientResponsibleToMineTheBlock;
 	}
 	
 	public void doBlockSerialization() {
