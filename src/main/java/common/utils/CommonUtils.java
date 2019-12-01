@@ -56,6 +56,11 @@ public class CommonUtils {
 	public static final int NUM_BYTES_CHALLENGE = 2;
 	
 	/**
+	 * The number of ASCII Table possibilities in the Challenge
+	 */
+	public static final int NUM_ASCII_TABLE_POSSIBILITIES_IN_CHALLENGE = 256;
+	
+	/**
 	 * The Total Number of Outside Separators, contained in the Meta Header
 	 */
 	public static final int META_HEADER_OUTSIDE_SEPARATORS = 2;
