@@ -21,8 +21,8 @@ public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements 
 	private List<Bid> openBidsList;
 	
 	
-	public AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService( byte strategyForTryToCloseBlockOfBids,
-															 List<User> usersList, List<Bid> openBidsList ) {
+	public AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService(byte strategyForTryToCloseBlockOfBids,
+															 	   List<User> usersList, List<Bid> openBidsList) {
 		
 		this.strategyForTryToCloseBlockOfBids = strategyForTryToCloseBlockOfBids;
 		this.usersList = usersList;
@@ -116,6 +116,8 @@ public class AuctionServerTryToCloseBlockOfBidsIfUsersAreBusyService implements 
 				}
 				
 				// TODO - Broadcast of ProofOfWorkMessage
+				
+				
 				
 			}
 			

@@ -98,21 +98,21 @@ public class CryptoPuzzleSolverForProofOfWork {
 			
 			case 0:
 				
-				this.solveChallengeSequential();
+				this.solveBlockChallengeSequential();
 				
 				break;
 			
 			
 			case 1:
 				
-				this.solveChallengeInverseSequential();
+				this.solveBlockChallengeInverseSequential();
 				
 				break;
 				
 				
 			case 2:
 		
-				this.solveChallengeRandomly();
+				this.solveBlockChallengeRandomly();
 				
 				break;
 				
@@ -124,7 +124,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 		
 	}
 	
-	private void solveChallengeSequential() {
+	private void solveBlockChallengeSequential() {
 		
 		byte[] blockOfOpenBidsForChallengeSerializedAndHashedToCheck = this.blockOfOpenBidsForChallengeToCheck
 	    		   .getBlockSerializedHashed();
@@ -182,7 +182,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 		}
 	}
 	
-	private void solveChallengeInverseSequential() {
+	private void solveBlockChallengeInverseSequential() {
 		
 		byte[] blockOfOpenBidsForChallengeSerializedAndHashedToCheck = this.blockOfOpenBidsForChallengeToCheck
 	    		   .getBlockSerializedHashed();
@@ -241,7 +241,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 		
 	}
 	
-	private void solveChallengeRandomly() {
+	private void solveBlockChallengeRandomly() {
 		
 		byte[] blockOfOpenBidsForChallengeSerializedAndHashedToCheck = this.blockOfOpenBidsForChallengeToCheck
 	    		   .getBlockSerializedHashed();
