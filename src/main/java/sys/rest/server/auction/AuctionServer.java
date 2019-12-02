@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -23,6 +24,7 @@ import javax.net.ssl.SSLSocket;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -30,6 +32,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -51,7 +54,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	private Gson gson;
 
 	HttpClient httpClient;
-	
+
 	private SSLServerSocket serverSocket;
 	private SSLSocket responseSocket;
 
@@ -83,7 +86,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		}
 
 		JdkHttpServerFactory.createHttpServer(baseUri, config);
-		
+
 		System.out.println("Auction Server ready @ " + baseUri);
 	}
 
@@ -91,11 +94,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 		//		System.setProperty(key, value);
 		//		System.setProperty(key, value);
-//		System.setProperty("javax.net.debug", "SSL,handshake");
+		//		System.setProperty("javax.net.debug", "SSL,handshake");
 
 		System.setProperty("javax.net.ssl.keyStore", "res/keystores/auctionServerKeystore.jks");
 		System.setProperty("javax.net.ssl.keyStorePassword", "auctionServer1920");
-		
+
 		System.setProperty("javax.net.ssl.trustStore", "res/truststores/auctionServerTruststore.jks");
 		System.setProperty("javax.net.ssl.trustStorePassword", "auctionServer1920");
 
@@ -105,28 +108,28 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		gson = new Gson();
 		httpClient = HttpClients.createDefault();
 
-//	    KeyStore ks = KeyStore.getInstance("JKS");
-//	    InputStream ksIs = new FileInputStream("res/keystores/auctionServerKeystore.jks");
-//	    try {
-//	        ks.load(ksIs, "auctionServer1920".toCharArray());
-//	    } finally {
-//	        if (ksIs != null) {
-//	            ksIs.close();
-//	        }
-//	    }
-//
-//	    KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory
-//	            .getDefaultAlgorithm());
-//	    kmf.init(ks, "auctionServer1920".toCharArray());
-//		
+		//	    KeyStore ks = KeyStore.getInstance("JKS");
+		//	    InputStream ksIs = new FileInputStream("res/keystores/auctionServerKeystore.jks");
+		//	    try {
+		//	        ks.load(ksIs, "auctionServer1920".toCharArray());
+		//	    } finally {
+		//	        if (ksIs != null) {
+		//	            ksIs.close();
+		//	        }
+		//	    }
+		//
+		//	    KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory
+		//	            .getDefaultAlgorithm());
+		//	    kmf.init(ks, "auctionServer1920".toCharArray());
+		//		
 		SSLContext sslContext = SSLContext.getDefault();
-//	    SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-//		sslContext.init(kmf.getKeyManagers(), null, null);
+		//	    SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+		//		sslContext.init(kmf.getKeyManagers(), null, null);
 		SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
 		serverSocket = (SSLServerSocket)serverSocketFactory.createServerSocket(8443);
-//		serverSocket.setEnabledCipherSuites(sslContext.getServerSocketFactory().getSupportedCipherSuites());
-//		serverSocket.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2", "SSLv3"});
-//		serverSocket.setWantClientAuth(true);
+		//		serverSocket.setEnabledCipherSuites(sslContext.getServerSocketFactory().getSupportedCipherSuites());
+		//		serverSocket.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2", "SSLv3"});
+		//		serverSocket.setWantClientAuth(true);
 
 		start();
 	}
@@ -134,17 +137,18 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public void run() {
 		String arg1 = null, arg2 = null;
 		HttpResponse response = null;
-		
+
 		try {
 			responseSocket = (SSLSocket) serverSocket.accept();
 			responseSocket.startHandshake();
 			while(true) {
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
-				if(jsonMessage != null) {
-//					SSLSession session = responseSocket.getSession();
-//					Principal clientID = session.getPeerPrincipal();
-//					System.out.println("Client has been identified as: " + clientID);
-					SSLSocketMessage message = gson.fromJson(jsonMessage, SSLSocketMessage.class);
+				//					SSLSession session = responseSocket.getSession();
+				//					Principal clientID = session.getPeerPrincipal();
+				//					System.out.println("Client has been identified as: " + clientID);
+				SSLSocketMessage message = gson.fromJson(jsonMessage, SSLSocketMessage.class);
+				if(message != null) {
+
 					switch (message.getOperation()) {
 					case OPEN_AUCTION:
 						response = createAuction(message.getBody());
@@ -227,7 +231,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 	}
-	
+
 	private String sslReadRequest(InputStream socketInStream) throws IOException {
 		StringBuilder builder = new StringBuilder();
 		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
@@ -236,9 +240,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return builder.toString();
 	}
 
-	private void sslWriteResponse(OutputStream socketOutStream, HttpResponse response) {
+	private void sslWriteResponse(OutputStream socketOutStream, HttpResponse response) throws ParseException, IOException {
+		String string;
+		if(response.getEntity() != null)
+			string = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
+		else
+			string = response.getStatusLine().toString();
 		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
-		printWriter.print(response + System.lineSeparator());
+		printWriter.print(string + System.lineSeparator());
 		printWriter.flush();
 	}
 
@@ -307,7 +316,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		default:
 			break;
 		}
-		
+
 		HttpPost postRequest = new HttpPost(url);
 		HttpResponse response = null;
 		try {
@@ -340,7 +349,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				"Received request to close an existing Auction!");
 
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/close-auction/" + openedAuctionID;
-		
+
 		HttpPut putRequest = new HttpPut(url);
 		HttpResponse response = null;
 		try {
@@ -349,7 +358,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
@@ -387,7 +396,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
-		
+
 		return response;
 	}
 
@@ -405,12 +414,12 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
-		
+
 		return response;
 	}
 
@@ -419,7 +428,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all opened Auctions!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened";
-		
+
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -428,7 +437,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
@@ -442,7 +451,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all closed Auctions!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed";
-		
+
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -451,7 +460,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
@@ -466,7 +475,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all Auctions by owner " + productOwnerUserClientID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/by-product-owner-user/" + productOwnerUserClientID;
-		
+
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -475,7 +484,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
@@ -490,7 +499,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all opened Auctions by owner " + productOwnerUserClientID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/by-product-owner-user/" + productOwnerUserClientID;
-		
+
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -499,7 +508,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
@@ -514,7 +523,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all closed Auctions by owner " + productOwnerUserClientID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/by-product-owner-user/" + productOwnerUserClientID;
-		
+
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -523,7 +532,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
@@ -537,7 +546,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get Auction with id" + auctionID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + auctionID;
-		
+
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -546,7 +555,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
@@ -559,7 +568,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id" + openedAuctionID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/" + openedAuctionID;
-		
+
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -568,7 +577,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
@@ -582,7 +591,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id" + closedAuctionID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/" + closedAuctionID;
-		
+
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -591,7 +600,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
