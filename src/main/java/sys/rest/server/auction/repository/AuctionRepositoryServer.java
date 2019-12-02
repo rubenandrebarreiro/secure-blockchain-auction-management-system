@@ -925,15 +925,12 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 		else {
 			
-			this.allBidsRepositoryDao.create(newBid);
+			this.openedBidsRepositoryDao.create(newBid);
 			
 			System.out.println("Bid added to Opened Bids in an Auction!!!");
 			
 		}
-		
-		
-		this.openedBidsRepositoryDao.create(newBid);
-		
+				
 		
 		this.allProductsAuctionsRepositoryDao.update(openedAuction);
 
