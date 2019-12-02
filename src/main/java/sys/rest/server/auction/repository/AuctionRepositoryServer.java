@@ -896,7 +896,13 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 		
 		
-		openedAuction.addAuctionBid(newBid);
+		if(!openedAuction.addAuctionBid(newBid)) {
+			
+			System.err.println("The new Bid needs to be of higher value than the previous highest value!!!");
+			
+			return Response.status(Status.BAD_REQUEST).build();
+			
+		}
 		
 		
 		long newBidID = newBid.getBidID();

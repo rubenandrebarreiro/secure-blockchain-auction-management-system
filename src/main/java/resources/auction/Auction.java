@@ -262,10 +262,11 @@ public class Auction {
 		this.auctionBidsMade = auctionBidsMade;
 	}
 
-	public void addAuctionBid(Bid auctionBid) {
-		
+	public boolean addAuctionBid(Bid auctionBid) {
+		boolean result = false;
 		if(this.validateAuctionBid(auctionBid)) {
 			this.auctionBidsMade.put(auctionBid.getBidID(), auctionBid); 
+			result = true;
 		}
 		else {
 			
@@ -273,6 +274,7 @@ public class Auction {
 							 + "this Bid will not be accepted!!!");
 			
 		}
+		return result;
 	}
 		
 	public boolean validateAuctionBid(Bid auctionBid) {
