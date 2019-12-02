@@ -449,7 +449,7 @@ public class Client implements ClientAPI {
 		String auctionID = br.readLine();
 		System.out.println("Enter bid amount: ");
 		String bidAmount = br.readLine();
-		UserBidInfo bidInfo = new UserBidInfo(currentUser, Long.parseLong(bidAmount));
+		UserBidInfo bidInfo = new UserBidInfo(currentUser, Double.parseDouble(bidAmount));
 		String bidInfoSerialiazed = gson.toJson(bidInfo);
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
@@ -522,7 +522,7 @@ public class Client implements ClientAPI {
 		System.out.println("Enter auctionID: ");
 		String auctionID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
-		paramsMap.put("product-owner-user-client-id", auctionID);
+		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_AUCTIONS_BY_ID,
 				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
@@ -534,7 +534,7 @@ public class Client implements ClientAPI {
 		System.out.println("Enter auctionID: ");
 		String auctionID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
-		paramsMap.put("product-owner-user-client-id", auctionID);
+		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_AUCTIONS_BY_ID,
 				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
@@ -546,7 +546,7 @@ public class Client implements ClientAPI {
 		System.out.println("Enter auctionID: ");
 		String auctionID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
-		paramsMap.put("product-owner-user-client-id", auctionID);
+		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_AUCTIONS_BY_ID,
 				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
