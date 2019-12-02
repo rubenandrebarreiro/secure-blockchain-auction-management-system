@@ -56,7 +56,7 @@ public class ChallengeMessageBlock {
 		
 		this.blockChallenge = this.block.getBlockSerializedHashed();
 		
-		for(int currentByteBlockChallenge = CommonUtils.NUM_BYTES_CHALLENGE; currentByteBlockChallenge > 0; currentByteBlockChallenge--) {
+		for(int currentByteBlockChallenge = CommonUtils.NUM_BYTES_TO_SOLVE_CHALLENGE; currentByteBlockChallenge > 0; currentByteBlockChallenge--) {
 			this.blockChallenge[blockChallenge.length - currentByteBlockChallenge] = (byte) -1;
 		}
 		
