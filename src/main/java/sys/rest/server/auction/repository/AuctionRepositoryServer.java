@@ -861,7 +861,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 
 		Auction auction = this.allProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
-
+		
 		if( !this.verifyExistenceOfProductAuction(openedAuctionID, auction) ) {
 
 			return Response.status(Status.NOT_FOUND).build(); 
@@ -1166,7 +1166,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		Auction auction = this.closedProductsAuctionsRepositoryDao.queryForId(auctionID);
+		Auction auction = this.allProductsAuctionsRepositoryDao.queryForId(auctionID);
 
 		if( !this.verifyExistenceOfProductAuction(auctionID, auction) ) {
 
@@ -1199,9 +1199,9 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		Auction openedAuction = this.closedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
+		Auction openedAuction = this.openedProductsAuctionsRepositoryDao.queryForId(openedAuctionID);
 
-		if( !this.verifyExistenceOfClosedProductAuction(openedAuctionID, openedAuction) ) {
+		if( !this.verifyExistenceOfOpenedProductAuction(openedAuctionID, openedAuction) ) {
 
 			return Response.status(Status.NOT_FOUND).build(); 
 

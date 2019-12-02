@@ -523,7 +523,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	@Override
 	public HttpResponse findProductAuctionByID(String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
-				"Received request to get Auction with id" + auctionID + "!");
+				"Received request to get Auction with id " + auctionID + "!");
 		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + auctionID;
 		url = removeSpaceFromURL(url);
@@ -546,7 +546,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	@Override
 	public HttpResponse findOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
-				"Received request to get opened Auction with id" + openedAuctionID + "!");
+				"Received request to get opened Auction with id " + openedAuctionID + "!");
 		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/" + openedAuctionID;
 		url = removeSpaceFromURL(url);
@@ -570,7 +570,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	@Override
 	public HttpResponse findClosedProductAuctionByID(String closedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
-				"Received request to get opened Auction with id" + closedAuctionID + "!");
+				"Received request to get opened Auction with id " + closedAuctionID + "!");
 		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/" + closedAuctionID;
 		url = removeSpaceFromURL(url);
@@ -593,7 +593,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	@Override
 	public HttpResponse listAllBidsOfProductAuctionByID(String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
-				"Received request to get all bids from all Auction with id" + auctionID + "!");
+				"Received request to get all bids from all Auction with id " + auctionID + "!");
 		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + auctionID + "/bids";
 		url = removeSpaceFromURL(url);
@@ -616,7 +616,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	@Override
 	public HttpResponse listAllBidsOfOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
-				"Received request to get all bids from opened Auction with id" + openedAuctionID + "!");
+				"Received request to get all bids from opened Auction with id " + openedAuctionID + "!");
 		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/" + openedAuctionID + "/bids";
 		url = removeSpaceFromURL(url);
