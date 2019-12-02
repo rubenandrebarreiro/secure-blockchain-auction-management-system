@@ -3,9 +3,6 @@ package test.java.sys.rest.server.auction.repository;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
 import javax.jcr.LoginException;
 import javax.jcr.RepositoryException;
 import javax.ws.rs.core.Response.Status;
