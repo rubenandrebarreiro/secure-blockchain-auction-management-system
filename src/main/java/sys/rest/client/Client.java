@@ -4,39 +4,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import javax.ws.rs.core.UriBuilder;
-
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.Dsl;
-import org.asynchttpclient.ListenableFuture;
-import org.asynchttpclient.Response;
 import org.bouncycastle.util.encoders.Hex;
-import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
 import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.misc.IOUtils;
 import com.j256.ormlite.support.ConnectionSource;
 
 import main.java.api.rest.client.ClientAPI;
@@ -75,18 +55,16 @@ public class Client implements ClientAPI {
 	private static final String AUCTION_SERVER_ADDRESS = "https://localhost:8081/auction-server";
 	private static final String USER_DATABASE_JDBC_PATH = "jdbc:sqlite:res/database/client/users.db";
 
-	private static final String ENCONDING = "UTF-8";
-
 	private User currentUser;
 
 	private Gson gson;
-	private AsyncHttpClient httpClient;
 	private Dao<User, String> userDao;
 
 	private BufferedReader br;
 
 	private SSLSocket socket;
 	private SSLSocketFactory socketFactory;
+	
 	public static void main(String[] args) {
 
 		if(args.length != 6) {
@@ -168,8 +146,6 @@ public class Client implements ClientAPI {
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-
-		httpClient = Dsl.asyncHttpClient();
 
 		br = new BufferedReader(new InputStreamReader(System.in));
 		String line = null;
@@ -564,100 +540,6 @@ public class Client implements ClientAPI {
 	private void sslReadResponse(InputStream socketInStream) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
 		System.out.println(br.readLine());					
-	}
-
-	private HttpsURLConnection createGetRequest(String urlString, Map<String, String> params) {
-		URL url = null;
-		HttpsURLConnection result = null;
-
-		try {
-			url = new URL(addParamsToURL(urlString, params));
-			result = (HttpsURLConnection)url.openConnection();
-			result.setRequestMethod("GET");
-		} catch (MalformedURLException e) {
-			System.err.println("Invalid URL");
-		} catch (IOException e) {
-			System.err.println("Error opening connection");
-		}
-
-		return result;
-	}
-
-	private byte[] createPostRequest(String urlString, Map<String, String> params) {
-		URL url = null;
-		HttpsURLConnection result = null;
-
-		try {
-			url = new URL(addParamsToURL(urlString, params));
-			result = (HttpsURLConnection)url.openConnection();
-			result.setRequestMethod("POST");
-		} catch (MalformedURLException e) {
-			System.err.println("Invalid URL");
-		} catch (IOException e) {
-			System.err.println("Error opening connection");
-		}
-
-
-		return null;	
-	}
-
-	private byte[] createPutRequest(String urlString, Map<String, String> params) {
-		URL url = null;
-		HttpsURLConnection result = null;
-
-		try {
-			url = new URL(urlString);
-			result = (HttpsURLConnection)url.openConnection();
-			result.setRequestMethod("PUT");
-		} catch (MalformedURLException e) {
-			System.err.println("Invalid URL");
-		} catch (IOException e) {
-			System.err.println("Error opening connection");
-		}
-
-
-		return null;	
-	}
-
-	private byte[] createDeleteRequest(String urlString, Map<String, String> params) {
-		URL url = null;
-		HttpsURLConnection result = null;
-
-		try {
-			url = new URL(urlString);
-			result = (HttpsURLConnection)url.openConnection();
-			result.setRequestMethod("DELETE");
-		} catch (MalformedURLException e) {
-			System.err.println("Invalid URL");
-		} catch (IOException e) {
-			System.err.println("Error opening connection");
-		}
-
-		return null;	
-	}
-
-	private String addParamsToURL(String urlString, Map<String, String> params) {
-		StringBuilder builder = new StringBuilder();
-		boolean first = true;
-		try {
-			builder.append(urlString);
-			if(params != null) {
-				Set<Entry<String, String>> entryMap = params.entrySet();
-				if(entryMap.size() != 0) {
-					for (Entry<String, String> entry : entryMap) {
-						if(first) first = false;
-						else builder.append("&");
-						builder.append(URLEncoder.encode(entry.getKey(), ENCONDING));
-						builder.append("=");
-						builder.append(URLEncoder.encode(entry.getValue(), ENCONDING));
-					}
-				}
-			}
-		} catch (UnsupportedEncodingException e) {
-			System.err.println("Error while adding parameters to URL");
-		}
-
-		return builder.toString();
 	}
 
 	private void sendMessage(SSLSocketMessage message) throws IOException {
