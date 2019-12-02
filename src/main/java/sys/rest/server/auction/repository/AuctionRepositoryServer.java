@@ -1,7 +1,12 @@
 package main.java.sys.rest.server.auction.repository;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.ServerSocket;
 import java.net.URI;
+import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -9,14 +14,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
+
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpsConfigurator;
+import com.sun.net.httpserver.HttpsParameters;
+import com.sun.net.httpserver.HttpsServer;
 
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import com.google.gson.Gson;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
@@ -28,9 +44,16 @@ import main.java.resources.auction.Auction;
 import main.java.resources.auction.utils.AuctionBidTypes;
 import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
+import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
+import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
 public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
+	private AuctionServerTLSConfigurationReader auctionServerTLSConfigurationReader;
+	
+	private AuctionServerKeyStoreConfigurationReader auctionServerKeyStoreConfigurationReader;
+	
+	
 	private Gson gsonObject;
 
 	private Dao<Auction, String> allProductsAuctionsRepositoryDao;
@@ -46,32 +69,144 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	private Dao<Bid, Long> closedBidsRepositoryDao; //TODO - ver como fechar a bid
 	
 	private Dao<User, String> allUsersRepositoryDao;
-
-
-	public AuctionRepositoryServer() {
+	
+	
+	
+	public AuctionRepositoryServer(String tlsConfigurationsFilePath, String keyStoreConfigurationsFilePath)
+		   throws FileNotFoundException {
+		
 		this.gsonObject = new Gson();
 		
 		System.out.println("Created a JDBC Connection!!!");
 		
 		this.createAuctionRepositoriesDao();
 		
+		this.auctionServerTLSConfigurationReader = new AuctionServerTLSConfigurationReader
+				                                      (tlsConfigurationsFilePath);
+		
+		this.auctionServerKeyStoreConfigurationReader = new AuctionServerKeyStoreConfigurationReader
+				                                           (keyStoreConfigurationsFilePath);
+		
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws NoSuchAlgorithmException, FileNotFoundException {
 
-		int port = 8080;
+		if(args.length != 3) {
+			
+			System.err.println
+				(String.format
+						("Usage: java AuctionRepositoryServer <port> "
+					   + "<tls-configurations-file-path> <key-store-configurations-file-path>")
+				);
+			
+			System.exit(1);
+		}
 		
-
-		//String secret = args[0];
-
-		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
-
+		int port = Integer.parseInt(args[0]);
+		
+		String tlsConfigurationsFilePath = args[1];
+		String keyStoreConfigurationsFilePath = args[2];
+	
+		
+		URI baseUri = UriBuilder.fromUri("https://0.0.0.0/").port(port).build();
+		
 		ResourceConfig config = new ResourceConfig();
-		config.register( new AuctionRepositoryServer() );
+		
+		AuctionRepositoryServer auctionRepositoryServer = new AuctionRepositoryServer
+															 (tlsConfigurationsFilePath,
+															  keyStoreConfigurationsFilePath);
+		
+		config.register( auctionRepositoryServer );
+		
+		try {
+			
+			KeyStore keyStore = KeyStore.getInstance(auctionRepositoryServer.getKeyStoreInstance());
+		    keyStore.load(new FileInputStream
+		    		   (auctionRepositoryServer.getKeyStoreFileLocationPath()), 
+		    		    auctionRepositoryServer.getKeyStorePassword().toCharArray());
+	        
+		    KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance
+		    									 (auctionRepositoryServer.getKeyManagerFactoryInstance());
+		    
+		    char[] ctPass = "something".toCharArray(); // TODO - change/verify this
+		    keyManagerFactory.init(keyStore, ctPass);
+	        
+			SSLContext sslContext = SSLContext.getInstance
+								   (auctionRepositoryServer.getAvailableSSLContextInstance());
+			
+			sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
+			
+			// TODO - Do Hybrid Version
+			
+			SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
+			
+			ServerSocket sslServerSocket = sslServerSocketFactory.createServerSocket(port);
+			
+			( (SSLServerSocket)sslServerSocket ).setEnabledProtocols(auctionRepositoryServer.getAvailableTLSVersions());
+			( (SSLServerSocket)sslServerSocket ).setEnabledCipherSuites(auctionRepositoryServer.getAvailableTLSCiphersuites());
+			
+			( (SSLServerSocket)sslServerSocket )
+			.setNeedClientAuth(auctionRepositoryServer.getAvailableSSLContextInstance() == "TLS" ? true : false);
+			
+			
+			
+			
+			HttpServer auctionRepositoryHTTPSServer = JdkHttpServerFactory.createHttpServer(baseUri, config, sslContext);
+			
+			
+			((HttpsServer) auctionRepositoryHTTPSServer).setHttpsConfigurator(new HttpsConfigurator(sslContext) {
+			    
+				@Override
+			    public void configure(final HttpsParameters params) {
+					
+					final SSLContext sslContext = getSSLContext();
+					final SSLParameters sslparams = sslContext.getDefaultSSLParameters();
+					
+					params.setSSLParameters(sslparams);
+					
+					params.setProtocols(auctionRepositoryServer.getAvailableTLSVersions());
+					params.setCipherSuites(auctionRepositoryServer.getAvailableTLSCiphersuites());
+			    }
+			});
+			
+	
+			System.out.println("Auction Repository Server ready @ " + baseUri);
+		}
+		catch (Exception e) {
+			System.err.println(e.toString());
+		}
+	}
+	
+	public String getAvailableSSLContextInstance() {
+		return this.auctionServerTLSConfigurationReader.getSSLContextInstance();
+	}
+	
+	public String[] getAvailableTLSVersions() {
+		return this.auctionServerTLSConfigurationReader.getAvailableTLSVersions();
+	}
+	
+	public String[] getAvailableTLSCiphersuites() {
+		return this.auctionServerTLSConfigurationReader.getAvailableTLSCiphersuites();
+	}
+	
+	public String[] getAvailableTLSAuthenticationModes() {
+		return this.auctionServerTLSConfigurationReader.getAvailableTLSAuthenticationModes();
+	}
+	
+	public String getKeyStoreFileLocationPath() {
+		return this.auctionServerKeyStoreConfigurationReader.getKeyStoreFileLocationPath();
+	}
 
-		JdkHttpServerFactory.createHttpServer(baseUri, config);
+	public String getKeyStorePassword() {
+		return this.auctionServerKeyStoreConfigurationReader.getKeyStorePassword();
+	}
+	
+	public String getKeyStoreInstance() {
+		return this.auctionServerKeyStoreConfigurationReader.getKeyStoreInstance();
+	}
 
-		System.out.println("Auction Repository Server ready @ " + baseUri);
+	public String getKeyManagerFactoryInstance() {
+		return this.auctionServerKeyStoreConfigurationReader.getKeyManagerFactoryInstance();
 	}
 	
 	private void createAuctionRepositoriesDao() {

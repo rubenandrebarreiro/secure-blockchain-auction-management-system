@@ -3,8 +3,11 @@ package test.java.sys.rest.server.auction.repository;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-import javax.jcr.LoginException;
-import javax.jcr.RepositoryException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.security.NoSuchAlgorithmException;
+
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.jupiter.api.AfterAll;
@@ -29,7 +32,7 @@ public class TestAuctionJDBC {
 	private Gson gson;
 	
 	@BeforeAll
-	public static void initAuctionRepositoryServer() throws InterruptedException, LoginException, RepositoryException {
+	public static void initAuctionRepositoryServer() throws InterruptedException, NoSuchAlgorithmException, FileNotFoundException {
 //    	File file = new File("res/database");
 //    	File[] files = file.listFiles();
 //    	for (File tempFile : files) {
@@ -37,6 +40,7 @@ public class TestAuctionJDBC {
 //		}
     	
     	AuctionRepositoryServer.main(null);
+
 	}
 	
     @BeforeEach
