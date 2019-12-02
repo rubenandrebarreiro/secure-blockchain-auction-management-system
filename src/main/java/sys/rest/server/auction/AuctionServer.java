@@ -153,8 +153,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						response = listClosedProductsAuctions();
 						break;
 					case LIST_ALL_AUCTIONS_BY_OWNER:
-						//TODO REMOVE!!!
-						System.err.println("GOT: " + message.getParamsMap().get("product-owner-user-client-id"));
 						response = listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
 						break;
 					case LIST_OPENED_AUCTIONS_BY_OWNER:
@@ -606,41 +604,143 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	@Override
 	public HttpResponse listAllBidsOfProductAuctionByID(String auctionID) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all bids from all Auction with id" + auctionID + "!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + auctionID + "/bids";
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
 	}
 
 	@Override
 	public HttpResponse listAllBidsOfOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all bids from opened Auction with id" + openedAuctionID + "!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/" + openedAuctionID + "/bids";
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
 	}
 
 	@Override
 	public HttpResponse listAllBidsOfClosedProductAuctionByID(String closedAuctionID) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all bids from closed Auction with id" + closedAuctionID + "!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/" + closedAuctionID + "/bids";
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
 	}
 
 	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientInProductAuctionByID(String auctionID, String bidderUserClientID)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all bids from Auction with id" + auctionID + " and from " + bidderUserClientID + "!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + auctionID + "/bids/" + bidderUserClientID;
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
 	}
 
 	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(String openedAuctionID,
 			String bidderUserClientID) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all opened bids from Auction with id" + openedAuctionID + " and from " + bidderUserClientID + "!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + openedAuctionID + "/bids/" + bidderUserClientID;
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
 	}
 
 	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(String closedAuctionID,
 			String bidderUserClientID) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all closed bids from Auction with id" + closedAuctionID + " and from " + bidderUserClientID + "!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + closedAuctionID + "/bids/" + bidderUserClientID;
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
 	}
 	
 	private String removeSpaceFromURL(String url) {
