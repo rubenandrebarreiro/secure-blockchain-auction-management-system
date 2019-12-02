@@ -241,7 +241,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				userAuctionInfo.getAuctionTimestampLimit(),
 				1,
 				"ProductNameTest", 
-				user.getUserFirstName() + " " + user.getUserLastName());
+				user.getUserPeerID());
 
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Created auction:\n" + 
