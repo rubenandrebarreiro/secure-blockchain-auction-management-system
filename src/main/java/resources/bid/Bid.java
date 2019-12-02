@@ -20,6 +20,7 @@ public class Bid {
 	private boolean isBidMined;
 	
 	
+	
 	private byte[] bidSerializedBytes;
 
 	

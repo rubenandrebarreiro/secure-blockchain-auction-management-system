@@ -51,15 +51,14 @@ public class CommonUtils {
 	public static final byte CURRENT_VERSION_PROTOCOL = VersionNumber.VERSION_01.getVersionNumber();
 	
 	/**
-	 * The default length of the buffer to keep the data of the Datagram Packet received,
-	 * related to the Operation Messages 
+	 * The number of bytes to guess/mine in the Challenge
 	 */
-	public static final int DEFAULT_MESSAGE_DATAGRAM_PACKET_RECEIVED_SIZE = 65508;
+	public static final int NUM_BYTES_TO_SOLVE_CHALLENGE = 2;
 	
 	/**
-	 * The Number of Components, contained in the Meta Header
+	 * The number of ASCII Table possibilities in the Challenge
 	 */
-	public static final int NUM_COMPONENTS_META_HEADER = 8;
+	public static final int NUM_ASCII_TABLE_POSSIBILITIES_IN_CHALLENGE = 256;
 	
 	/**
 	 * The Total Number of Outside Separators, contained in the Meta Header
@@ -124,9 +123,15 @@ public class CommonUtils {
 	public static final int DEFAULT_SECURE_MULTICAST_SOCKET_TIMEOUT_MILLIS = 5000;
 	
 	/**
-	 * The Rate Time for verification of the Cleaning Random Nonces Service
+	 * The Rate Time for verification of the Try to Close Block of Bids Service
+	 * (for both, Clients and Auction Server)
 	 */
-	public static final long CLEANING_RANDOM_NONCES_SERVICE_VERIFICATION_RATE_TIME = 10000;
+	public static final long TRY_TO_CLOSE_BLOCK_OF_BIDS_SERVICE_VERIFICATION_RATE_TIME = 10000;
+	
+	/**
+	 * The Maximum Number of Bids to Try to Mine
+	 */
+	public static final int MAX_NUM_BIDS_TO_TRY_TO_MINE = 5;
 	
 	/**
 	 * The Timeout for triggering the event of Cleaning/Removing old Random Nonces
