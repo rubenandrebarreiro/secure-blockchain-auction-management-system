@@ -1265,7 +1265,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 
-		Auction auction = this.openedProductsAuctionsRepositoryDao.queryForId(auctionID);
+		Auction auction = this.allProductsAuctionsRepositoryDao.queryForId(auctionID);
 
 		if( !this.verifyExistenceOfProductAuction(auctionID, auction) ) {
 
