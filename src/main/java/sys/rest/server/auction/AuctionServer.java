@@ -143,6 +143,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	public void run() {
 		String arg1 = null, arg2 = null;
+		HttpResponse response = null;
 		try {				
 			responseSocket = (SSLSocket) serverSocket.accept();
 			responseSocket.startHandshake();
@@ -155,72 +156,72 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				SSLSocketMessage message = gson.fromJson(jsonMessage, SSLSocketMessage.class);
 				switch (message.getOperation()) {
 				case OPEN_AUCTION:
-					createAuction(message.getBody());
+					response = createAuction(message.getBody());
 					break;
 				case CLOSE_AUCTION:
-					closeAuction(message.getParamsMap().get("auction-id"));
+					response = closeAuction(message.getParamsMap().get("auction-id"));
 					break;
 				case ADD_BID:
 					arg1 = message.getParamsMap().get("auction-id");
 					arg2 = message.getBody();
-					addBidToOpenedProductAuction(arg1, arg2);
+					response = addBidToOpenedProductAuction(arg1, arg2);
 					break;
 				case LIST_ALL_AUCTIONS:
-					listAllProductsAuctions();
+					response = listAllProductsAuctions();
 					break;
 				case LIST_OPENED_AUCTIONS:
-					listOpenedProductsAuctions();
+					response = listOpenedProductsAuctions();
 					break;
 				case LIST_CLOSED_AUCTIONS:
-					listClosedProductsAuctions();
+					response = listClosedProductsAuctions();
 					break;
 				case LIST_ALL_AUCTIONS_BY_OWNER:
-					listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+					response = listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
 					break;
 				case LIST_OPENED_AUCTIONS_BY_OWNER:
-					listOpenedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+					response = listOpenedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
 					break;
 				case LIST_CLOSED_AUCTIONS_BY_OWNER:
-					listClosedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+					response = listClosedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
 					break;
 				case LIST_ALL_AUCTIONS_BY_ID:
-					findProductAuctionByID(message.getParamsMap().get("auction-id"));
+					response = findProductAuctionByID(message.getParamsMap().get("auction-id"));
 					break;
 				case LIST_OPENED_AUCTIONS_BY_ID:
-					findOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
+					response = findOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
 					break;
 				case LIST_CLOSED_AUCTIONS_BY_ID:
-					findClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
+					response = findClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
 					break;
 				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
-					listAllBidsOfProductAuctionByID(message.getParamsMap().get("auction-id"));
+					response = listAllBidsOfProductAuctionByID(message.getParamsMap().get("auction-id"));
 					break;
 				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
-					listAllBidsOfOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
+					response = listAllBidsOfOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
 					break;
 				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
-					listAllBidsOfClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
+					response = listAllBidsOfClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
 					break;
 				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 					arg1 = message.getParamsMap().get("auction-id");
 					arg2 = message.getParamsMap().get("bidder-user-client-id");
-					listAllBidsMadeByBidderUserClientInProductAuctionByID(arg1, arg2);
+					response = listAllBidsMadeByBidderUserClientInProductAuctionByID(arg1, arg2);
 					break;
 				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 					arg1 = message.getParamsMap().get("auction-id");
 					arg2 = message.getParamsMap().get("bidder-user-client-id");
-					listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(arg1, arg2);
+					response = listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(arg1, arg2);
 					break;
 				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 					arg1 = message.getParamsMap().get("auction-id");
 					arg2 = message.getParamsMap().get("bidder-user-client-id");
-					listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
+					response = listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
 					break;
 				default:
 					//TODO Error somewhere?
 					break;
 				}
-				sslWriteResponse(responseSocket.getOutputStream());
+				sslWriteResponse(responseSocket.getOutputStream(), response);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -250,22 +251,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return builder.toString();
 	}
 
-	private void sslWriteResponse(OutputStream socketOutStream) {
+	private void sslWriteResponse(OutputStream socketOutStream, HttpResponse response) {
 		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
-		printWriter.print("HTTP/1.1 200 OK\n");
-		printWriter.print("Content-Type: text/html\n");
-		printWriter.print("\n");
-		printWriter.print("<html>\n");
-		printWriter.print("<body>\n");
-		printWriter.print("Porra funciona pah!!\n");
-		printWriter.print("</body>\n");
-		printWriter.print("</html>\n");
-		printWriter.print("\n");
+		printWriter.print(response);
 		printWriter.flush();
 	}
 
 	@Override
-	public Response createAuction(String clientAuctionInformation) {
+	public HttpResponse createAuction(String clientAuctionInformation) {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to create a new Auction!");
 
@@ -353,11 +346,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response closeAuction(String openedAuctionID) throws SQLException {	
+	public HttpResponse closeAuction(String openedAuctionID) throws SQLException {	
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to close an existing Auction!");
 
@@ -377,11 +370,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response addBidToOpenedProductAuction(String openedAuctionID, String bidForAuctionJSONString)
+	public HttpResponse addBidToOpenedProductAuction(String openedAuctionID, String bidForAuctionJSONString)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to add bid to " + openedAuctionID + "!");
@@ -410,11 +403,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 		
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response listAllProductsAuctions() throws SQLException {
+	public HttpResponse listAllProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all Auctions!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all";
@@ -433,11 +426,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 		
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response listOpenedProductsAuctions() throws SQLException {
+	public HttpResponse listOpenedProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all opened Auctions!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened";
@@ -456,11 +449,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response listClosedProductsAuctions() throws SQLException {
+	public HttpResponse listClosedProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all closed Auctions!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed";
@@ -479,11 +472,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response listAllProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
+	public HttpResponse listAllProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all Auctions by owner " + productOwnerUserClientID + "!");
@@ -503,11 +496,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response listOpenedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
+	public HttpResponse listOpenedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all opened Auctions by owner " + productOwnerUserClientID + "!");
@@ -527,11 +520,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response listClosedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
+	public HttpResponse listClosedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all closed Auctions by owner " + productOwnerUserClientID + "!");
@@ -551,11 +544,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response findProductAuctionByID(String auctionID) throws SQLException {
+	public HttpResponse findProductAuctionByID(String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get Auction with id" + auctionID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + auctionID;
@@ -573,11 +566,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response findOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
+	public HttpResponse findOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id" + openedAuctionID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/" + openedAuctionID;
@@ -596,11 +589,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response findClosedProductAuctionByID(String closedAuctionID) throws SQLException {
+	public HttpResponse findClosedProductAuctionByID(String closedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id" + closedAuctionID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/" + closedAuctionID;
@@ -618,43 +611,43 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				"Response: " + response.getStatusLine());
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
-		return Response.accepted().build();
+		return response;
 	}
 
 	@Override
-	public Response listAllBidsOfProductAuctionByID(String auctionID) throws SQLException {
+	public HttpResponse listAllBidsOfProductAuctionByID(String auctionID) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Response listAllBidsOfOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
+	public HttpResponse listAllBidsOfOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Response listAllBidsOfClosedProductAuctionByID(String closedAuctionID) throws SQLException {
+	public HttpResponse listAllBidsOfClosedProductAuctionByID(String closedAuctionID) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Response listAllBidsMadeByBidderUserClientInProductAuctionByID(String auctionID, String bidderUserClientID)
+	public HttpResponse listAllBidsMadeByBidderUserClientInProductAuctionByID(String auctionID, String bidderUserClientID)
 			throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Response listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(String openedAuctionID,
+	public HttpResponse listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(String openedAuctionID,
 			String bidderUserClientID) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Response listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(String closedAuctionID,
+	public HttpResponse listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(String closedAuctionID,
 			String bidderUserClientID) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
