@@ -16,6 +16,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
+import java.util.Random;
+import java.util.UUID;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
@@ -40,8 +42,10 @@ import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
 import main.java.resources.auction.Auction;
+import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
+import main.java.resources.user.UserBidInfo;
 import main.java.sys.SSLSocketMessage;
 
 public class AuctionServer extends Thread implements AuctionServerAPI{
@@ -214,25 +218,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		}
 	}
 
-	private String sslReadRequest(InputStream socketInStream) throws IOException {
-		StringBuilder builder = new StringBuilder();
-		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
-		builder.append(br.readLine());
-
-		return builder.toString();
-	}
-
-	private void sslWriteResponse(OutputStream socketOutStream, HttpResponse response) throws ParseException, IOException {
-		String string;
-		if(response.getEntity() != null)
-			string = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
-		else
-			string = response.getStatusLine().toString();
-		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
-		printWriter.print(string + System.lineSeparator());
-		printWriter.flush();
-	}
-
 	@Override
 	public HttpResponse createAuction(String clientAuctionInformation) {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -352,7 +337,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	}
 
 	@Override
-	public HttpResponse addBidToOpenedProductAuction(String openedAuctionID, String bidForAuctionJSONString)
+	public HttpResponse addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to add bid to " + openedAuctionID + "!");
@@ -361,8 +346,13 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		url = removeSpaceFromURL(url);
 		HttpPost postRequest = new HttpPost(url);
 		HttpResponse response = null;
+		UserBidInfo bidInfo = gson.fromJson(userBidInfo, UserBidInfo.class);
+		//TODO Change generation of Bid ID!
+		Random random = new Random();
+		Bid bid = new Bid(random.nextLong(), bidInfo.getUser().getUserPeerID(), bidInfo.getBidValue());
+		String bidJson = gson.toJson(bid);
 		try {
-			postRequest.setEntity(new StringEntity(bidForAuctionJSONString));
+			postRequest.setEntity(new StringEntity(bidJson));
 			postRequest.setHeader("Accept", "application/json");
 			postRequest.setHeader("Content-type", "application/json");
 			response = httpClient.execute(postRequest);
@@ -741,6 +731,23 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
 				"Response: " + response.getEntity());
 		return response;
+	}
+	
+	private String sslReadRequest(InputStream socketInStream) throws IOException {
+		StringBuilder builder = new StringBuilder();
+		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
+		builder.append(br.readLine());
+
+		return builder.toString();
+	}
+
+	private void sslWriteResponse(OutputStream socketOutStream, HttpResponse response) throws ParseException, IOException {
+		String string = response.getStatusLine().toString();
+		if(response.getEntity() != null && response.getEntity().getContentLength() != 0)
+			string = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
+		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
+		printWriter.print(string + System.lineSeparator());
+		printWriter.flush();
 	}
 	
 	private String removeSpaceFromURL(String url) {

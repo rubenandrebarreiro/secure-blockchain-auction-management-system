@@ -8,15 +8,10 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.bouncycastle.util.encoders.Hex;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,6 +25,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import main.java.api.rest.client.ClientAPI;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
+import main.java.resources.user.UserBidInfo;
 import main.java.sys.SSLSocketAuctionOperation;
 import main.java.sys.SSLSocketMessage;
 
@@ -60,7 +56,6 @@ public class Client implements ClientAPI {
 
 	private static final String HASH_ALGORITHM = "SHA-256";
 
-	private static final String AUCTION_SERVER_ADDRESS = "https://localhost:8081/auction-server";
 	private static final String USER_DATABASE_JDBC_PATH = "jdbc:sqlite:res/database/client/users.db";
 
 	private User currentUser;
@@ -419,6 +414,7 @@ public class Client implements ClientAPI {
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.OPEN_AUCTION,
 				new HashMap<String, String>(), postData);
 		String result = sendMessageAndGetResponse(message);
+		System.out.println(result);
 	}
 
 	private void closeAuction() throws IOException {
@@ -428,17 +424,21 @@ public class Client implements ClientAPI {
 		paramsMap.put("auction-id", auctionIDToClose);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CLOSE_AUCTION, paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
+		System.out.println(result);
 	}
 
 	private void createBid() throws IOException{
-		// TODO
-		String result;
 		System.out.println("Enter auctionID to bid: ");
 		String auctionID = br.readLine();
 		System.out.println("Enter bid amount: ");
 		String bidAmount = br.readLine();
-
-		String url = AUCTION_SERVER_ADDRESS + "/add-bid-to-opened-auction/)" + auctionID;
+		UserBidInfo bidInfo = new UserBidInfo(currentUser, Long.parseLong(bidAmount));
+		String bidInfoSerialiazed = gson.toJson(bidInfo);
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.ADD_BID, paramsMap, bidInfoSerialiazed);
+		String result = sendMessageAndGetResponse(message);
+		System.out.println(result);
 	}
 
 	private void listAll() throws IOException {
@@ -582,7 +582,6 @@ public class Client implements ClientAPI {
 	
 	private String getPrettyJsonString(String string) {
 		String prettyResult = string;
-		
 		// Check if is valid JSON
 		try {
 			gson.fromJson(string, Object.class);
@@ -591,11 +590,12 @@ public class Client implements ClientAPI {
 				Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 				JsonElement jsonElement = new JsonParser().parse(string);
 				prettyResult = prettyGson.toJson(jsonElement);
+
 			}
 		} catch (Exception e) {
 			// Not JSON! Ignore and continue!
 		}
-		
+
 		return prettyResult;
 	}
 

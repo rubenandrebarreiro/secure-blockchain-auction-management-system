@@ -29,7 +29,7 @@ public interface AuctionServerAPI {
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public HttpResponse addBidToOpenedProductAuction
-    	 (@PathParam("auction-id") String openedAuctionID, String bidForAuctionJSONString)
+    	 (@PathParam("auction-id") String openedAuctionID, String userBidInfo)
     	   throws SQLException;
 	
 	@GET
