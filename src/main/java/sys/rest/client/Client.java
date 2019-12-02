@@ -43,7 +43,6 @@ public class Client implements ClientAPI {
 	private static final String LIST_ALL_AUCTIONS_BY_ID = "list all auctionID";
 	private static final String LIST_OPENED_AUCTIONS_BY_ID = "list open auctionID";
 	private static final String LIST_CLOSED_AUCTIONS_BY_ID = "list closed auctionID";
-	//TODO Implement these!
 	private static final String LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID = "list all bids auctionID";
 	private static final String LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID = "list opened bids auctionID";
 	private static final String LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID = "list closed bids auctionID";
@@ -194,11 +193,29 @@ public class Client implements ClientAPI {
 				case LIST_ALL_AUCTIONS_BY_ID:
 					listAllByAuctionID();
 					break;
+				case LIST_OPENED_AUCTIONS_BY_ID:
+					listOpenByAuctionID();
+					break;
 				case LIST_CLOSED_AUCTIONS_BY_ID:
 					listClosedByAuctionID();
 					break;
-				case LIST_OPENED_AUCTIONS_BY_ID:
-					listOpenByAuctionID();
+				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
+					listBidsOfAllAuctionsByAuctionID();
+					break;
+				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
+					listBidsOfOpenedAuctionByAuctionID();
+					break;
+				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
+					listBidsOfClosedAuctionsByAuctionID();
+					break;
+				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+					listBidsOfAllAuctionsByAuctionIDAndClientID();
+					break;
+				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+					listBidsOfOpenedAuctionsByAuctionIDAndClientID();
+					break;
+				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+					listBidsOfClosedAuctionsByAuctionIDAndClientID();
 					break;
 				case HELP:
 					helpScreen();
@@ -537,6 +554,87 @@ public class Client implements ClientAPI {
 		System.out.println(prettyResult);
 	}
 
+	private void listBidsOfAllAuctionsByAuctionID() throws IOException {
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void listBidsOfOpenedAuctionByAuctionID() throws IOException {
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void listBidsOfClosedAuctionsByAuctionID() throws IOException {
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void listBidsOfAllAuctionsByAuctionIDAndClientID() throws IOException {
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		System.out.println("Enter bidderID: ");
+		String bidderID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		paramsMap.put("bidder-user-client-id", bidderID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void listBidsOfOpenedAuctionsByAuctionIDAndClientID() throws IOException {
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		System.out.println("Enter bidderID: ");
+		String bidderID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		paramsMap.put("bidder-user-client-id", bidderID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void listBidsOfClosedAuctionsByAuctionIDAndClientID() throws IOException {
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		System.out.println("Enter bidderID: ");
+		String bidderID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		paramsMap.put("bidder-user-client-id", bidderID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
 	private void helpScreen() {
 		System.out.println("HELP SCREEN");
 		System.out.println(OPEN_AUCTION);
@@ -551,7 +649,6 @@ public class Client implements ClientAPI {
 		System.out.println(LIST_ALL_AUCTIONS_BY_ID);
 		System.out.println(LIST_OPENED_AUCTIONS_BY_ID);
 		System.out.println(LIST_CLOSED_AUCTIONS_BY_ID);
-		//TODO Implements these!
 		System.out.println(LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID);
 		System.out.println(LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID);
 		System.out.println(LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID);
