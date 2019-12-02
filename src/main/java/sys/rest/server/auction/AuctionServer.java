@@ -48,6 +48,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	private static final String AUCTION_SERVER_REPOSITORY_ADDRESS = "http://localhost:8080/products-auctions";
 
+	private static final String URL_SPACE = "%20";
+	
 	private int currentAuctionID;
 	private int currentSerialNumber;
 
@@ -151,6 +153,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						response = listClosedProductsAuctions();
 						break;
 					case LIST_ALL_AUCTIONS_BY_OWNER:
+						//TODO REMOVE!!!
+						System.err.println("GOT: " + message.getParamsMap().get("product-owner-user-client-id"));
 						response = listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
 						break;
 					case LIST_OPENED_AUCTIONS_BY_OWNER:
@@ -296,6 +300,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		default:
 			break;
 		}
+		
+		url = removeSpaceFromURL(url);
 
 		HttpPost postRequest = new HttpPost(url);
 		HttpResponse response = null;
@@ -328,8 +334,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to close an existing Auction!");
 
-		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/close-auction/" + openedAuctionID;
-
+		String url = (AUCTION_SERVER_REPOSITORY_ADDRESS + "/close-auction/" + openedAuctionID).replace(" ", URL_SPACE);
+		url = removeSpaceFromURL(url);
 		HttpPut putRequest = new HttpPut(url);
 		HttpResponse response = null;
 		try {
@@ -354,6 +360,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				"Received request to add bid to " + openedAuctionID + "!");
 
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/add-bid-to-opened-auction/" + openedAuctionID;
+		url = removeSpaceFromURL(url);
 		HttpPost postRequest = new HttpPost(url);
 		HttpResponse response = null;
 		try {
@@ -384,8 +391,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public HttpResponse listAllProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all Auctions!");
+		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all";
-
+		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -407,8 +415,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public HttpResponse listOpenedProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all opened Auctions!");
+	
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened";
-
+		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -430,8 +439,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public HttpResponse listClosedProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all closed Auctions!");
+		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed";
-
+		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -454,8 +464,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all Auctions by owner " + productOwnerUserClientID + "!");
+		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/by-product-owner-user/" + productOwnerUserClientID;
-
+		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -478,8 +489,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all opened Auctions by owner " + productOwnerUserClientID + "!");
+		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/by-product-owner-user/" + productOwnerUserClientID;
-
+		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -502,8 +514,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all closed Auctions by owner " + productOwnerUserClientID + "!");
+		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/by-product-owner-user/" + productOwnerUserClientID;
-
+		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -525,8 +538,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public HttpResponse findProductAuctionByID(String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get Auction with id" + auctionID + "!");
+		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + auctionID;
-
+		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -547,8 +561,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public HttpResponse findOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id" + openedAuctionID + "!");
+		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/" + openedAuctionID;
-
+		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -570,8 +585,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public HttpResponse findClosedProductAuctionByID(String closedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id" + closedAuctionID + "!");
+		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/" + closedAuctionID;
-
+		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
 		try {
@@ -625,5 +641,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			String bidderUserClientID) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	private String removeSpaceFromURL(String url) {
+		return url.replace(" ", URL_SPACE);
 	}
 }

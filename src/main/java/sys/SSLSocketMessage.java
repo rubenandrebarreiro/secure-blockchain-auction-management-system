@@ -51,6 +51,11 @@ public class SSLSocketMessage implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+
+	@Override
+	public String toString() {
+		return "SSLSocketMessage [operation=" + operation + ", paramsMap=" + paramsMap + ", body=" + body + "]";
+	}
 	
 	
 	

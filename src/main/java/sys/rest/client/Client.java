@@ -471,7 +471,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("product-owner-user-client-id", userID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_AUCTIONS_BY_OWNER,
-				new HashMap<String, String>(), "");
+				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
 		String prettyResult = getPrettyJsonString(result);
 		System.out.println(prettyResult);
@@ -483,7 +483,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("product-owner-user-client-id", userID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_AUCTIONS_BY_OWNER,
-				new HashMap<String, String>(), "");
+				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
 		String prettyResult = getPrettyJsonString(result);
 		System.out.println(prettyResult);
@@ -495,7 +495,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("product-owner-user-client-id", userID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_AUCTIONS_BY_OWNER,
-				new HashMap<String, String>(), "");
+				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
 		String prettyResult = getPrettyJsonString(result);
 		System.out.println(prettyResult);
@@ -507,7 +507,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("product-owner-user-client-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_AUCTIONS_BY_ID,
-				new HashMap<String, String>(), "");
+				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
 		String prettyResult = getPrettyJsonString(result);
 		System.out.println(prettyResult);
@@ -519,7 +519,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("product-owner-user-client-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_AUCTIONS_BY_ID,
-				new HashMap<String, String>(), "");
+				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
 		String prettyResult = getPrettyJsonString(result);
 		System.out.println(prettyResult);
@@ -531,7 +531,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("product-owner-user-client-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_AUCTIONS_BY_ID,
-				new HashMap<String, String>(), "");
+				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
 		String prettyResult = getPrettyJsonString(result);
 		System.out.println(prettyResult);
