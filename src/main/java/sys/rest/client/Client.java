@@ -36,6 +36,7 @@ import com.google.gson.Gson;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.misc.IOUtils;
 import com.j256.ormlite.support.ConnectionSource;
 
 import main.java.api.rest.client.ClientAPI;
@@ -549,23 +550,20 @@ public class Client implements ClientAPI {
 		System.out.println(LIST_OPENED_AUCTIONS_BY_ID);
 		System.out.println(LIST_CLOSED_AUCTIONS_BY_ID);
 		//TODO Implements these!
-		System.out.println();
+		System.out.println(LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID);
+		System.out.println(LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID);
+		System.out.println(LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID);
+		System.out.println(LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID);
+		System.out.println(LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID);
+		System.out.println(LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID);
+
 		System.out.println(HELP);
 		System.out.println(EXIT);
 	}
 
-	private void sslReadResponse(InputStream socketInStream) {
-		System.err.print("Response: ");
-		int ch = 0;
-		try {
-			while( (ch = socketInStream.read()) >= 0 && ch != '\n' ) {
-				System.err.print((char)ch);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println();
+	private void sslReadResponse(InputStream socketInStream) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
+		System.out.println(br.readLine());					
 	}
 
 	private HttpsURLConnection createGetRequest(String urlString, Map<String, String> params) {
@@ -666,7 +664,7 @@ public class Client implements ClientAPI {
 		OutputStream out = socket.getOutputStream();
 		PrintWriter printWriter = new PrintWriter(out);
 
-		printWriter.print(gson.toJson(message) + "\n");
+		printWriter.print(gson.toJson(message) + System.lineSeparator());
 		printWriter.flush();
 
 		InputStream in = socket.getInputStream();

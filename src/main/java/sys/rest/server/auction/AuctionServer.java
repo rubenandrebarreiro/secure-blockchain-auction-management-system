@@ -144,84 +144,86 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public void run() {
 		String arg1 = null, arg2 = null;
 		HttpResponse response = null;
-		try {				
+		
+		try {
 			responseSocket = (SSLSocket) serverSocket.accept();
 			responseSocket.startHandshake();
 			while(true) {
-
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
-//				SSLSession session = responseSocket.getSession();
-//				Principal clientID = session.getPeerPrincipal();
-//				System.out.println("Client has been identified as: " + clientID);
-				SSLSocketMessage message = gson.fromJson(jsonMessage, SSLSocketMessage.class);
-				switch (message.getOperation()) {
-				case OPEN_AUCTION:
-					response = createAuction(message.getBody());
-					break;
-				case CLOSE_AUCTION:
-					response = closeAuction(message.getParamsMap().get("auction-id"));
-					break;
-				case ADD_BID:
-					arg1 = message.getParamsMap().get("auction-id");
-					arg2 = message.getBody();
-					response = addBidToOpenedProductAuction(arg1, arg2);
-					break;
-				case LIST_ALL_AUCTIONS:
-					response = listAllProductsAuctions();
-					break;
-				case LIST_OPENED_AUCTIONS:
-					response = listOpenedProductsAuctions();
-					break;
-				case LIST_CLOSED_AUCTIONS:
-					response = listClosedProductsAuctions();
-					break;
-				case LIST_ALL_AUCTIONS_BY_OWNER:
-					response = listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
-					break;
-				case LIST_OPENED_AUCTIONS_BY_OWNER:
-					response = listOpenedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
-					break;
-				case LIST_CLOSED_AUCTIONS_BY_OWNER:
-					response = listClosedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
-					break;
-				case LIST_ALL_AUCTIONS_BY_ID:
-					response = findProductAuctionByID(message.getParamsMap().get("auction-id"));
-					break;
-				case LIST_OPENED_AUCTIONS_BY_ID:
-					response = findOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
-					break;
-				case LIST_CLOSED_AUCTIONS_BY_ID:
-					response = findClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
-					break;
-				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
-					response = listAllBidsOfProductAuctionByID(message.getParamsMap().get("auction-id"));
-					break;
-				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
-					response = listAllBidsOfOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
-					break;
-				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
-					response = listAllBidsOfClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
-					break;
-				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					arg1 = message.getParamsMap().get("auction-id");
-					arg2 = message.getParamsMap().get("bidder-user-client-id");
-					response = listAllBidsMadeByBidderUserClientInProductAuctionByID(arg1, arg2);
-					break;
-				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					arg1 = message.getParamsMap().get("auction-id");
-					arg2 = message.getParamsMap().get("bidder-user-client-id");
-					response = listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(arg1, arg2);
-					break;
-				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					arg1 = message.getParamsMap().get("auction-id");
-					arg2 = message.getParamsMap().get("bidder-user-client-id");
-					response = listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
-					break;
-				default:
-					//TODO Error somewhere?
-					break;
+				if(jsonMessage != null) {
+//					SSLSession session = responseSocket.getSession();
+//					Principal clientID = session.getPeerPrincipal();
+//					System.out.println("Client has been identified as: " + clientID);
+					SSLSocketMessage message = gson.fromJson(jsonMessage, SSLSocketMessage.class);
+					switch (message.getOperation()) {
+					case OPEN_AUCTION:
+						response = createAuction(message.getBody());
+						break;
+					case CLOSE_AUCTION:
+						response = closeAuction(message.getParamsMap().get("auction-id"));
+						break;
+					case ADD_BID:
+						arg1 = message.getParamsMap().get("auction-id");
+						arg2 = message.getBody();
+						response = addBidToOpenedProductAuction(arg1, arg2);
+						break;
+					case LIST_ALL_AUCTIONS:
+						response = listAllProductsAuctions();
+						break;
+					case LIST_OPENED_AUCTIONS:
+						response = listOpenedProductsAuctions();
+						break;
+					case LIST_CLOSED_AUCTIONS:
+						response = listClosedProductsAuctions();
+						break;
+					case LIST_ALL_AUCTIONS_BY_OWNER:
+						response = listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+						break;
+					case LIST_OPENED_AUCTIONS_BY_OWNER:
+						response = listOpenedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+						break;
+					case LIST_CLOSED_AUCTIONS_BY_OWNER:
+						response = listClosedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+						break;
+					case LIST_ALL_AUCTIONS_BY_ID:
+						response = findProductAuctionByID(message.getParamsMap().get("auction-id"));
+						break;
+					case LIST_OPENED_AUCTIONS_BY_ID:
+						response = findOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
+						break;
+					case LIST_CLOSED_AUCTIONS_BY_ID:
+						response = findClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
+						break;
+					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
+						response = listAllBidsOfProductAuctionByID(message.getParamsMap().get("auction-id"));
+						break;
+					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
+						response = listAllBidsOfOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
+						break;
+					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
+						response = listAllBidsOfClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
+						break;
+					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+						arg1 = message.getParamsMap().get("auction-id");
+						arg2 = message.getParamsMap().get("bidder-user-client-id");
+						response = listAllBidsMadeByBidderUserClientInProductAuctionByID(arg1, arg2);
+						break;
+					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+						arg1 = message.getParamsMap().get("auction-id");
+						arg2 = message.getParamsMap().get("bidder-user-client-id");
+						response = listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(arg1, arg2);
+						break;
+					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+						arg1 = message.getParamsMap().get("auction-id");
+						arg2 = message.getParamsMap().get("bidder-user-client-id");
+						response = listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
+						break;
+					default:
+						//TODO Error somewhere?
+						break;
+					}
+					sslWriteResponse(responseSocket.getOutputStream(), response);
 				}
-				sslWriteResponse(responseSocket.getOutputStream(), response);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -236,24 +238,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		}
 	}
 	
-	private String sslReadRequest(InputStream socketInStream) {
-		System.err.print("Request: ");
+	private String sslReadRequest(InputStream socketInStream) throws IOException {
 		StringBuilder builder = new StringBuilder();
-		int ch = 0;
-		try {
-			while( (ch = socketInStream.read()) >= 0 && ch != '\n' ) {
-				builder.append((char)ch);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
+		builder.append(br.readLine());
+
 		return builder.toString();
 	}
 
 	private void sslWriteResponse(OutputStream socketOutStream, HttpResponse response) {
 		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
-		printWriter.print(response);
+		printWriter.print(response + System.lineSeparator());
 		printWriter.flush();
 	}
 
