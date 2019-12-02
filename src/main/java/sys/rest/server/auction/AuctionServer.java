@@ -33,6 +33,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.asynchttpclient.AsyncHttpClient;
@@ -361,22 +362,20 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				"Received request to close an existing Auction!");
 
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/close-auction/" + openedAuctionID;
-//
-//		ListenableFuture<org.asynchttpclient.Response> future;
-//
-//		future = httpClient.preparePut(url)
-//				.execute();
-//
-//		org.asynchttpclient.Response r = null;
-//		try {
-//			r = future.get();
-//		} catch (Exception e) {
-//			System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
-//					"Error getting response!");
-//		}
-//
-//		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
-//				"Response: " + r.getStatusText());
+		
+		HttpPut putRequest = new HttpPut(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(putRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
 
 		return Response.accepted().build();
 	}
@@ -384,8 +383,34 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	@Override
 	public Response addBidToOpenedProductAuction(String openedAuctionID, String bidForAuctionJSONString)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to add bid to " + openedAuctionID + "!");
+
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/add-bid-to-opened-auction/" + openedAuctionID;
+		HttpPost postRequest = new HttpPost(url);
+		HttpResponse response = null;
+		try {
+			postRequest.setEntity(new StringEntity(bidForAuctionJSONString));
+			postRequest.setHeader("Accept", "application/json");
+			postRequest.setHeader("Content-type", "application/json");
+			response = httpClient.execute(postRequest);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		
+		return Response.accepted().build();
 	}
 
 	@Override
@@ -416,21 +441,20 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all opened Auctions!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened";
-//		ListenableFuture<org.asynchttpclient.Response> future;
-//
-//		future = httpClient.prepareGet(url)
-//				.execute();
-//
-//		org.asynchttpclient.Response r = null;
-//		try {
-//			r = future.get();
-//		} catch (Exception e) {
-//			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-//					"Error getting response!");
-//		}
-//
-//		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
-//				"Response: " + r.getStatusText());
+		
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
 
 		return Response.accepted().build();
 	}
@@ -440,21 +464,20 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all closed Auctions!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed";
-//		ListenableFuture<org.asynchttpclient.Response> future;
-//
-//		future = httpClient.prepareGet(url)
-//				.execute();
-//
-//		org.asynchttpclient.Response r = null;
-//		try {
-//			r = future.get();
-//		} catch (Exception e) {
-//			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-//					"Error getting response!");
-//		}
-//
-//		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
-//				"Response: " + r.getStatusText());
+		
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
 
 		return Response.accepted().build();
 	}
@@ -462,22 +485,73 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	@Override
 	public Response listAllProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all Auctions by owner " + productOwnerUserClientID + "!");
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/by-product-owner-user/" + productOwnerUserClientID;
+		
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+
+		return Response.accepted().build();
 	}
 
 	@Override
 	public Response listOpenedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all opened Auctions by owner " + productOwnerUserClientID + "!");
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/by-product-owner-user/" + productOwnerUserClientID;
+		
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+
+		return Response.accepted().build();
 	}
 
 	@Override
 	public Response listClosedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all closed Auctions by owner " + productOwnerUserClientID + "!");
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/by-product-owner-user/" + productOwnerUserClientID;
+		
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+
+		return Response.accepted().build();
 	}
 
 	@Override
@@ -485,22 +559,20 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get Auction with id" + auctionID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + auctionID;
-//		ListenableFuture<org.asynchttpclient.Response> future;
-//
-//		future = httpClient.prepareGet(url)
-//				.execute();
-//
-//		org.asynchttpclient.Response r = null;
-//		try {
-//			r = future.get();
-//		} catch (Exception e) {
-//			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-//					"Error getting response!");
-//		}
-//
-//		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
-//				"Response: " + r.getStatusText());
-
+		
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
 		return Response.accepted().build();
 	}
 
@@ -509,21 +581,20 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id" + openedAuctionID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/" + openedAuctionID;
-//		ListenableFuture<org.asynchttpclient.Response> future;
-//
-//		future = httpClient.prepareGet(url)
-//				.execute();
-//
-//		org.asynchttpclient.Response r = null;
-//		try {
-//			r = future.get();
-//		} catch (Exception e) {
-//			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-//					"Error getting response!");
-//		}
-//
-//		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
-//				"Response: " + r.getStatusText());
+		
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
 
 		return Response.accepted().build();
 	}
@@ -533,22 +604,20 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id" + closedAuctionID + "!");
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/" + closedAuctionID;
-//		ListenableFuture<org.asynchttpclient.Response> future;
-//
-//		future = httpClient.prepareGet(url)
-//				.execute();
-//
-//		org.asynchttpclient.Response r = null;
-//		try {
-//			r = future.get();
-//		} catch (Exception e) {
-//			System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-//					"Error getting response!");
-//		}
-//
-//		System.err.println("[" + this.getClass().getCanonicalName() + "]: " + 
-//				"Response: " + r.getStatusText());
-
+		
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
 		return Response.accepted().build();
 	}
 
