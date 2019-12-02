@@ -33,13 +33,13 @@ public class TestAuctionJDBC {
 	
 	@BeforeAll
 	public static void initAuctionRepositoryServer() throws InterruptedException, LoginException, RepositoryException {
-    	File file = new File("res/database");
-    	File[] files = file.listFiles();
-    	for (File tempFile : files) {
-			tempFile.renameTo(new File(tempFile.getAbsolutePath() + ".bak"));
-		}
+//    	File file = new File("res/database");
+//    	File[] files = file.listFiles();
+//    	for (File tempFile : files) {
+//			tempFile.renameTo(new File(tempFile.getAbsolutePath() + ".bak"));
+//		}
     	
-    	AuctionRepositoryServer.main(new String[] {"0"});
+    	AuctionRepositoryServer.main(null);
 	}
 	
     @BeforeEach
@@ -51,30 +51,30 @@ public class TestAuctionJDBC {
  
     @AfterAll
     public static void cleanup() {
-    	File file = new File("res/database");
-    	File[] files = file.listFiles( new FilenameFilter() {
-			
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".db");
-			}
-		});
-    	for (File tempFile : files) {
-			tempFile.delete();
-		}
-    	
-    	file = new File("res/database");
-    	files = file.listFiles( new FilenameFilter() {
-			
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".bak");
-			}
-		});
-    	for (File tempFile : files) {
-			tempFile.renameTo(
-					new File(tempFile.getAbsolutePath().substring(0, tempFile.getAbsolutePath().length() - 4)));
-		}
+//    	File file = new File("res/database");
+//    	File[] files = file.listFiles( new FilenameFilter() {
+//			
+//			@Override
+//			public boolean accept(File dir, String name) {
+//				return name.endsWith(".db");
+//			}
+//		});
+//    	for (File tempFile : files) {
+//			tempFile.delete();
+//		}
+//    	
+//    	file = new File("res/database");
+//    	files = file.listFiles( new FilenameFilter() {
+//			
+//			@Override
+//			public boolean accept(File dir, String name) {
+//				return name.endsWith(".bak");
+//			}
+//		});
+//    	for (File tempFile : files) {
+//			tempFile.renameTo(
+//					new File(tempFile.getAbsolutePath().substring(0, tempFile.getAbsolutePath().length() - 4)));
+//		}
     }
     
     @Test
