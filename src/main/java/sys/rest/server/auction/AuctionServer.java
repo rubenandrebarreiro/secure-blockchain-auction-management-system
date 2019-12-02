@@ -1,8 +1,10 @@
 package main.java.sys.rest.server.auction;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -38,6 +40,7 @@ import main.java.api.rest.server.auction.AuctionServerAPI;
 import main.java.resources.auction.Auction;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
+import main.java.sys.SSLSocketMessage;
 
 public class AuctionServer extends Thread implements AuctionServerAPI{
 
@@ -56,7 +59,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		int port = 8081;
 
-		URI baseUri = UriBuilder.fromUri("https://0.0.0.0/").port(port).build();
+		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
 		ResourceConfig config = new ResourceConfig();
 		try {
 			config.register( new AuctionServer() );
@@ -80,9 +83,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-//		JdkHttpServerFactory.createHttpServer(baseUri, config);
-
-        JdkHttpServerFactory.createHttpServer(baseUri, config, SSLContext.getDefault(), true);
+		JdkHttpServerFactory.createHttpServer(baseUri, config);
 		
 		System.out.println("Auction Server ready @ " + baseUri);
 	}
@@ -132,16 +133,85 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	}
 
 	public void run() {
+		String arg1 = null, arg2 = null;
 		try {
 			while(true) {
-//				responseSocket = (SSLSocket) serverSocket.accept();
-//				responseSocket.startHandshake();
-//				sslReadRequest(responseSocket.getInputStream());
+				responseSocket = (SSLSocket) serverSocket.accept();
+				responseSocket.startHandshake();
+				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
 //				SSLSession session = responseSocket.getSession();
-////				Principal clientID = session.getPeerPrincipal();
-////				System.out.println("Client has been identified as: " + clientID);
-//				sslWriteResponse(responseSocket.getOutputStream());
-//				responseSocket.close();
+//				Principal clientID = session.getPeerPrincipal();
+//				System.out.println("Client has been identified as: " + clientID);
+				SSLSocketMessage message = gson.fromJson(jsonMessage, SSLSocketMessage.class);
+				switch (message.getOperation()) {
+				case OPEN_AUCTION:
+					createAuction(message.getBody());
+					break;
+				case CLOSE_AUCTION:
+					closeAuction(message.getParamsMap().get("auction-id"));
+					break;
+				case ADD_BID:
+					arg1 = message.getParamsMap().get("auction-id");
+					arg2 = message.getBody();
+					addBidToOpenedProductAuction(arg1, arg2);
+					break;
+				case LIST_ALL_AUCTIONS:
+					listAllProductsAuctions();
+					break;
+				case LIST_OPENED_AUCTIONS:
+					listOpenedProductsAuctions();
+					break;
+				case LIST_CLOSED_AUCTIONS:
+					listClosedProductsAuctions();
+					break;
+				case LIST_ALL_AUCTIONS_BY_OWNER:
+					listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+					break;
+				case LIST_OPENED_AUCTIONS_BY_OWNER:
+					listOpenedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+					break;
+				case LIST_CLOSED_AUCTIONS_BY_OWNER:
+					listClosedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+					break;
+				case LIST_ALL_AUCTIONS_BY_ID:
+					findProductAuctionByID(message.getParamsMap().get("auction-id"));
+					break;
+				case LIST_OPENED_AUCTIONS_BY_ID:
+					findOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
+					break;
+				case LIST_CLOSED_AUCTIONS_BY_ID:
+					findClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
+					break;
+				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
+					listAllBidsOfProductAuctionByID(message.getParamsMap().get("auction-id"));
+					break;
+				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
+					listAllBidsOfOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
+					break;
+				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
+					listAllBidsOfClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
+					break;
+				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+					arg1 = message.getParamsMap().get("auction-id");
+					arg2 = message.getParamsMap().get("bidder-user-client-id");
+					listAllBidsMadeByBidderUserClientInProductAuctionByID(arg1, arg2);
+					break;
+				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+					arg1 = message.getParamsMap().get("auction-id");
+					arg2 = message.getParamsMap().get("bidder-user-client-id");
+					listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(arg1, arg2);
+					break;
+				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+					arg1 = message.getParamsMap().get("auction-id");
+					arg2 = message.getParamsMap().get("bidder-user-client-id");
+					listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
+					break;
+				default:
+					//TODO Error somewhere?
+					break;
+				}
+				sslWriteResponse(responseSocket.getOutputStream());
+				responseSocket.close();
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -150,13 +220,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		}
 	}
 	
-	private void sslReadRequest(InputStream socketInStream) {
+	private String sslReadRequest(InputStream socketInStream) {
 		System.err.print("Request: ");
+		StringBuilder builder = new StringBuilder();
 		int ch = 0;
 		int lastCh = 0;
 		try {
 			while( (ch = socketInStream.read()) >= 0 && (ch != '\n' && lastCh != '\n') ) {
-				System.err.print((char)ch);
+				builder.append((char)ch);
 				if(ch != '\n')
 					lastCh = ch;
 			}
@@ -164,7 +235,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println();
+		return builder.toString();
 	}
 
 	private void sslWriteResponse(OutputStream socketOutStream) {
@@ -178,7 +249,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		printWriter.print("</body>\r\n");
 		printWriter.print("</html>\r\n");
 		printWriter.flush();
-		printWriter.close();
 	}
 
 	@Override
