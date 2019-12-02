@@ -878,7 +878,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		}
 
 		
-		if( !auction.equals(openedAuction) ) {
+		if( !auction.getAuctionID().equals(openedAuction.getAuctionID()) ) {
 
 			System.err.println("Not a valid Opened Auction to receive Bids!!!");
 			
