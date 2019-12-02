@@ -92,8 +92,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	public AuctionServer() throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
 
-		//		System.setProperty(key, value);
-		//		System.setProperty(key, value);
 		//		System.setProperty("javax.net.debug", "SSL,handshake");
 
 		System.setProperty("javax.net.ssl.keyStore", "res/keystores/auctionServerKeystore.jks");
@@ -108,28 +106,10 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		gson = new Gson();
 		httpClient = HttpClients.createDefault();
 
-		//	    KeyStore ks = KeyStore.getInstance("JKS");
-		//	    InputStream ksIs = new FileInputStream("res/keystores/auctionServerKeystore.jks");
-		//	    try {
-		//	        ks.load(ksIs, "auctionServer1920".toCharArray());
-		//	    } finally {
-		//	        if (ksIs != null) {
-		//	            ksIs.close();
-		//	        }
-		//	    }
-		//
-		//	    KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory
-		//	            .getDefaultAlgorithm());
-		//	    kmf.init(ks, "auctionServer1920".toCharArray());
-		//		
 		SSLContext sslContext = SSLContext.getDefault();
-		//	    SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-		//		sslContext.init(kmf.getKeyManagers(), null, null);
 		SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
 		serverSocket = (SSLServerSocket)serverSocketFactory.createServerSocket(8443);
-		//		serverSocket.setEnabledCipherSuites(sslContext.getServerSocketFactory().getSupportedCipherSuites());
-		//		serverSocket.setEnabledProtocols(new String[] {"TLSv1", "TLSv1.1", "TLSv1.2", "SSLv3"});
-		//		serverSocket.setWantClientAuth(true);
+//		serverSocket.setWantClientAuth(true);
 
 		start();
 	}
