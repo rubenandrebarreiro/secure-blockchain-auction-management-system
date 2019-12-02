@@ -1,12 +1,19 @@
 package main.java.resources.bid;
 
+import java.io.Serializable;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import main.java.common.utils.CommonUtils;
 
 @DatabaseTable(tableName = "bids")
-public class Bid {
+public class Bid implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2411627004106748354L;
 	
 	@DatabaseField( id = true )
 	private long bidID;
