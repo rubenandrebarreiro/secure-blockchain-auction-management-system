@@ -137,4 +137,19 @@ public interface AuctionServerAPI {
     @Produces(MediaType.APPLICATION_JSON)
 	HttpResponse checkOutcomeClosedAuctions(String bidderUserClientID) throws SQLException;
 	
+	@GET
+	@Path("/outcome/all/{auction-id}/{bidder-user-client-id}")
+    @Produces(MediaType.APPLICATION_JSON)
+	HttpResponse checkOutcomeAllAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException;
+	
+	@GET
+	@Path("/outcome/opened/{auction-id}/{bidder-user-client-id}")
+    @Produces(MediaType.APPLICATION_JSON)
+	HttpResponse checkOutcomeOpenedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException;
+	
+	@GET
+	@Path("/outcome/closed/{auction-id}/{bidder-user-client-id}")
+    @Produces(MediaType.APPLICATION_JSON)
+	HttpResponse checkOutcomeClosedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException;
+	
 }

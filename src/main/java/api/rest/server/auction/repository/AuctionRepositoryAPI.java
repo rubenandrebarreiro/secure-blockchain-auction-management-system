@@ -185,4 +185,19 @@ public interface AuctionRepositoryAPI {
     @Produces(MediaType.APPLICATION_JSON)
 	public Response checkOutcomeClosedAuctions(@PathParam("bidder-user-client-id") String bidderUserClientID) throws SQLException;
 	
+	@GET
+	@Path("/outcome/all/{auction-id}/{bidder-user-client-id}")
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response checkOutcomeAllAuctionsByAuctionID(@PathParam("bidder-user-client-id") String bidderUserClientID, @PathParam("auction-id") String auctionID) throws SQLException;
+	
+	@GET
+	@Path("/outcome/opened/{auction-id}/{bidder-user-client-id}")
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response checkOutcomeOpenedAuctionsByAuctionID(@PathParam("bidder-user-client-id") String bidderUserClientID, @PathParam("auction-id") String auctionID) throws SQLException;
+	
+	@GET
+	@Path("/outcome/closed/{auction-id}/{bidder-user-client-id}")
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response checkOutcomeClosedAuctionsByAuctionID(@PathParam("bidder-user-client-id") String bidderUserClientID, @PathParam("auction-id") String auctionID) throws SQLException;
+	
 }

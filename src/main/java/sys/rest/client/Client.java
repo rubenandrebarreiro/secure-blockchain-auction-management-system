@@ -256,13 +256,13 @@ public class Client implements ClientAPI {
 				
 					
 				case CHECK_OUTCOME_ALL_AUCTION_ID:
-					checkOutcomeAllAuctionsByAuctionID(); //TODO nao feito ainda
+					checkOutcomeAllAuctionsByAuctionID(); //TODO confirmar
 					break;
 				case CHECK_OUTCOME_OPENED_AUCTION_ID:
-					checkOutcomeOpenedAuctionsByAuctionID(); //TODO nao feito ainda
+					checkOutcomeOpenedAuctionsByAuctionID(); //TODO confirmar
 					break;
 				case CHECK_OUTCOME_CLOSED_AUCTION_ID:
-					checkOutcomeClosedAuctionsByAuctionID(); //TODO nao feito ainda
+					checkOutcomeClosedAuctionsByAuctionID(); //TODO confirmar
 					break;
 				
 				// VALIDATE RECEIPT
