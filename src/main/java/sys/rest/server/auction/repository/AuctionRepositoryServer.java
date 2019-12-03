@@ -1655,4 +1655,91 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		
 	}
 	
+	@Override
+	public Response checkOutcomeAllAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
+		
+		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
+
+		if( !this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions) ) {
+
+			return Response.status(Status.NO_CONTENT).build();
+
+		}
+		
+		List<Auction> allProductsAuctionsWhereBidderUserClientParticipated = 
+				      allProductsAuctions.stream()
+				      .filter(auction -> ( auction.isAnUserClientMadeSomeBid(bidderUserClientID) && 
+				    		               auction.getAuctionID().equalsIgnoreCase(auctionID) ))
+				      .collect(Collectors.toList());
+		
+		
+		if( allProductsAuctionsWhereBidderUserClientParticipated.isEmpty() ) {
+
+			return Response.status(Status.NO_CONTENT).build();
+
+		}
+		
+		
+		return Response.ok(this.gsonObject.toJson(allProductsAuctionsWhereBidderUserClientParticipated)).build();
+		
+	}
+
+	@Override
+	public Response checkOutcomeOpenedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
+
+		List<Auction> openedProductsAuctions = this.openedProductsAuctionsRepositoryDao.queryForAll();
+
+		if( !this.verifyExistenceOfAnyOpenedProductsAuctions(openedProductsAuctions) ) {
+
+			return Response.status(Status.NO_CONTENT).build();
+
+		}
+		
+		List<Auction> openedProductsAuctionsWhereBidderUserClientParticipated = 
+					  openedProductsAuctions.stream()
+				      .filter(auction -> ( auction.isAnUserClientMadeSomeBid(bidderUserClientID) && 
+				    		  			   auction.getAuctionID().equalsIgnoreCase(auctionID) ))
+				      .collect(Collectors.toList());
+		
+		
+		if( openedProductsAuctionsWhereBidderUserClientParticipated.isEmpty() ) {
+
+			return Response.status(Status.NO_CONTENT).build();
+
+		}
+		
+		
+		return Response.ok(this.gsonObject.toJson(openedProductsAuctionsWhereBidderUserClientParticipated)).build();
+		
+	}
+
+	@Override
+	public Response checkOutcomeClosedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
+
+		List<Auction> closedProductsAuctions = this.closedProductsAuctionsRepositoryDao.queryForAll();
+
+		if( !this.verifyExistenceOfAnyClosedProductsAuctions(closedProductsAuctions) ) {
+
+			return Response.status(Status.NO_CONTENT).build();
+
+		}
+		
+		List<Auction> closedProductsAuctionsWhereBidderUserClientParticipated = 
+					  closedProductsAuctions.stream()
+				      .filter(auction -> ( auction.isAnUserClientMadeSomeBid(bidderUserClientID)) && 
+				    		               auction.getAuctionID().equalsIgnoreCase(auctionID) )
+				      .collect(Collectors.toList());
+		
+		
+		if( closedProductsAuctionsWhereBidderUserClientParticipated.isEmpty() ) {
+
+			return Response.status(Status.NO_CONTENT).build();
+
+		}
+		
+		
+		return Response.ok(this.gsonObject.toJson(closedProductsAuctionsWhereBidderUserClientParticipated)).build();
+		
+	}
+
 }
