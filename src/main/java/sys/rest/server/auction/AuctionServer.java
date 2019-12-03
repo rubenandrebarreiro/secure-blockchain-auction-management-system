@@ -62,36 +62,10 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	private SSLServerSocket serverSocket;
 	private SSLSocket responseSocket;
 
-	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
-		int port = 8081;
+	public static void main(String[] args) throws NoSuchAlgorithmException, IOException, UnrecoverableKeyException, KeyManagementException, KeyStoreException, CertificateException {
 
-		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
-		ResourceConfig config = new ResourceConfig();
-		try {
-			config.register( new AuctionServer() );
-		} catch (IOException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (UnrecoverableKeyException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (CertificateException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (KeyManagementException e) {
-			e.getMessage();
-			e.printStackTrace();
-		}
+		new AuctionServer();
 
-		JdkHttpServerFactory.createHttpServer(baseUri, config);
-
-		System.out.println("Auction Server ready @ " + baseUri);
 	}
 
 	public AuctionServer() throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
@@ -196,6 +170,56 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						arg2 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
 						break;
+				
+						
+					
+						
+					case LIST_ALL_BIDS_BY_CLIENT_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = listAllBidsMadeByBidderUserClientID(arg1);
+						break;
+					case LIST_OPENED_BIDS_BY_CLIENT_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = listOpenedBidsMadeByBidderUserClientID(arg1);
+						break;
+					case LIST_CLOSED_BIDS_BY_CLIENT_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = listClosedBidsMadeByBidderUserClientID(arg1);
+						break;
+					
+					
+					case CHECK_OUTCOME_ALL_AUCTION:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
+						break;
+					case CHECK_OUTCOME_OPENED_AUCTION:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
+						break;
+					case CHECK_OUTCOME_CLOSED_AUCTION:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
+						break;
+					
+					
+					case CHECK_OUTCOME_ALL_AUCTION_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg2 = message.getParamsMap().get("auction-id");
+						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
+						break;
+					case CHECK_OUTCOME_OPENED_AUCTION_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg2 = message.getParamsMap().get("auction-id");
+						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
+						break;
+					case CHECK_OUTCOME_CLOSED_AUCTION_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg2 = message.getParamsMap().get("auction-id");
+						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
+						break;
+						
+						
+						
 					default:
 						//TODO Error somewhere?
 						break;
