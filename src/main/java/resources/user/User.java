@@ -23,6 +23,8 @@ public class User {
 	@DatabaseField
 	private String userBankAccountNIB;
 	
+	private boolean isSolvingChallenge;
+	
 	// TODO - confirmar
 	private MerkleTree blockchainHashesMerkleTree;
 	
@@ -46,6 +48,8 @@ public class User {
 		
 		this.userHomeAddress = userHomeAddress;
 		this.userBankAccountNIB = userBankAccountNIB;
+		
+		this.isSolvingChallenge = false;
 		
 		this.blockchainHashesMerkleTree = new MerkleTree(); // TODO - ver como usar merkle tree
 	}
@@ -106,5 +110,13 @@ public class User {
 	public void setUserBankNIB(String userBankAccountNIB) {
 		this.userBankAccountNIB = userBankAccountNIB;
 	}
-
+	
+	public boolean getIsSolvingChallenge() {
+		return this.isSolvingChallenge;
+	}
+	
+	public void setIsSolvingChallenge(boolean isSolvingChallenge) {
+		this.isSolvingChallenge = isSolvingChallenge;
+	}
+	
 }
