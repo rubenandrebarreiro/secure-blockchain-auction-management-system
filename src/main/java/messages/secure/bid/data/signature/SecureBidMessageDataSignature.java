@@ -1,4 +1,4 @@
-package main.java.messages.secure.bid.components.content.proposal.signature;
+package main.java.messages.secure.bid.data.signature;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -19,7 +19,7 @@ import org.bouncycastle.util.Arrays;
 import main.java.common.utils.CommonUtils;
 import main.java.resources.bid.Bid;
 
-public class SecureBidMessageSignatureProposal {
+public class SecureBidMessageDataSignature {
 
 	private Bid bid;
 
@@ -48,7 +48,7 @@ public class SecureBidMessageSignatureProposal {
 	private boolean isBidDigitalSigned;
 
 
-	public SecureBidMessageSignatureProposal(Bid bid) {
+	public SecureBidMessageDataSignature(Bid bid) {
 
 		this.bid = bid;
 
@@ -69,7 +69,7 @@ public class SecureBidMessageSignatureProposal {
 
 	}
 
-	public SecureBidMessageSignatureProposal(byte[] bidDigitalSigned, int sizeOfBidSerialized, int sizeOfBidderUserClientID) {
+	public SecureBidMessageDataSignature(byte[] bidDigitalSigned, int sizeOfBidSerialized, int sizeOfBidderUserClientID) {
 
 		this.bidDigitalSigned = bidDigitalSigned;
 		this.isBidDigitalSigned = true;
