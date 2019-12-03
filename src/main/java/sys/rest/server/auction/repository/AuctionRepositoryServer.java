@@ -426,6 +426,45 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		return true;
 	}
+	
+	private boolean verifyExistenceOfAnyBids(List<Bid> allBids) {
+
+		if(allBids.isEmpty()) {
+
+			System.err.println("Don't exist any Bid made in the system, at this moment!!!");
+
+			return false;
+
+		}
+
+		return true;
+	}
+	
+	private boolean verifyExistenceOfOpenedBids(List<Bid> openedBids) {
+
+		if(openedBids.isEmpty()) {
+
+			System.err.println("Don't exist opened Bids made in the system, at this moment!!!");
+
+			return false;
+
+		}
+
+		return true;
+	}
+	
+	private boolean verifyExistenceOfClosedBids(List<Bid> closedBids) {
+
+		if(closedBids.isEmpty()) {
+
+			System.err.println("Don't exist closed Bids made in the system, at this moment!!!");
+
+			return false;
+
+		}
+
+		return true;
+	}
 
 	@Override
 	public Response openNormalAuction(String normalAuctionJSONString) throws SQLException {
@@ -1264,7 +1303,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		}
 
-
+		
 		Auction auction = this.allProductsAuctionsRepositoryDao.queryForId(auctionID);
 
 		if( !this.verifyExistenceOfProductAuction(auctionID, auction) ) {
@@ -1275,7 +1314,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 
 		Map<Long, Bid> bidsFromAuction = auction.getAuctionBidsMade();
-
+		
 		if( !this.verifyExistenceOfBidsInProductAuction(auctionID, bidsFromAuction) ) {
 
 			return Response.status(Status.NO_CONTENT).build();
@@ -1309,7 +1348,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		return Response.ok(this.gsonObject.toJson(bidsFromAuctionMadeByBidderUserClient)).build();
 
 	}
-
+	
 	@Override
 	public Response listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(String openedAuctionID, String bidderUserClientID) throws SQLException {
 
@@ -1378,9 +1417,9 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		}
 
-
+		
 		Auction closedAuction = this.closedProductsAuctionsRepositoryDao.queryForId(closedAuctionID);
-
+		
 		if( !this.verifyExistenceOfClosedProductAuction(closedAuctionID, closedAuction) ) {
 
 			return Response.status(Status.NOT_FOUND).build(); 
@@ -1396,7 +1435,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 
 		}
 
-
+		
 		List<Bid> bidsFromClosedAuctionMadeByBidderUserClientList = 
 				bidsFromClosedAuction.entrySet().stream()
 				.filter(bidEntry -> bidEntry.getValue().getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
@@ -1406,7 +1445,7 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		if(bidsFromClosedAuctionMadeByBidderUserClientList.isEmpty()) {
 
 			System.err.println(String.format("Don't exist any Bid made by the User/Client with the ID: [%s] in "
-					+ "the Closed Product's Auction with the ID: [%s]!!!", bidderUserClientID, closedAuctionID));
+											+ "the Closed Product's Auction with the ID: [%s]!!!", bidderUserClientID, closedAuctionID));
 
 			return Response.status(Status.NOT_FOUND).build();
 
@@ -1418,9 +1457,118 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 		for(Bid bid : bidsFromClosedAuctionMadeByBidderUserClientList) {
 			bidsFromClosedAuctionMadeByBidderUserClient.put(bid.getBidID(), bid);
 		}
-
+		
 
 		return Response.ok(this.gsonObject.toJson(bidsFromClosedAuctionMadeByBidderUserClient)).build();
 
 	}
+	
+	@Override
+	public Response listAllBidsMadeByBidderUser(String bidderUserClientID) throws SQLException {
+
+		List<Bid> allBids = this.allBidsRepositoryDao.queryForAll();
+
+		if( !this.verifyExistenceOfAnyBids(allBids) ) {
+
+			return Response.status(Status.NO_CONTENT).build();
+
+		}
+		
+		List<Bid> allBidsMadeByBidderUserClientList = 
+					allBids.stream()
+					.filter(bid -> bid.getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
+					.collect(Collectors.toList());
+
+		if(allBidsMadeByBidderUserClientList.isEmpty()) {
+
+			System.err.println(String.format("Don't exist any Bid made by the User/Client with the ID: [%s]!!!", bidderUserClientID));
+
+			return Response.status(Status.NOT_FOUND).build();
+
+		}
+
+
+		Map<Long ,Bid> allBidsMadeByBidderUserClient = new HashMap<Long, Bid>();
+
+		for(Bid bid : allBidsMadeByBidderUserClientList) {
+			allBidsMadeByBidderUserClient.put(bid.getBidID(), bid);
+		}
+		
+
+		return Response.ok(this.gsonObject.toJson(allBidsMadeByBidderUserClient)).build();
+
+	}
+	
+	@Override
+	public Response listOpenedBidsMadeByBidderUser(String bidderUserClientID) throws SQLException {
+
+		List<Bid> openedBids = this.openedBidsRepositoryDao.queryForAll();
+
+		if( !this.verifyExistenceOfOpenedBids(openedBids) ) {
+
+			return Response.status(Status.NO_CONTENT).build();
+
+		}
+		
+		List<Bid> openedBidsMadeByBidderUserClientList = 
+					openedBids.stream()
+					.filter(bid -> bid.getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
+					.collect(Collectors.toList());
+
+		if(openedBidsMadeByBidderUserClientList.isEmpty()) {
+
+			System.err.println(String.format("Don't exist opened Bids made by the User/Client with the ID: [%s]!!!", bidderUserClientID));
+
+			return Response.status(Status.NOT_FOUND).build();
+
+		}
+
+
+		Map<Long ,Bid> openedBidsMadeByBidderUserClient = new HashMap<Long, Bid>();
+
+		for(Bid bid : openedBidsMadeByBidderUserClientList) {
+			openedBidsMadeByBidderUserClient.put(bid.getBidID(), bid);
+		}
+		
+
+		return Response.ok(this.gsonObject.toJson(openedBidsMadeByBidderUserClient)).build();
+
+	}
+	
+	@Override
+	public Response listClosedBidsMadeByBidderUser(String bidderUserClientID) throws SQLException {
+
+		List<Bid> closedBids = this.closedBidsRepositoryDao.queryForAll();
+
+		if( !this.verifyExistenceOfClosedBids(closedBids) ) {
+
+			return Response.status(Status.NO_CONTENT).build();
+
+		}
+		
+		List<Bid> closedBidsMadeByBidderUserClientList = 
+					closedBids.stream()
+					.filter(bid -> bid.getBidderUserClientID().equalsIgnoreCase(bidderUserClientID))
+					.collect(Collectors.toList());
+
+		if(closedBidsMadeByBidderUserClientList.isEmpty()) {
+
+			System.err.println(String.format("Don't exist closed Bids made by the User/Client with the ID: [%s]!!!", bidderUserClientID));
+
+			return Response.status(Status.NOT_FOUND).build();
+
+		}
+
+
+		Map<Long ,Bid> closedBidsMadeByBidderUserClient = new HashMap<Long, Bid>();
+
+		for(Bid bid : closedBidsMadeByBidderUserClientList) {
+			closedBidsMadeByBidderUserClient.put(bid.getBidID(), bid);
+		}
+		
+
+		return Response.ok(this.gsonObject.toJson(closedBidsMadeByBidderUserClient)).build();
+
+	}
+	
 }

@@ -687,9 +687,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public HttpResponse listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(String openedAuctionID,
 			String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
-				"Received request to get all opened bids from Auction with id" + openedAuctionID + " and from " + bidderUserClientID + "!");
+				"Received request to get all bids from Opened Auction with id" + openedAuctionID + " and from " + bidderUserClientID + "!");
 		
-		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + openedAuctionID + "/bids/" + bidderUserClientID;
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/opened/" + openedAuctionID + "/bids/" + bidderUserClientID;
 		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;
@@ -711,9 +711,78 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public HttpResponse listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(String closedAuctionID,
 			String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
-				"Received request to get all closed bids from Auction with id" + closedAuctionID + " and from " + bidderUserClientID + "!");
+				"Received request to get all bids from Closed Auction with id" + closedAuctionID + " and from " + bidderUserClientID + "!");
 		
-		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/all/" + closedAuctionID + "/bids/" + bidderUserClientID;
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/closed/" + closedAuctionID + "/bids/" + bidderUserClientID;
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
+	}
+	
+	@Override
+	public HttpResponse listAllBidsMadeByBidderUserClientID(String bidderUserClientID) throws SQLException {
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get all bids from " + bidderUserClientID + "!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/bids/all/" + bidderUserClientID;
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
+	}
+	
+	@Override
+	public HttpResponse listOpenedBidsMadeByBidderUserClientID(String bidderUserClientID) throws SQLException {
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get opened bids from " + bidderUserClientID + "!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/bids/opened/" + bidderUserClientID;
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
+	}
+	
+	@Override
+	public HttpResponse listClosedBidsMadeByBidderUserClientID(String bidderUserClientID) throws SQLException {
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to get closed bids from " + bidderUserClientID + "!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/bids/closed/" + bidderUserClientID;
 		url = removeSpaceFromURL(url);
 		HttpGet getRequest = new HttpGet(url);
 		HttpResponse response = null;

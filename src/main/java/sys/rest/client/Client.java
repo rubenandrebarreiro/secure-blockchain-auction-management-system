@@ -46,7 +46,6 @@ public class Client implements ClientAPI {
 	private static final String LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID = "list bids all auction auctionID";
 	private static final String LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID = "list bids opened auction auctionID";
 	private static final String LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID = "list bids closed auction auctionID";
-	
 	private static final String LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID = "list bids all auction by user auctionID userID";
 	private static final String LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID = "list bids opened auction by user auctionID userID";
 	private static final String LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID = "list bids closed auction by user auctionID userID";
@@ -222,24 +221,27 @@ public class Client implements ClientAPI {
 					break;
 				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
 					listBidsOfClosedAuctionsByAuctionID();
-					break;
+					break;	
 				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					listBidsOfAllAuctionsByAuctionIDAndClientID(); //TODO
+					listBidsOfAllAuctionsByAuctionIDAndClientID();
 					break;
 				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					listBidsOfOpenedAuctionsByAuctionIDAndClientID(); //TODO
+					listBidsOfOpenedAuctionsByAuctionIDAndClientID();
 					break;
 				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					listBidsOfClosedAuctionsByAuctionIDAndClientID();
 					break;
+					
+					
+				// CREATE	
 				case LIST_ALL_BIDS_BY_CLIENT_ID:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					listAllBidsByClientID(); //TODO confirmar
 					break;
 				case LIST_OPENED_BIDS_BY_CLIENT_ID:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					listOpenedBidsByClientID(); //TODO confirmar
 					break;
 				case LIST_CLOSED_BIDS_BY_CLIENT_ID:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					listClosedBidsByClientID(); //TODO confirmat
 					break;
 				case CHECK_OUTCOME_ALL_AUCTION:
 					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
@@ -310,7 +312,7 @@ public class Client implements ClientAPI {
 		String productDescription = br.readLine();
 		System.out.println(
 				"	"
-						+ "1: NORMAL_BIDS,\n" + 
+						+  "1: NORMAL_BIDS,\n" + 
 						"	2: MIN_INITIAL_VALUE_BID\n" + 
 						"	3: MIN_AMOUNT_VALUE_BID\n" + 
 						"	4: MAX_AMOUNT_VALUE_BID\n" + 
@@ -677,6 +679,42 @@ public class Client implements ClientAPI {
 		System.out.println(prettyResult);
 	}
 	
+	private void listAllBidsByClientID() throws IOException {
+		System.out.println("Enter bidderID: ");
+		String bidderID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("bidder-user-client-id", bidderID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_BIDS_BY_CLIENT_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void listOpenedBidsByClientID() throws IOException {
+		System.out.println("Enter bidderID: ");
+		String bidderID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("bidder-user-client-id", bidderID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_BIDS_BY_CLIENT_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void listClosedBidsByClientID() throws IOException {
+		System.out.println("Enter bidderID: ");
+		String bidderID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("bidder-user-client-id", bidderID);
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_BIDS_BY_CLIENT_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
 	private void helpScreen() {
 		System.out.println("HELP SCREEN");
 		System.out.println(OPEN_AUCTION);
@@ -697,6 +735,15 @@ public class Client implements ClientAPI {
 		System.out.println(LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID);
 		System.out.println(LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID);
 		System.out.println(LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID);
+		System.out.println(LIST_ALL_BIDS_BY_CLIENT_ID);
+		System.out.println(LIST_OPENED_BIDS_BY_CLIENT_ID);
+		System.out.println(LIST_CLOSED_BIDS_BY_CLIENT_ID);
+		System.out.println(CHECK_OUTCOME_ALL_AUCTION);
+		System.out.println(CHECK_OUTCOME_OPENED_AUCTION);
+		System.out.println(CHECK_OUTCOME_CLOSED_AUCTION);
+		System.out.println(CHECK_OUTCOME_ALL_AUCTION_ID);
+		System.out.println(CHECK_OUTCOME_OPENED_AUCTION_ID);
+		System.out.println(CHECK_OUTCOME_CLOSED_AUCTION_ID);
 		System.out.println();
 		System.out.println(HELP);
 		System.out.println(EXIT);

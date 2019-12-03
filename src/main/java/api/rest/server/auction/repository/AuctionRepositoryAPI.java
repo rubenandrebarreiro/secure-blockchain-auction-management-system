@@ -155,4 +155,19 @@ public interface AuctionRepositoryAPI {
  	public Response listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(@PathParam("auction-id") String closedAuctionID,
  																				@PathParam("bidder-user-client-id") String bidderUserClientID) throws SQLException;
 	
+	@GET
+	@Path("/bids/all/{bidder-user-client-id}")
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response listAllBidsMadeByBidderUser(@PathParam("bidder-user-client-id") String bidderUserClientID) throws SQLException;
+	
+	@GET
+	@Path("/bids/opened/{bidder-user-client-id}")
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response listOpenedBidsMadeByBidderUser(@PathParam("bidder-user-client-id") String bidderUserClientID) throws SQLException;
+	
+	@GET
+	@Path("/bids/closed/{bidder-user-client-id}")
+    @Produces(MediaType.APPLICATION_JSON)
+	public Response listClosedBidsMadeByBidderUser(@PathParam("bidder-user-client-id") String bidderUserClientID) throws SQLException;
+	
 }
