@@ -77,84 +77,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	private KeyManagerFactory kmf;
 	private KeyStore ks;
 
-	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
-		int port = 8081;
-
-		URI baseUri = UriBuilder.fromUri("http://0.0.0.0/").port(port).build();
-		ResourceConfig config = new ResourceConfig();
-		try {
-			config.register( new AuctionServer() );
-		} catch (IOException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (UnrecoverableKeyException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (KeyStoreException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (CertificateException e) {
-			e.getMessage();
-			e.printStackTrace();
-		} catch (KeyManagementException e) {
-			e.getMessage();
-			e.printStackTrace();
-		}
-
-		JdkHttpServerFactory.createHttpServer(baseUri, config);
-
-		System.out.println("Auction Server ready @ " + baseUri);
-	}
-
-	public AuctionServer() throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
-
-		//		System.setProperty("javax.net.debug", "SSL,handshake");
-
-		AuctionServerTLSConfigurationReader tlsConfigurationReader = null;
-		AuctionServerKeyStoreConfigurationReader storesConfigurationReader = null;
-		try {
-			tlsConfigurationReader = new AuctionServerTLSConfigurationReader(AUCTION_SERVER_TLS_CONFIGURATION_PATH);
-			storesConfigurationReader = new AuctionServerKeyStoreConfigurationReader(AUCTION_SERVER_STORES_CONFIGURATION_PATH);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.setProperty("javax.net.ssl.keyStore", storesConfigurationReader.getKeyStoreFileLocationPath());
-		System.setProperty("javax.net.ssl.keyStorePassword", storesConfigurationReader.getKeyStorePassword());
-
-		System.setProperty("javax.net.ssl.trustStore", storesConfigurationReader.getTrustStoreFileLocationPath());
-		System.setProperty("javax.net.ssl.trustStorePassword", storesConfigurationReader.getTrustStorePassword());
-
-		System.out.println(storesConfigurationReader.getKeyStoreFileLocationPath());
-		System.out.println(storesConfigurationReader.getKeyStorePassword());
-		System.out.println(storesConfigurationReader.getTrustStoreFileLocationPath());
-		System.out.println(storesConfigurationReader.getTrustStorePassword());
-
-		currentAuctionID = 0;
-		currentSerialNumber = 0;
-
-		gson = new Gson();
-		httpClient = HttpClients.createDefault();
-
-//		SSLContext sslContext = SSLContext.getInstance(tlsConfigurationReader.getSSLContextInstance());
-//		kmf = KeyManagerFactory.getInstance("SunX509");
-//		ks = KeyStore.getInstance("JKS");		
-//		sslContext.init(null, null, null);
-		SSLContext sslContext = SSLContext.getDefault();
-		SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
-		serverSocket = (SSLServerSocket)serverSocketFactory.createServerSocket(8443);
-		serverSocket.setEnabledCipherSuites(tlsConfigurationReader.getAvailableTLSCiphersuites());
-		serverSocket.setEnabledProtocols(tlsConfigurationReader.getAvailableTLSVersions());
-		String[] mutualAuth = tlsConfigurationReader.getAvailableTLSAuthenticationModes();
-		// TODO Change this maybe!
-		if(mutualAuth[0].equals(TLS_CONF_MUTUAL))
-			serverSocket.setNeedClientAuth(true);
-
-		start();
+	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+		this.serverSocket = serverSocket;
+		this.responseSocket = responseSocket;
+		this.gson = new Gson();
+		this.httpClient = HttpClients.createDefault();
 	}
 
 	public void run() {
@@ -162,8 +89,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		HttpResponse response = null;
 
 		try {
-			responseSocket = (SSLSocket) serverSocket.accept();
-			responseSocket.startHandshake();
 			while(true) {
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
 				//					SSLSession session = responseSocket.getSession();
@@ -244,12 +169,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			try {
-				responseSocket.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			e.getMessage();
 			e.printStackTrace();
 		}
