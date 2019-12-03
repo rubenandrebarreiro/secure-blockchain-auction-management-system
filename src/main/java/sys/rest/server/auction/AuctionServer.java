@@ -184,7 +184,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 						arg1 = message.getParamsMap().get("auction-id");
 						arg2 = message.getParamsMap().get("bidder-user-client-id");
-						response = listAllBidsMadeByBidderUserClientInProductAuctionByID(arg1, arg2);
+						response = listAllBidsMadeByBidderUserClientInAllProductAuctionByID(arg1, arg2);
 						break;
 					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 						arg1 = message.getParamsMap().get("auction-id");
@@ -660,7 +660,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	}
 
 	@Override
-	public HttpResponse listAllBidsMadeByBidderUserClientInProductAuctionByID(String auctionID, String bidderUserClientID)
+	public HttpResponse listAllBidsMadeByBidderUserClientInAllProductAuctionByID(String auctionID, String bidderUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all bids from Auction with id" + auctionID + " and from " + bidderUserClientID + "!");

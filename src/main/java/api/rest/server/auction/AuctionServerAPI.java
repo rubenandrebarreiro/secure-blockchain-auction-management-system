@@ -95,7 +95,7 @@ public interface AuctionServerAPI {
 	@GET
 	@Path("/all/{auction-id}/bids/{bidder-user-client-id}")
     @Produces(MediaType.APPLICATION_JSON)
- 	public HttpResponse listAllBidsMadeByBidderUserClientInProductAuctionByID(@PathParam("auction-id") String auctionID,
+ 	public HttpResponse listAllBidsMadeByBidderUserClientInAllProductAuctionByID(@PathParam("auction-id") String auctionID,
  																		  @PathParam("bidder-user-client-id") String bidderUserClientID) throws SQLException;
 	@GET
 	@Path("/opened/{auction-id}/bids/{bidder-user-client-id}")
