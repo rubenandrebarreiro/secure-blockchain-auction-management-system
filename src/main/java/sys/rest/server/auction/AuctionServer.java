@@ -1,7 +1,6 @@
 package main.java.sys.rest.server.auction;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,10 +8,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -20,13 +17,8 @@ import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.Random;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
-import javax.ws.rs.core.UriBuilder;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -37,9 +29,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-
 import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
@@ -49,8 +38,6 @@ import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
 import main.java.resources.user.UserBidInfo;
 import main.java.sys.SSLSocketMessage;
-import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
-import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
 public class AuctionServer extends Thread implements AuctionServerAPI{
 
@@ -58,28 +45,16 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	private static final String URL_SPACE = "%20";
 
-	private static final String AUCTION_SERVER_TLS_CONFIGURATION_PATH = "res/configurations/auction-server-tls-configuration.conf";
-	private static final String AUCTION_SERVER_STORES_CONFIGURATION_PATH = "res/configurations/auction-server-keystore-configuration.conf";
-	
-	private static final String TLS_CONF_CLIENT_ONLY = "CLIENT-ONLY";
-	private static final String TLS_CONF_SERVER_ONLY = "SERVER-ONLY";
-	private static final String TLS_CONF_MUTUAL = "MUTUAL";
-	
-	private int currentAuctionID;
 	private int currentSerialNumber;
 
 	private Gson gson;
 
 	HttpClient httpClient;
 
-	private SSLServerSocket serverSocket;
 	private SSLSocket responseSocket;
-	private KeyManagerFactory kmf;
-	private KeyStore ks;
 	private Random random;
 
 	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
-		this.serverSocket = serverSocket;
 		this.responseSocket = responseSocket;
 		this.gson = new Gson();
 		this.httpClient = HttpClients.createDefault();
