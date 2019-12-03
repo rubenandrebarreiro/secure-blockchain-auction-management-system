@@ -231,6 +231,8 @@ public class Client implements ClientAPI {
 				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 					listBidsOfClosedAuctionsByAuctionIDAndClientID();
 					break;
+			
+					
 				case LIST_ALL_BIDS_BY_CLIENT_ID:
 					listAllBidsByClientID(); //TODO confirmar
 					break;
@@ -242,24 +244,25 @@ public class Client implements ClientAPI {
 					break;
 				
 					
-				// CREATE TODO - JA NAO TEMOS ISTO????
 				case CHECK_OUTCOME_ALL_AUCTION:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					checkOutcomeAllAuctions(); //TODO confirmar
 					break;
 				case CHECK_OUTCOME_OPENED_AUCTION:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					checkOutcomeOpenedAuctions(); //TODO confirmar
 					break;
 				case CHECK_OUTCOME_CLOSED_AUCTION:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					checkOutcomeClosedAuctions(); //TODO confirmar
 					break;
+				
+					
 				case CHECK_OUTCOME_ALL_AUCTION_ID:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					checkOutcomeAllAuctionsByAuctionID(); //TODO
 					break;
 				case CHECK_OUTCOME_OPENED_AUCTION_ID:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					checkOutcomeOpenedAuctionsByAuctionID(); //TODO
 					break;
 				case CHECK_OUTCOME_CLOSED_AUCTION_ID:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
+					checkOutcomeClosedAuctionsByAuctionID(); //TODO
 					break;
 				
 				// VALIDATE RECEIPT
@@ -712,6 +715,75 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("bidder-user-client-id", bidderID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_BIDS_BY_CLIENT_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void checkOutcomeAllAuctions() throws IOException {
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_ALL_AUCTION,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void checkOutcomeOpenedAuctions() throws IOException {
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_OPENED_AUCTION,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void checkOutcomeClosedAuctions() throws IOException {
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_CLOSED_AUCTION,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void checkOutcomeAllAuctionsByAuctionID() throws IOException {
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_ALL_AUCTION_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void checkOutcomeOpenedAuctionsByAuctionID() throws IOException {
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_OPENED_AUCTION_ID,
+				paramsMap, "");
+		String result = sendMessageAndGetResponse(message);
+		String prettyResult = getPrettyJsonString(result);
+		System.out.println(prettyResult);
+	}
+	
+	private void checkOutcomeClosedAuctionsByAuctionID() throws IOException {
+		System.out.println("Enter auctionID: ");
+		String auctionID = br.readLine();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		paramsMap.put("auction-id", auctionID);
+		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
+		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_CLOSED_AUCTION_ID,
 				paramsMap, "");
 		String result = sendMessageAndGetResponse(message);
 		String prettyResult = getPrettyJsonString(result);

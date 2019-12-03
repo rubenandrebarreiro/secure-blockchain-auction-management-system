@@ -261,6 +261,19 @@ public class Auction {
 	public void setAuctionBids(HashMap<Long, Bid> auctionBidsMade) {
 		this.auctionBidsMade = auctionBidsMade;
 	}
+	
+	public boolean isAnUserClientMadeSomeBid(String bidderUserClientID) {
+		
+		for(Bid bid : this.auctionBidsMade.values()) {
+			
+			if(bid.getBidderUserClientID().equalsIgnoreCase(bidderUserClientID)) {
+				return true;
+			}
+		
+		}
+		
+		return false;
+	}
 
 	public boolean addAuctionBid(Bid auctionBid) {
 		boolean result = false;
