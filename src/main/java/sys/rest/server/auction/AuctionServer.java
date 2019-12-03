@@ -76,12 +76,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	private SSLSocket responseSocket;
 	private KeyManagerFactory kmf;
 	private KeyStore ks;
+	private Random random;
 
 	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
 		this.serverSocket = serverSocket;
 		this.responseSocket = responseSocket;
 		this.gson = new Gson();
 		this.httpClient = HttpClients.createDefault();
+		this.random = new Random();
 	}
 
 	public void run() {
@@ -187,7 +189,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 		// TODO Change some values
 		Auction newAuction = new Auction(
-				String.valueOf(currentAuctionID++), 
+				String.valueOf(random.nextInt()), 
 				currentSerialNumber++,
 				auctionDescription, 
 				userAuctionInfo.getBidType(),
