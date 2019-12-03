@@ -231,9 +231,6 @@ public class Client implements ClientAPI {
 				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 					listBidsOfClosedAuctionsByAuctionIDAndClientID();
 					break;
-					
-					
-				// CREATE	
 				case LIST_ALL_BIDS_BY_CLIENT_ID:
 					listAllBidsByClientID(); //TODO confirmar
 					break;
@@ -243,6 +240,9 @@ public class Client implements ClientAPI {
 				case LIST_CLOSED_BIDS_BY_CLIENT_ID:
 					listClosedBidsByClientID(); //TODO confirmat
 					break;
+				
+					
+				// CREATE TODO - JA NAO TEMOS ISTO????
 				case CHECK_OUTCOME_ALL_AUCTION:
 					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
 					break;
@@ -261,6 +261,9 @@ public class Client implements ClientAPI {
 				case CHECK_OUTCOME_CLOSED_AUCTION_ID:
 					listBidsOfClosedAuctionsByAuctionIDAndClientID(); //TODO
 					break;
+				
+				// VALIDATE RECEIPT
+				
 				case HELP:
 					helpScreen();
 					break;
