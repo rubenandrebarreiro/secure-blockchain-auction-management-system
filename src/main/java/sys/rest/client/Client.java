@@ -1,6 +1,7 @@
 package main.java.sys.rest.client;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,6 +29,8 @@ import main.java.resources.user.UserAuctionInfo;
 import main.java.resources.user.UserBidInfo;
 import main.java.sys.SSLSocketAuctionOperation;
 import main.java.sys.SSLSocketMessage;
+import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
+import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
 public class Client implements ClientAPI {
 
@@ -70,6 +73,8 @@ public class Client implements ClientAPI {
 	private static final String HASH_ALGORITHM = "SHA-256";
 
 	private static final String USER_DATABASE_JDBC_PATH = "jdbc:sqlite:res/database/client/users.db";
+	private static final String USER_TLS_CONFIGURATION_PATH = "res/configurations/client-tls-configuration.conf";
+	private static final String USER_STORES_CONFIGURATION_PATH = "res/configurations/client-keystore-configuration.conf";
 
 	private User currentUser;
 
@@ -83,31 +88,15 @@ public class Client implements ClientAPI {
 	
 	public static void main(String[] args) {
 
-		if(args.length != 6) {
-
-			System.err.println
-			(String.format
-					("Usage: java AuctionRepositoryServer <url> <port> "
-							+ "<key-store-file-path> <key-store-password>"
-							+ "<trust-store-file-path> <trust-store-password>"
-							)
-					);
-
+		if(args.length != 2) {
+			System.err.println("Usage: java Client <serverURL> <serverSocketPort> ");
 			System.exit(1);
 		}
 
 		String url = args[0];
 		int serverPort = Integer.parseInt(args[1]);
 
-		String keyStoreFilePath = args[2];
-		String keyStorePassword = args[3];
-
-		String trustStoreFilePath = args[4];
-		String trustStorePassword = args[5];
-
-		new Client(url, serverPort,
-				keyStoreFilePath, keyStorePassword,
-				trustStoreFilePath, trustStorePassword);				
+		new Client(url, serverPort);				
 	}
 
 	// Taken from https://www.mkyong.com/webservices/jax-ws/java-security-cert-certificateexception-no-name-matching-localhost-found/
@@ -126,17 +115,25 @@ public class Client implements ClientAPI {
 				});
 	}
 
-	public Client(String url, int serverPort,
-			String keyStorePath, String keyStorePassword,
-			String trustStorePath, String trustStorePassword) {
+	public Client(String url, int serverPort) {
 
+		AuctionServerTLSConfigurationReader tlsConfigurationReader = null;
+		AuctionServerKeyStoreConfigurationReader storesConfigurationReader = null;
+		try {
+			tlsConfigurationReader = new AuctionServerTLSConfigurationReader(USER_TLS_CONFIGURATION_PATH);
+			storesConfigurationReader = new AuctionServerKeyStoreConfigurationReader(USER_STORES_CONFIGURATION_PATH);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		//SSL Connection
 
 		try {
-			System.setProperty("javax.net.ssl.keyStore", keyStorePath);
-			System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
-			System.setProperty("javax.net.ssl.trustStore", trustStorePath);
-			System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+			System.setProperty("javax.net.ssl.keyStore", storesConfigurationReader.getKeyStoreFileLocationPath());
+			System.setProperty("javax.net.ssl.keyStorePassword", storesConfigurationReader.getKeyStorePassword());
+			System.setProperty("javax.net.ssl.trustStore", storesConfigurationReader.getTrustStoreFileLocationPath());
+			System.setProperty("javax.net.ssl.trustStorePassword", storesConfigurationReader.getTrustStorePassword());
 
 			//			System.setProperty("javax.net.debug", "SSL,handshake");
 
@@ -144,12 +141,15 @@ public class Client implements ClientAPI {
 
 			socketFactory = sslContext.getSocketFactory();
 			socket = (SSLSocket)socketFactory.createSocket(url, serverPort);
+			socket.setEnabledCipherSuites(tlsConfigurationReader.getAvailableTLSCiphersuites());
+			socket.setEnabledProtocols(tlsConfigurationReader.getAvailableTLSVersions());
 			//		    socket.setSoTimeout(1000);
 			socket.startHandshake();
 		} catch (Exception e) {
 			System.err.println("Error setting up TLS connection/socket!");
 			e.getMessage();
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 		String userRepository = USER_DATABASE_JDBC_PATH;

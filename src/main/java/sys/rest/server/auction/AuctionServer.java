@@ -1,6 +1,7 @@
 package main.java.sys.rest.server.auction;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,12 +12,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.Random;
+
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -45,12 +49,21 @@ import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
 import main.java.resources.user.UserBidInfo;
 import main.java.sys.SSLSocketMessage;
+import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
+import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
 public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	private static final String AUCTION_SERVER_REPOSITORY_ADDRESS = "http://localhost:8080/products-auctions";
 
 	private static final String URL_SPACE = "%20";
+
+	private static final String AUCTION_SERVER_TLS_CONFIGURATION_PATH = "res/configurations/auction-server-tls-configuration.conf";
+	private static final String AUCTION_SERVER_STORES_CONFIGURATION_PATH = "res/configurations/auction-server-keystore-configuration.conf";
+	
+	private static final String TLS_CONF_CLIENT_ONLY = "CLIENT-ONLY";
+	private static final String TLS_CONF_SERVER_ONLY = "SERVER-ONLY";
+	private static final String TLS_CONF_MUTUAL = "MUTUAL";
 	
 	private int currentAuctionID;
 	private int currentSerialNumber;
@@ -61,6 +74,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	private SSLServerSocket serverSocket;
 	private SSLSocket responseSocket;
+	private KeyManagerFactory kmf;
+	private KeyStore ks;
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		int port = 8081;
@@ -98,11 +113,26 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 		//		System.setProperty("javax.net.debug", "SSL,handshake");
 
-		System.setProperty("javax.net.ssl.keyStore", "res/keystores/auctionServerKeystore.jks");
-		System.setProperty("javax.net.ssl.keyStorePassword", "auctionServer1920");
+		AuctionServerTLSConfigurationReader tlsConfigurationReader = null;
+		AuctionServerKeyStoreConfigurationReader storesConfigurationReader = null;
+		try {
+			tlsConfigurationReader = new AuctionServerTLSConfigurationReader(AUCTION_SERVER_TLS_CONFIGURATION_PATH);
+			storesConfigurationReader = new AuctionServerKeyStoreConfigurationReader(AUCTION_SERVER_STORES_CONFIGURATION_PATH);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.setProperty("javax.net.ssl.keyStore", storesConfigurationReader.getKeyStoreFileLocationPath());
+		System.setProperty("javax.net.ssl.keyStorePassword", storesConfigurationReader.getKeyStorePassword());
 
-		System.setProperty("javax.net.ssl.trustStore", "res/truststores/auctionServerTruststore.jks");
-		System.setProperty("javax.net.ssl.trustStorePassword", "auctionServer1920");
+		System.setProperty("javax.net.ssl.trustStore", storesConfigurationReader.getTrustStoreFileLocationPath());
+		System.setProperty("javax.net.ssl.trustStorePassword", storesConfigurationReader.getTrustStorePassword());
+
+		System.out.println(storesConfigurationReader.getKeyStoreFileLocationPath());
+		System.out.println(storesConfigurationReader.getKeyStorePassword());
+		System.out.println(storesConfigurationReader.getTrustStoreFileLocationPath());
+		System.out.println(storesConfigurationReader.getTrustStorePassword());
 
 		currentAuctionID = 0;
 		currentSerialNumber = 0;
@@ -110,10 +140,19 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		gson = new Gson();
 		httpClient = HttpClients.createDefault();
 
+//		SSLContext sslContext = SSLContext.getInstance(tlsConfigurationReader.getSSLContextInstance());
+//		kmf = KeyManagerFactory.getInstance("SunX509");
+//		ks = KeyStore.getInstance("JKS");		
+//		sslContext.init(null, null, null);
 		SSLContext sslContext = SSLContext.getDefault();
 		SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
 		serverSocket = (SSLServerSocket)serverSocketFactory.createServerSocket(8443);
-//		serverSocket.setWantClientAuth(true);
+		serverSocket.setEnabledCipherSuites(tlsConfigurationReader.getAvailableTLSCiphersuites());
+		serverSocket.setEnabledProtocols(tlsConfigurationReader.getAvailableTLSVersions());
+		String[] mutualAuth = tlsConfigurationReader.getAvailableTLSAuthenticationModes();
+		// TODO Change this maybe!
+		if(mutualAuth[0].equals(TLS_CONF_MUTUAL))
+			serverSocket.setNeedClientAuth(true);
 
 		start();
 	}
