@@ -39,7 +39,7 @@ public class TestAuctionJDBC {
 //			tempFile.renameTo(new File(tempFile.getAbsolutePath() + ".bak"));
 //		}
     	
-    	AuctionRepositoryServer.main(null);
+    	AuctionRepositoryServer.main(new String[] {"8080"});
 
 	}
 	
