@@ -761,7 +761,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	@Override
 	public HttpResponse checkOutcomeOpenedAuctions(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
-				"Received request to check the outcome from all auctions where " + bidderUserClientID + " participated!");
+				"Received request to check the outcome from opened auctions where " + bidderUserClientID + " participated!");
 		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/outcome/opened/" + bidderUserClientID;
 		url = removeSpaceFromURL(url);
@@ -784,7 +784,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	@Override
 	public HttpResponse checkOutcomeClosedAuctions(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
-				"Received request to check the outcome from all auctions where " + bidderUserClientID + " participated!");
+				"Received request to check the outcome from closed auctions where " + bidderUserClientID + " participated!");
 		
 		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/outcome/closed/" + bidderUserClientID;
 		url = removeSpaceFromURL(url);
@@ -803,6 +803,77 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				"Response: " + response.getEntity());
 		return response;
 	}
+	
+	@Override
+	public HttpResponse checkOutcomeAllAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to check the outcome from closed auctions with ID " + auctionID + "where " + bidderUserClientID + " participated!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/outcome/all/" + auctionID + "/" + bidderUserClientID;
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
+	}
+
+	@Override
+	public HttpResponse checkOutcomeOpenedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to check the outcome from opened auctions with ID " + auctionID + "where " + bidderUserClientID + " participated!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/outcome/opened/" + auctionID + "/" + bidderUserClientID;
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
+	}
+	
+	@Override
+	public HttpResponse checkOutcomeClosedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
+				"Received request to check the outcome from closed auctions with ID " + auctionID + "where " + bidderUserClientID + " participated!");
+		
+		String url = AUCTION_SERVER_REPOSITORY_ADDRESS + "/outcome/closed/" + auctionID + "/" + bidderUserClientID;
+		url = removeSpaceFromURL(url);
+		HttpGet getRequest = new HttpGet(url);
+		HttpResponse response = null;
+		try {
+			response = httpClient.execute(getRequest);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getStatusLine());
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + response.getEntity());
+		return response;
+	}
+	
+	
 	private String sslReadRequest(InputStream socketInStream) throws IOException {
 		StringBuilder builder = new StringBuilder();
 		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
