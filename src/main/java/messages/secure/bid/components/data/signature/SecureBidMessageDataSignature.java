@@ -1,4 +1,4 @@
-package main.java.messages.secure.bid.data.signature;
+package main.java.messages.secure.bid.components.data.signature;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;

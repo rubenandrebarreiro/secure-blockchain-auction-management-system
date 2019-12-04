@@ -1,4 +1,4 @@
-package main.java.messages.secure.bid.data;
+package main.java.messages.secure.bid.components.data;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -7,8 +7,8 @@ import java.security.NoSuchProviderException;
 
 import javax.crypto.NoSuchPaddingException;
 
-import main.java.messages.secure.bid.data.personal.SecureBidMessageDataPersonal;
-import main.java.messages.secure.bid.data.signature.SecureBidMessageDataSignature;
+import main.java.messages.secure.bid.components.data.personal.SecureBidMessageDataPersonal;
+import main.java.messages.secure.bid.components.data.signature.SecureBidMessageDataSignature;
 
 public class SecureBidMessageData {
 
