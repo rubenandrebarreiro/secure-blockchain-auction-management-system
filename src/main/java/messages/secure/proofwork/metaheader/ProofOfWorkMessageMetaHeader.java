@@ -35,7 +35,7 @@ public class ProofOfWorkMessageMetaHeader {
 		
 	}
 	
-	
+	 
 	public int getSizeOfBlockSerialized() {
 		return this.sizeOfBlockSerialized;
 	}
