@@ -69,7 +69,9 @@ public class SecureBidMessageDataSignature {
 
 	}
 
-	public SecureBidMessageDataSignature(byte[] bidDigitalSigned, int sizeOfBidSerialized, int sizeOfBidderUserClientID) {
+	public SecureBidMessageDataSignature(byte[] bidDigitalSigned,
+										 int sizeOfBidSerialized,
+										 int sizeOfBidderUserClientID) {
 
 		this.bidDigitalSigned = bidDigitalSigned;
 		this.isBidDigitalSigned = true;

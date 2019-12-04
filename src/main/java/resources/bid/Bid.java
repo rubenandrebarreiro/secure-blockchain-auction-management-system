@@ -57,6 +57,7 @@ public class Bid implements Serializable {
 		
 		this.bidID = -1L;
 		this.bidderUserClientID = null;
+		this.sizeOfBidderUserClientID = sizeOfBidderUserClientID;
 		this.bidValue = -1.0;
 		this.bidTimestamp = -1L;
 		
