@@ -2,7 +2,7 @@ package main.java.messages.secure.common.header;
 
 import main.java.common.utils.CommonUtils;
 
-public abstract class SecureCommonHeader {
+public class SecureCommonHeader {
 	
 	private byte versionID;
 	
