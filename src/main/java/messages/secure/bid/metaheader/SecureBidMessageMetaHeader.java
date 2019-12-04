@@ -14,10 +14,6 @@ public class SecureBidMessageMetaHeader {
 	private int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
 	
 	
-	private int sizeOfSecureBidMessageDataPersonalSerialized;
-	
-	private int sizeOfSecureBidMessageDataPersonalSerializedHashed;
-	
 		
 	private int sizeOfBidDigitalSignedSerialized;
 	
@@ -25,14 +21,19 @@ public class SecureBidMessageMetaHeader {
 	
 	private int sizeOfBidSerializedHashedCiphered;
 	
-	private int sizeOfBidderUserClientID;
+	private int sizeOfBidderUserClientIDSerialized;
 	
 	
-	private int sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized;
+	
+	private int sizeOfSecureBidMessageDataPersonalSerialized;
+	
+	private int sizeOfSecureBidMessageDataPersonalSerializedHashed;
+	
+	private int sizeOfUserEmailSerialized;
 
-	private int sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized;
+	private int sizeOfUserHomeAddressSerialized;
 	
-	private int sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized;
+	private int sizeOfUserBankAccountNIBSerialized;
 	
 	
 	private byte[] secureBidMessageMetaHeaderSerialized;
@@ -50,10 +51,10 @@ public class SecureBidMessageMetaHeader {
 									  int sizeOfBidDigitalSignedSerialized,
 									  int sizeOfBidSerialized,
 									  int sizeOfBidSerializedHashedCiphered,
-									  int sizeOfBidderUserClientID,
-									  int sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized,
-									  int sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized,
-									  int sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized) {
+									  int sizeOfBidderUserClientIDSerialized,
+									  int sizeOfUserEmailSerialized,
+									  int sizeOfUserHomeAddressSerialized,
+									  int sizeOfUserBankAccountNIBSerialized) {
 		
 		this.sizeOfSecureBidMessageDataSerialized = sizeOfSecureBidMessageDataSerialized;
 		this.sizeOfSecureBidMessageDoSMitigationSerialized = sizeOfSecureBidMessageDoSMitigationSerialized;
@@ -62,21 +63,22 @@ public class SecureBidMessageMetaHeader {
 		this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered = 
 											sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
 		
+		this.sizeOfBidDigitalSignedSerialized = sizeOfBidDigitalSignedSerialized;
+		this.sizeOfBidSerialized = sizeOfBidSerialized;
+		this.sizeOfBidSerializedHashedCiphered = sizeOfBidSerializedHashedCiphered;
+		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
+		
+		
 		this.sizeOfSecureBidMessageDataPersonalSerialized = sizeOfSecureBidMessageDataPersonalSerialized;
 		this.sizeOfSecureBidMessageDataPersonalSerializedHashed = 
 											sizeOfSecureBidMessageDataPersonalSerializedHashed;
 		
-		this.sizeOfBidDigitalSignedSerialized = sizeOfBidDigitalSignedSerialized;
-		this.sizeOfBidSerialized = sizeOfBidSerialized;
-		this.sizeOfBidSerializedHashedCiphered = sizeOfBidSerializedHashedCiphered;
-		this.sizeOfBidderUserClientID = sizeOfBidderUserClientID;
-		
-		this.sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized = 
-						sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized;
-		this.sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized = 
-						sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized;
-		this.sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized =
-						sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized;
+		this.sizeOfUserEmailSerialized = 
+						sizeOfUserEmailSerialized;
+		this.sizeOfUserHomeAddressSerialized = 
+						sizeOfUserHomeAddressSerialized;
+		this.sizeOfUserBankAccountNIBSerialized =
+						sizeOfUserBankAccountNIBSerialized;
 		
 		
 		this.secureBidMessageMetaHeaderSerialized = null;
@@ -95,17 +97,17 @@ public class SecureBidMessageMetaHeader {
 		this.sizeOfSecureBidMessageDataSignatureSerialized = 0;
 		this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered = 0;
 		
-		this.sizeOfSecureBidMessageDataPersonalSerialized = 0;
-		this.sizeOfSecureBidMessageDataPersonalSerializedHashed = 0;
-		
 		this.sizeOfBidDigitalSignedSerialized = 0;
 		this.sizeOfBidSerialized = 0;
 		this.sizeOfBidSerializedHashedCiphered = 0;
-		this.sizeOfBidderUserClientID = 0;
+		this.sizeOfBidderUserClientIDSerialized = 0;
 		
-		this.sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized = 0;
-		this.sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized = 0;
-		this.sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized = 0;
+		this.sizeOfSecureBidMessageDataPersonalSerialized = 0;
+		this.sizeOfSecureBidMessageDataPersonalSerializedHashed = 0;
+		
+		this.sizeOfUserEmailSerialized = 0;
+		this.sizeOfUserHomeAddressSerialized = 0;
+		this.sizeOfUserBankAccountNIBSerialized = 0;
 		
 	}
 	
@@ -130,6 +132,8 @@ public class SecureBidMessageMetaHeader {
 	
 	}
 
+	
+	
 	public int getSizeOfSecureBidMessageDataSignatureSerialized() {
 		return this.sizeOfSecureBidMessageDataSignatureSerialized;
 	}
@@ -141,42 +145,7 @@ public class SecureBidMessageMetaHeader {
 				sizeOfSecureBidMessageDataSignatureSerialized;
 	
 	}
-
-	public int getSizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered() {
-		return this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
-	}
-
-	public void setSizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered
-		  (int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered) {
-		
-		this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered = 
-				sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
 	
-	}
-
-	public int getSizeOfSecureBidMessageDataPersonalSerialized() {
-		return sizeOfSecureBidMessageDataPersonalSerialized;
-	}
-
-	public void setSizeOfSecureBidMessageDataPersonalSerialized
-		  (int sizeOfSecureBidMessageDataPersonalSerialized) {
-		
-		this.sizeOfSecureBidMessageDataPersonalSerialized = 
-				sizeOfSecureBidMessageDataPersonalSerialized;
-	
-	}
-
-	public int getSizeOfSecureBidMessageDataPersonalSerializedHashed() {
-		return this.sizeOfSecureBidMessageDataPersonalSerializedHashed;
-	}
-
-	public void setSizeOfSecureBidMessageDataPersonalSerializedHashed
-		  (int sizeOfSecureBidMessageDataPersonalSerializedHashed) {
-		
-		this.sizeOfSecureBidMessageDataPersonalSerializedHashed = 
-				sizeOfSecureBidMessageDataPersonalSerializedHashed;
-	
-	}
 
 	public int getSizeOfBidDigitalSignedSerialized() {
 		return this.sizeOfBidDigitalSignedSerialized;
@@ -202,49 +171,91 @@ public class SecureBidMessageMetaHeader {
 		this.sizeOfBidSerializedHashedCiphered = sizeOfBidSerializedHashedCiphered;
 	}
 
-	public int getSizeOfBidderUserClientID() {
-		return this.sizeOfBidderUserClientID;
+	public int getSizeOfBidderUserClientIDSerialized() {
+		return this.sizeOfBidderUserClientIDSerialized;
 	}
 
-	public void setSizeOfBidderUserClientID(int sizeOfBidderUserClientID) {
-		this.sizeOfBidderUserClientID = sizeOfBidderUserClientID;
+	public void setSizeOfBidderUserClientIDSerialized(int sizeOfBidderUserClientIDSerialized) {
+		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
+	}
+	
+	
+	
+	public int getSizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered() {
+		return this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
 	}
 
-	public int getSizeOfUserEmailFromSecureBidMessageDataPersonalSerialized() {
-		return this.sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized;
-	}
-
-	public void setSizeOfUserEmailFromSecureBidMessageDataPersonalSerialized
-		  (int sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized) {
+	public void setSizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered
+		  (int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered) {
 		
-		this.sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized = 
-				sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized;
+		this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered = 
+				sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
 	
 	}
 
-	public int getSizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized() {
-		return this.sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized;
+	
+	public int getSizeOfSecureBidMessageDataPersonalSerialized() {
+		return sizeOfSecureBidMessageDataPersonalSerialized;
 	}
 
-	public void setSizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized
-		  (int sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized) {
+	public void setSizeOfSecureBidMessageDataPersonalSerialized
+		  (int sizeOfSecureBidMessageDataPersonalSerialized) {
 		
-		this.sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized = 
-				sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized;
+		this.sizeOfSecureBidMessageDataPersonalSerialized = 
+				sizeOfSecureBidMessageDataPersonalSerialized;
+	
+	}
+	
+	public int getSizeOfSecureBidMessageDataPersonalSerializedHashed() {
+		return this.sizeOfSecureBidMessageDataPersonalSerializedHashed;
+	}
+
+	public void setSizeOfSecureBidMessageDataPersonalSerializedHashed
+		  (int sizeOfSecureBidMessageDataPersonalSerializedHashed) {
+		
+		this.sizeOfSecureBidMessageDataPersonalSerializedHashed = 
+				sizeOfSecureBidMessageDataPersonalSerializedHashed;
+	
+	}
+	
+	public int getSizeOfUserEmailSerialized() {
+		return this.sizeOfUserEmailSerialized;
+	}
+
+	public void setSizeOfUserEmailSerialized
+		  (int sizeOfUserEmailSerialized) {
+		
+		this.sizeOfUserEmailSerialized = 
+				sizeOfUserEmailSerialized;
+	
+	}
+
+	public int getSizeOfUserHomeAddressSerialized() {
+		return this.sizeOfUserHomeAddressSerialized;
+	}
+
+	public void setSizeOfUserHomeAddressSerialized
+		  (int sizeOfUserHomeAddressSerialized) {
+		
+		this.sizeOfUserHomeAddressSerialized = 
+				sizeOfUserHomeAddressSerialized;
 		
 	}
 
-	public int getSizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized() {
-		return this.sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized;
+	public int getSizeOfUserBankAccountNIBSerialized() {
+		return this.sizeOfUserBankAccountNIBSerialized;
 	}
 
-	public void setSizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized
-		  (int sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized) {
+	public void setSizeOfUserBankAccountNIBSerialized
+		  (int sizeOfUserBankAccountNIBSerialized) {
 		
-		this.sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized = 
-				sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized;
+		this.sizeOfUserBankAccountNIBSerialized = 
+				sizeOfUserBankAccountNIBSerialized;
 		
 	}
+
+	
+	
 	
 	public byte[] getSecureBidMessageMetaHeaderSerialized() {
 		return this.secureBidMessageMetaHeaderSerialized;
@@ -295,14 +306,14 @@ public class SecureBidMessageMetaHeader {
 			byte[] sizeOfBidDigitalSignedSerializedInBytes = CommonUtils.fromIntToByteArray(this.sizeOfBidDigitalSignedSerialized);
 			byte[] sizeOfBidSerializedInBytes = CommonUtils.fromIntToByteArray(this.sizeOfBidSerialized);
 			byte[] sizeOfBidSerializedHashedCipheredInBytes = CommonUtils.fromIntToByteArray(this.sizeOfBidSerializedHashedCiphered);
-			byte[] sizeOfBidderUserClientIDInBytes = CommonUtils.fromIntToByteArray(this.sizeOfBidderUserClientID);
+			byte[] sizeOfBidderUserClientIDSerializedInBytes = CommonUtils.fromIntToByteArray(this.sizeOfBidderUserClientIDSerialized);
 
-			byte[] sizeOfUserEmailFromSecureBidMessageDataPersonalSerializedInBytes = 
-					CommonUtils.fromIntToByteArray(this.sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized);
-			byte[] sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerializedInBytes = 
-					CommonUtils.fromIntToByteArray(this.sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized);
-			byte[] sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerializedInBytes = 
-					CommonUtils.fromIntToByteArray(this.sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized);
+			byte[] sizeOfUserEmailSerializedInBytes = 
+					CommonUtils.fromIntToByteArray(this.sizeOfUserEmailSerialized);
+			byte[] sizeOfUserHomeAddressSerializedInBytes = 
+					CommonUtils.fromIntToByteArray(this.sizeOfUserHomeAddressSerialized);
+			byte[] sizeOfUserBankAccountNIBSerializedInBytes = 
+					CommonUtils.fromIntToByteArray(this.sizeOfUserBankAccountNIBSerialized);
 
 
 			// Operations to Fill a Byte Array, with the following parameters:
@@ -462,9 +473,9 @@ public class SecureBidMessageMetaHeader {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(sizeOfBidderUserClientIDInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
-					serializationOffset, sizeOfBidderUserClientIDInBytes.length);
-			serializationOffset += sizeOfBidderUserClientIDInBytes.length;
+			System.arraycopy(sizeOfBidderUserClientIDSerializedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfBidderUserClientIDSerializedInBytes.length);
+			serializationOffset += sizeOfBidderUserClientIDSerializedInBytes.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -477,9 +488,9 @@ public class SecureBidMessageMetaHeader {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(sizeOfUserEmailFromSecureBidMessageDataPersonalSerializedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
-					serializationOffset, sizeOfUserEmailFromSecureBidMessageDataPersonalSerializedInBytes.length);
-			serializationOffset += sizeOfUserEmailFromSecureBidMessageDataPersonalSerializedInBytes.length;
+			System.arraycopy(sizeOfUserEmailSerializedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfUserEmailSerializedInBytes.length);
+			serializationOffset += sizeOfUserEmailSerializedInBytes.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -492,9 +503,9 @@ public class SecureBidMessageMetaHeader {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerializedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
-					serializationOffset, sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerializedInBytes.length);
-			serializationOffset += sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerializedInBytes.length;
+			System.arraycopy(sizeOfUserHomeAddressSerializedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfUserHomeAddressSerializedInBytes.length);
+			serializationOffset += sizeOfUserHomeAddressSerializedInBytes.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -507,9 +518,9 @@ public class SecureBidMessageMetaHeader {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerializedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
-					serializationOffset, sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerializedInBytes.length);
-			serializationOffset += sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerializedInBytes.length;
+			System.arraycopy(sizeOfUserBankAccountNIBSerializedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfUserBankAccountNIBSerializedInBytes.length);
+			serializationOffset += sizeOfUserBankAccountNIBSerializedInBytes.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -541,11 +552,11 @@ public class SecureBidMessageMetaHeader {
 			byte[] sizeOfBidDigitalSignedSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfBidSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfBidSerializedHashedCipheredInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
-			byte[] sizeOfBidderUserClientIDInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			byte[] sizeOfBidderUserClientIDSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 
-			byte[] sizeOfUserEmailFromSecureBidMessageDataPersonalSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
-			byte[] sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
-			byte[] sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			byte[] sizeOfUserEmailSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			byte[] sizeOfUserHomeAddressSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			byte[] sizeOfUserBankAccountNIBSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			
 			
 			byte[] outsideSeparator = new byte[] { ( (byte) 0x00 ), ( (byte) 0x00 ) };
@@ -655,9 +666,9 @@ public class SecureBidMessageMetaHeader {
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
 			serializationOffset += insideSeparator.length;
-			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset, sizeOfBidderUserClientIDInBytes,
-					0, sizeOfBidderUserClientIDInBytes.length);
-			serializationOffset += sizeOfBidderUserClientIDInBytes.length;
+			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset, sizeOfBidderUserClientIDSerializedInBytes,
+					0, sizeOfBidderUserClientIDSerializedInBytes.length);
+			serializationOffset += sizeOfBidderUserClientIDSerializedInBytes.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -665,9 +676,9 @@ public class SecureBidMessageMetaHeader {
 			// the position corresponding to the length of the current Bid's Serialization
 			serializationOffset += insideSeparator.length;
 			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfUserEmailFromSecureBidMessageDataPersonalSerializedInBytes,
-					0, sizeOfUserEmailFromSecureBidMessageDataPersonalSerializedInBytes.length);
-			serializationOffset += sizeOfUserEmailFromSecureBidMessageDataPersonalSerializedInBytes.length;
+					sizeOfUserEmailSerializedInBytes,
+					0, sizeOfUserEmailSerializedInBytes.length);
+			serializationOffset += sizeOfUserEmailSerializedInBytes.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -675,18 +686,18 @@ public class SecureBidMessageMetaHeader {
 			// the position corresponding to the length of the current Bid's Serialization
 			serializationOffset += insideSeparator.length;
 			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerializedInBytes,
-					0, sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerializedInBytes.length);
-			serializationOffset += sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerializedInBytes.length;
+					sizeOfUserHomeAddressSerializedInBytes,
+					0, sizeOfUserHomeAddressSerializedInBytes.length);
+			serializationOffset += sizeOfUserHomeAddressSerializedInBytes.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
 			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset, 
-					sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerializedInBytes,
-					0, sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerializedInBytes.length);
-			serializationOffset += sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerializedInBytes.length;
+					sizeOfUserBankAccountNIBSerializedInBytes,
+					0, sizeOfUserBankAccountNIBSerializedInBytes.length);
+			serializationOffset += sizeOfUserBankAccountNIBSerializedInBytes.length;
 			
 			
 			this.sizeOfSecureBidMessageDataSerialized = CommonUtils.fromByteArrayToInt(sizeOfSecureBidMessageDataSerializedInBytes);
@@ -704,14 +715,14 @@ public class SecureBidMessageMetaHeader {
 			this.sizeOfBidDigitalSignedSerialized = CommonUtils.fromByteArrayToInt(sizeOfBidDigitalSignedSerializedInBytes);
 			this.sizeOfBidSerialized = CommonUtils.fromByteArrayToInt(sizeOfBidSerializedInBytes);
 			this.sizeOfBidSerializedHashedCiphered = CommonUtils.fromByteArrayToInt(sizeOfBidSerializedHashedCipheredInBytes);
-			this.sizeOfBidderUserClientID = CommonUtils.fromByteArrayToInt(sizeOfBidderUserClientIDInBytes);
+			this.sizeOfBidderUserClientIDSerialized = CommonUtils.fromByteArrayToInt(sizeOfBidderUserClientIDSerializedInBytes);
 			
-			this.sizeOfUserEmailFromSecureBidMessageDataPersonalSerialized = 
-					CommonUtils.fromByteArrayToInt(sizeOfUserEmailFromSecureBidMessageDataPersonalSerializedInBytes);
-			this.sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerialized = 
-					CommonUtils.fromByteArrayToInt(sizeOfUserHomeAddressFromSecureBidMessageDataPersonalSerializedInBytes);
-			this.sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerialized = 
-					CommonUtils.fromByteArrayToInt(sizeOfUserBankAccountNIBFromSecureBidMessageDataPersonalSerializedInBytes);
+			this.sizeOfUserEmailSerialized = 
+					CommonUtils.fromByteArrayToInt(sizeOfUserEmailSerializedInBytes);
+			this.sizeOfUserHomeAddressSerialized = 
+					CommonUtils.fromByteArrayToInt(sizeOfUserHomeAddressSerializedInBytes);
+			this.sizeOfUserBankAccountNIBSerialized = 
+					CommonUtils.fromByteArrayToInt(sizeOfUserBankAccountNIBSerializedInBytes);
 			
 			
 			this.setIsSecureBidMessageMetaHeaderSerialized(false);

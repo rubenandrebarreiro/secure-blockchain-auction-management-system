@@ -28,8 +28,10 @@ public class SecureBidMessageDataSignature {
 	private boolean isBidSerialized;
 
 	private int sizeOfBidSerialized;
+
+	private int sizeOfBidSerializedHashedCiphered;
 	
-	private int sizeOfBidderUserClientID;
+	private int sizeOfBidderUserClientIDSerialized;
 
 	private byte[] bidSerializedHashed;
 
@@ -55,6 +57,7 @@ public class SecureBidMessageDataSignature {
 		this.bidSerialized = null;
 		this.isBidSerialized = false;
 		this.sizeOfBidSerialized = 0;
+		this.sizeOfBidderUserClientIDSerialized = 0;
 
 		this.bidSerializedHashed = null;
 		this.isBidSerializedHashed = false;
@@ -71,7 +74,8 @@ public class SecureBidMessageDataSignature {
 
 	public SecureBidMessageDataSignature(byte[] bidDigitalSigned,
 										 int sizeOfBidSerialized,
-										 int sizeOfBidderUserClientID) {
+										 int sizeOfBidSerializedHashedCiphered,
+										 int sizeOfBidderUserClientIDSerialized) {
 
 		this.bidDigitalSigned = bidDigitalSigned;
 		this.isBidDigitalSigned = true;
@@ -88,7 +92,8 @@ public class SecureBidMessageDataSignature {
 		this.isBidSerialized = true;
 		
 		this.sizeOfBidSerialized = sizeOfBidSerialized;
-		this.sizeOfBidderUserClientID = sizeOfBidderUserClientID;
+		this.sizeOfBidSerializedHashedCiphered = sizeOfBidSerializedHashedCiphered;
+		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
 
 		this.bid = null;
 
@@ -174,6 +179,10 @@ public class SecureBidMessageDataSignature {
 		this.isBidSerializedHashedCiphered = isBidSerializedHashedCiphered;
 	}
 
+	public int getSizeOfBidSerializedHashedCiphered() {
+		return this.sizeOfBidSerializedHashedCiphered;
+	}
+	
 	public byte[] getBidDigitalSigned() {
 		return this.bidDigitalSigned;
 	}
@@ -190,7 +199,7 @@ public class SecureBidMessageDataSignature {
 		this.isBidDigitalSigned = isBidDigitalSigned;
 	}
 
-	public void buildSecureBidMessageSignatureToSend()
+	public void buildSecureBidMessageDataSignatureToSend()
 		   throws NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException,
 		          NoSuchPaddingException, InvalidAlgorithmParameterException {
 
@@ -212,7 +221,7 @@ public class SecureBidMessageDataSignature {
 
 	}
 	
-	public void buildSecureBidMessageSignatureReceived() throws NoSuchAlgorithmException {
+	public void buildSecureBidMessageDataSignatureReceived() throws NoSuchAlgorithmException {
 		
 		boolean isPossibleToBuildSecureBidMessageSignatureReceived = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
@@ -261,7 +270,7 @@ public class SecureBidMessageDataSignature {
 			
 			if(isBidSerializedHashedVerifiedAndValid) {
 				
-				this.bid = new Bid(this.bidSerialized, this.sizeOfBidderUserClientID);
+				this.bid = new Bid(this.bidSerialized, this.sizeOfBidderUserClientIDSerialized);
 				
 				this.bid.undoSerialization();
 				
