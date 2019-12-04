@@ -259,9 +259,9 @@ public class SecureBidMessageDataSignature {
 			
 			if(isBidSerializedHashedVerifiedAndValid) {
 				
-				this.bid = new Bid(this.bidSerialized);
+				this.bid = new Bid(this.bidSerialized, this.sizeOfBidderUserClientID);
 				
-				this.bid.undoSerialization(this.sizeOfBidderUserClientID);
+				this.bid.undoSerialization();
 				
 				this.setIsBidSerialized(false);
 				

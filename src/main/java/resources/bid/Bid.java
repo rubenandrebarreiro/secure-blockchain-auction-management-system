@@ -26,6 +26,8 @@ public class Bid implements Serializable {
 	@DatabaseField
 	private boolean isBidMined;
 	
+	private int sizeOfBidderUserClientID;
+	
 	
 	
 	private byte[] bidSerializedBytes;
@@ -41,6 +43,7 @@ public class Bid implements Serializable {
 
 		this.bidID = bidID;
 		this.bidderUserClientID = bidderUserClientID;
+		this.sizeOfBidderUserClientID = this.bidderUserClientID.length();
 		this.bidValue = bidValue;
 		this.bidTimestamp = System.currentTimeMillis();
 
@@ -50,7 +53,7 @@ public class Bid implements Serializable {
 		
 	}
 	
-	public Bid(byte[] bidSerializedBytes) {
+	public Bid(byte[] bidSerializedBytes, int sizeOfBidderUserClientID) {
 		
 		this.bidID = -1L;
 		this.bidderUserClientID = null;
@@ -78,6 +81,10 @@ public class Bid implements Serializable {
 
 	public void setBidderUserClientID(String bidderUserClientID) {
 		this.bidderUserClientID = bidderUserClientID;
+	}
+	
+	public int getSizeOfBidderUserClientID() {
+		return this.sizeOfBidderUserClientID;
 	}
 
 	public double getBidValue() {
@@ -160,10 +167,10 @@ public class Bid implements Serializable {
 		
 	}
 
-	public void undoSerialization(int sizeOfBidderUserClientID) {
+	public void undoSerialization() {
 		
 		byte[] bidIDSerialized = new byte[CommonUtils.LONG_IN_BYTES_LENGTH];
-		byte[] bidderUserClientIDSerialized = new byte[sizeOfBidderUserClientID];
+		byte[] bidderUserClientIDSerialized = new byte[this.sizeOfBidderUserClientID];
 		byte[] bidValueSerialized = new byte[CommonUtils.DOUBLE_IN_BYTES_LENGTH];
 		byte[] bidTimestampSerialized = new byte[CommonUtils.LONG_IN_BYTES_LENGTH];
 		
