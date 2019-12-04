@@ -67,7 +67,7 @@ public class SecureKeyExchangeMessageAgreement {
 		return this.secretHMACKeyForDoSMitigationInBytes;
 	}
 	
-	public byte[] secureKeyExchangeAgreementSerialized() {
+	public byte[] getSecureKeyExchangeAgreementSerialized() {
 		return this.secureKeyExchangeAgreementSerialized;
 	}
 	
@@ -153,8 +153,8 @@ public class SecureKeyExchangeMessageAgreement {
 			byte[] randomNonceSerialized = new byte[CommonUtils.LONG_IN_BYTES_LENGTH];
 			byte[] timestampSerialized = new byte[CommonUtils.LONG_IN_BYTES_LENGTH];
 			
-			this.secretSymmetricKeyForDataPersonalInBytes = new byte[CommonUtils.SECRET_KEY_256_BITS_IN_BYTES];
-			this.secretHMACKeyForDoSMitigationInBytes = new byte[CommonUtils.SECRET_KEY_256_BITS_IN_BYTES];
+			this.secretSymmetricKeyForDataPersonalInBytes = new byte[CommonUtils.LENGTH_256_BITS_IN_BYTES];
+			this.secretHMACKeyForDoSMitigationInBytes = new byte[CommonUtils.LENGTH_256_BITS_IN_BYTES];
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied

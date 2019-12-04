@@ -121,9 +121,9 @@ public class CommonUtils {
 	public static final int LONG_IN_BYTES_LENGTH = 8;
 	
 	/**
-	 * The Length of a Secret Key of 256 bts, in bytes
+	 * The Length of 256 bts, in bytes
 	 */
-	public static final int SECRET_KEY_256_BITS_IN_BYTES = 32;
+	public static final int LENGTH_256_BITS_IN_BYTES = 32;
 	
 	/**
 	 * The time (in milliseconds) to the pooling test of termination of
