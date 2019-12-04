@@ -79,6 +79,11 @@ public class CommonUtils {
 	 * The Total Length of an Inside Separator, contained in the Meta Header
 	 */
 	public static final int META_HEADER_INSIDE_SEPARATORS_LENGTH = 1;
+
+	/**
+	 * The Total Length of the Common Header
+	 */
+	public static final int COMMON_HEADER_LENGTH = 10;
 	
 	/**
 	 * The Total Length of a Byte
@@ -153,6 +158,7 @@ public class CommonUtils {
 	 * before the socket stops accepting a message
 	 */
 	public static final int SEQUENCE_NUMBERS_SKIP_LIMIT = 10;
+
 	
 	
 	// Global Instance Variables:

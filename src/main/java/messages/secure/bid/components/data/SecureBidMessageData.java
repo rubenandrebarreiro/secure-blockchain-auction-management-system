@@ -62,6 +62,7 @@ public class SecureBidMessageData {
 	public SecureBidMessageData(byte[] secureBidMessageDataSerialized,
 								int sizeOfSecureBidMessageDataSignatureSerialized,
 								int sizeOfBidSerialized,
+								int sizeOfBidSerializedHashedCiphered,
 							    int sizeOfBidderUserClientIDSerialized,
 								int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered,
 								int sizeOfSecureBidMessageDataPersonalSerialized,
@@ -75,6 +76,7 @@ public class SecureBidMessageData {
 		this.secureBidMessageDataSignature = null;
 		this.sizeOfSecureBidMessageDataSignatureSerialized = sizeOfSecureBidMessageDataSignatureSerialized;
 		this.sizeOfBidSerialized = sizeOfBidSerialized;
+		this.sizeOfBidSerializedHashedCiphered = sizeOfBidSerializedHashedCiphered;
 		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
 		
 		this.secureBidMessageDataPersonal = null;
