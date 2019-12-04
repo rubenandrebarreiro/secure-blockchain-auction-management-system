@@ -35,7 +35,7 @@ public class ProofOfWorkMessageMetaHeader {
 		
 	}
 	
-	
+	 
 	public int getSizeOfBlockSerialized() {
 		return this.sizeOfBlockSerialized;
 	}
@@ -74,7 +74,7 @@ public class ProofOfWorkMessageMetaHeader {
 		if(!this.isProofOfWorkMessageMetaHeaderSerialized) {
 			
 			int sizeOfChallengeMessageMetaHeaderSerialized = ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) + 
-															   ( CommonUtils.SHORT_IN_BYTES_LENGTH ) +
+															   ( CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
 															   ( 2 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 
 			this.proofOfWorkMessageMetaHeaderSerialized = new byte[ sizeOfChallengeMessageMetaHeaderSerialized ];

@@ -1,4 +1,4 @@
-package main.java.messages.secure.bid.components.content.proposal.signature;
+package main.java.messages.secure.bid.components.data.signature;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -19,7 +19,7 @@ import org.bouncycastle.util.Arrays;
 import main.java.common.utils.CommonUtils;
 import main.java.resources.bid.Bid;
 
-public class SecureBidMessageSignatureProposal {
+public class SecureBidMessageDataSignature {
 
 	private Bid bid;
 
@@ -28,8 +28,10 @@ public class SecureBidMessageSignatureProposal {
 	private boolean isBidSerialized;
 
 	private int sizeOfBidSerialized;
+
+	private int sizeOfBidSerializedHashedCiphered;
 	
-	private int sizeOfBidderUserClientID;
+	private int sizeOfBidderUserClientIDSerialized;
 
 	private byte[] bidSerializedHashed;
 
@@ -48,13 +50,14 @@ public class SecureBidMessageSignatureProposal {
 	private boolean isBidDigitalSigned;
 
 
-	public SecureBidMessageSignatureProposal(Bid bid) {
+	public SecureBidMessageDataSignature(Bid bid) {
 
 		this.bid = bid;
 
 		this.bidSerialized = null;
 		this.isBidSerialized = false;
 		this.sizeOfBidSerialized = 0;
+		this.sizeOfBidderUserClientIDSerialized = 0;
 
 		this.bidSerializedHashed = null;
 		this.isBidSerializedHashed = false;
@@ -69,7 +72,10 @@ public class SecureBidMessageSignatureProposal {
 
 	}
 
-	public SecureBidMessageSignatureProposal(byte[] bidDigitalSigned, int sizeOfBidSerialized, int sizeOfBidderUserClientID) {
+	public SecureBidMessageDataSignature(byte[] bidDigitalSigned,
+										 int sizeOfBidSerialized,
+										 int sizeOfBidSerializedHashedCiphered,
+										 int sizeOfBidderUserClientIDSerialized) {
 
 		this.bidDigitalSigned = bidDigitalSigned;
 		this.isBidDigitalSigned = true;
@@ -86,7 +92,8 @@ public class SecureBidMessageSignatureProposal {
 		this.isBidSerialized = true;
 		
 		this.sizeOfBidSerialized = sizeOfBidSerialized;
-		this.sizeOfBidderUserClientID = sizeOfBidderUserClientID;
+		this.sizeOfBidSerializedHashedCiphered = sizeOfBidSerializedHashedCiphered;
+		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
 
 		this.bid = null;
 
@@ -172,6 +179,10 @@ public class SecureBidMessageSignatureProposal {
 		this.isBidSerializedHashedCiphered = isBidSerializedHashedCiphered;
 	}
 
+	public int getSizeOfBidSerializedHashedCiphered() {
+		return this.sizeOfBidSerializedHashedCiphered;
+	}
+	
 	public byte[] getBidDigitalSigned() {
 		return this.bidDigitalSigned;
 	}
@@ -188,7 +199,7 @@ public class SecureBidMessageSignatureProposal {
 		this.isBidDigitalSigned = isBidDigitalSigned;
 	}
 
-	public void buildSecureBidMessageSignatureToSend()
+	public void buildSecureBidMessageDataSignatureToSend()
 		   throws NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException,
 		          NoSuchPaddingException, InvalidAlgorithmParameterException {
 
@@ -210,7 +221,7 @@ public class SecureBidMessageSignatureProposal {
 
 	}
 	
-	public void buildSecureBidMessageSignatureReceived() throws NoSuchAlgorithmException {
+	public void buildSecureBidMessageDataSignatureReceived() throws NoSuchAlgorithmException {
 		
 		boolean isPossibleToBuildSecureBidMessageSignatureReceived = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
@@ -259,9 +270,9 @@ public class SecureBidMessageSignatureProposal {
 			
 			if(isBidSerializedHashedVerifiedAndValid) {
 				
-				this.bid = new Bid(this.bidSerialized);
+				this.bid = new Bid(this.bidSerialized, this.sizeOfBidderUserClientIDSerialized);
 				
-				this.bid.undoSerialization(this.sizeOfBidderUserClientID);
+				this.bid.undoSerialization();
 				
 				this.setIsBidSerialized(false);
 				

@@ -137,6 +137,56 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						arg2 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
 						break;
+				
+						
+					
+						
+					case LIST_ALL_BIDS_BY_CLIENT_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = listAllBidsMadeByBidderUserClientID(arg1);
+						break;
+					case LIST_OPENED_BIDS_BY_CLIENT_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = listOpenedBidsMadeByBidderUserClientID(arg1);
+						break;
+					case LIST_CLOSED_BIDS_BY_CLIENT_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = listClosedBidsMadeByBidderUserClientID(arg1);
+						break;
+					
+					
+					case CHECK_OUTCOME_ALL_AUCTION:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
+						break;
+					case CHECK_OUTCOME_OPENED_AUCTION:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
+						break;
+					case CHECK_OUTCOME_CLOSED_AUCTION:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
+						break;
+					
+					
+					case CHECK_OUTCOME_ALL_AUCTION_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg2 = message.getParamsMap().get("auction-id");
+						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
+						break;
+					case CHECK_OUTCOME_OPENED_AUCTION_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg2 = message.getParamsMap().get("auction-id");
+						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
+						break;
+					case CHECK_OUTCOME_CLOSED_AUCTION_ID:
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg2 = message.getParamsMap().get("auction-id");
+						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
+						break;
+						
+						
+						
 					default:
 						//TODO Error somewhere?
 						break;

@@ -29,6 +29,12 @@ C) PASSWORDS and their HASH CODES in SHA-256 for the Available Clients/Users of 
 
 D) INSTRUCTIONS FOR GENERATE KEY PAIRS (PUBLIC-KEY, PRIVATE-KEY) for the Clients/Users of the System:
 
+    1. Root CA:
+       ./keytool -genkey -keyalg RSA -alias root-ca -keystore rootca.jks -storepass fctnova1920 -keypass fctnova1920 -validity 360 -keysize 4096 -dname "CN=Root CA, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
+
+    2. Auction Server:
+       ./
+
     1. Eduardo Silva:
       ./keytool -genkeypair -alias ec-eduardo-571 -keyalg EC -keystore auction-server.jks -keysize 571 -storepass fctnova1920 -keypass 43ad624532bf40eef30f3980e07125325d8c580590859e909e7e95cb6ef22dac -validity 365 -dname "CN=Eduardo Silva, OU=DI @ FCT, O=FCT NOVA, L=Almada, ST=Setubal, C=PT"
 
