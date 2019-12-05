@@ -77,12 +77,21 @@ public class AuctionServerEntryPoint extends Thread{
 		connectedClientsMap = new ConcurrentHashMap<>();
 		
 		while(true) {
-			responseSocket = (SSLSocket) serverSocket.accept();
-			responseSocket.startHandshake();
-			connectedClientsMap.put(responseSocket.getRemoteSocketAddress().toString(),"Client IP:port");
-			Thread t = new AuctionServer(serverSocket, responseSocket, connectedClientsMap);
-			t.start();
+			try {
+				responseSocket = (SSLSocket) serverSocket.accept();
+				responseSocket.startHandshake();
+				connectedClientsMap.put(responseSocket.getRemoteSocketAddress().toString(),"Client IP:port");
+				Thread t = new AuctionServer(serverSocket, responseSocket, connectedClientsMap);
+				t.start();
+			} catch (Exception e) {
+				printErrorStringWithClassName(e.getMessage());
+			}
 		}
+	}
+	
+	private void printErrorStringWithClassName(Object message) {
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + message);
 	}
 	
 }
