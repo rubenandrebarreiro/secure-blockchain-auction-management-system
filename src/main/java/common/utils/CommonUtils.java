@@ -144,9 +144,14 @@ public class CommonUtils {
 	public static final long TRY_TO_CLOSE_BLOCK_OF_BIDS_SERVICE_VERIFICATION_RATE_TIME = 10000;
 	
 	/**
+	 * The Minimum Number of Bids to Try to Mine
+	 */
+	public static final int MIN_NUM_BIDS_TO_TRY_TO_MINE = 3;
+	
+	/**
 	 * The Maximum Number of Bids to Try to Mine
 	 */
-	public static final int MAX_NUM_BIDS_TO_TRY_TO_MINE = 5;
+	public static final int MAX_NUM_BIDS_TO_TRY_TO_MINE = 10;
 	
 	/**
 	 * The Timeout for triggering the event of Cleaning/Removing old Random Nonces
