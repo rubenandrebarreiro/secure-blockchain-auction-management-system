@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Random;
 
 import javax.net.ssl.SSLServerSocket;
@@ -53,9 +54,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	private SSLSocket responseSocket;
 	private Random random;
+	private Map<String, String> connectedClientsMap;
 
-	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, String> connectedClientsMap) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
 		this.responseSocket = responseSocket;
+		this.connectedClientsMap = connectedClientsMap;
 		this.gson = new Gson();
 		this.httpClient = HttpClients.createDefault();
 		this.random = new Random();
@@ -67,6 +70,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 		try {
 			while(true) {
+				System.out.println("Connected clients are: " );
+				connectedClientsMap.forEach((x,y) -> System.out.println(x + " " + y));
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
 				//					SSLSession session = responseSocket.getSession();
 				//					Principal clientID = session.getPeerPrincipal();

@@ -7,6 +7,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
@@ -25,9 +27,12 @@ public class AuctionServerEntryPoint extends Thread{
 	private static final String TLS_CONF_SERVER_ONLY = "SERVER-ONLY";
 	private static final String TLS_CONF_MUTUAL = "MUTUAL";
 	
-	SSLServerSocketFactory serverSocketFactory;
-	SSLServerSocket serverSocket;
-	SSLSocket responseSocket;
+	private SSLServerSocketFactory serverSocketFactory;
+	private SSLServerSocket serverSocket;
+	private SSLSocket responseSocket;
+	
+	private Map<String, String> connectedClientsMap;
+	
 	
 	public static void main(String[] args) throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
 		new AuctionServerEntryPoint();
@@ -59,7 +64,7 @@ public class AuctionServerEntryPoint extends Thread{
 //		ks = KeyStore.getInstance("JKS");		
 //		sslContext.init(null, null, null);
 		SSLContext sslContext = SSLContext.getDefault();
-		SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
+		serverSocketFactory = sslContext.getServerSocketFactory();
 		serverSocket = (SSLServerSocket)serverSocketFactory.createServerSocket(8443);
 		serverSocket.setEnabledCipherSuites(tlsConfigurationReader.getAvailableTLSCiphersuites());
 		serverSocket.setEnabledProtocols(tlsConfigurationReader.getAvailableTLSVersions());
@@ -67,12 +72,15 @@ public class AuctionServerEntryPoint extends Thread{
 		// TODO Change this maybe!
 		if(mutualAuth[0].equals(TLS_CONF_MUTUAL))
 			serverSocket.setNeedClientAuth(true);
+		else serverSocket.setNeedClientAuth(false);
+		
+		connectedClientsMap = new ConcurrentHashMap<>();
 		
 		while(true) {
 			responseSocket = (SSLSocket) serverSocket.accept();
 			responseSocket.startHandshake();
-
-			Thread t = new AuctionServer(serverSocket, responseSocket);
+			connectedClientsMap.put(responseSocket.getRemoteSocketAddress().toString(),"Client IP:port");
+			Thread t = new AuctionServer(serverSocket, responseSocket, connectedClientsMap);
 			t.start();
 		}
 	}
