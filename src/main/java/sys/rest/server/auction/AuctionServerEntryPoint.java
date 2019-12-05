@@ -70,7 +70,11 @@ public class AuctionServerEntryPoint extends Thread{
 		serverSocket.setEnabledProtocols(tlsConfigurationReader.getAvailableTLSVersions());
 		String[] mutualAuth = tlsConfigurationReader.getAvailableTLSAuthenticationModes();
 		// TODO Change this maybe!
-		if(mutualAuth[0].equals(TLS_CONF_MUTUAL))
+		if(mutualAuth[0].equals(TLS_CONF_CLIENT_ONLY)) {
+			printErrorStringWithClassName("Not supported");
+			System.exit(1);
+		}
+		else if(mutualAuth[0].equals(TLS_CONF_MUTUAL))
 			serverSocket.setNeedClientAuth(true);
 		else serverSocket.setNeedClientAuth(false);
 		
@@ -90,8 +94,8 @@ public class AuctionServerEntryPoint extends Thread{
 	}
 	
 	private void printErrorStringWithClassName(Object message) {
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + message);
+		System.err.println("[" + this.getClass().getCanonicalName() + "] " + 
+				"Message: " + message);
 	}
 	
 }
