@@ -61,6 +61,11 @@ public class CommonUtils {
 	public static final int NUM_ASCII_TABLE_POSSIBILITIES_IN_CHALLENGE = 256;
 	
 	/**
+	 * The Time Validation for Secret Keys shared between the Server and a User
+	 */
+	public static final int TIME_VALIDATION_SECRET_KEYS = 600000;
+	
+	/**
 	 * The Total Number of Outside Separators, contained in the Meta Header
 	 */
 	public static final int META_HEADER_OUTSIDE_SEPARATORS = 2;
@@ -114,6 +119,11 @@ public class CommonUtils {
 	 * The Total Length of a Long
 	 */
 	public static final int LONG_IN_BYTES_LENGTH = 8;
+	
+	/**
+	 * The Length of 256 bts, in bytes
+	 */
+	public static final int LENGTH_256_BITS_IN_BYTES = 32;
 	
 	/**
 	 * The time (in milliseconds) to the pooling test of termination of
