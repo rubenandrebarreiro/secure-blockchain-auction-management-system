@@ -833,6 +833,8 @@ public class Client implements ClientAPI {
 	}
 
 	private String sslReadResponse(InputStream socketInStream) throws IOException {
+		//Intercept auction bid message
+		//If special message, run special method TODO
 		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
 		String response = br.readLine();
 		return response;
