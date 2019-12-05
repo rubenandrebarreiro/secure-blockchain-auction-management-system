@@ -142,9 +142,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						arg2 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
 						break;
-				
-						
-					
 						
 					case LIST_ALL_BIDS_BY_CLIENT_ID:
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
@@ -188,9 +185,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						arg2 = message.getParamsMap().get("auction-id");
 						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
-						break;
-						
-						
+						break;						
 						
 					default:
 						//TODO Error somewhere?
@@ -292,11 +287,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -316,11 +308,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -355,11 +344,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -379,11 +365,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -403,11 +386,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -427,11 +407,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -452,11 +429,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -477,11 +451,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -502,11 +473,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -526,10 +494,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -549,11 +515,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
-
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -573,10 +536,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -596,10 +557,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -619,10 +578,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -642,10 +599,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -666,10 +621,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -690,10 +643,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -714,10 +665,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -737,10 +686,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -760,10 +707,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -783,10 +728,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -806,10 +749,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -829,10 +770,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -852,10 +791,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -875,10 +812,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -898,10 +833,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -920,11 +853,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getStatusLine());
-		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
-				"Response: " + response.getEntity());
+		
+		printErrorStringWithClassName(response.getStatusLine());
+		printErrorStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -948,5 +879,10 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	
 	private String removeSpaceFromURL(String url) {
 		return url.replace(" ", URL_SPACE);
+	}
+	
+	private void printErrorStringWithClassName(Object message) {
+		System.err.println("[" + this.getClass().getCanonicalName() + "]" + 
+				"Response: " + message);
 	}
 }
