@@ -65,8 +65,6 @@ public class Client implements ClientAPI {
 	private static final String CHECK_OUTCOME_OPENED_AUCTION_ID = "check outcome opened auction auctionID";
 	private static final String CHECK_OUTCOME_CLOSED_AUCTION_ID = "check outcome closed auction auctionID";
 	
-	
-	
 	private static final String HELP = "help";
 	private static final String EXIT = "exit";
 
@@ -88,15 +86,23 @@ public class Client implements ClientAPI {
 	
 	public static void main(String[] args) {
 
-		if(args.length != 2) {
-			System.err.println("Usage: java Client <serverURL> <serverSocketPort> ");
+		if(args.length != 6) {
+			System.err.println("Usage: java Client <serverURL> <serverSocketPort> "
+					+ "<keystore> <keystorePassword> "
+					+ "<truststore> <truststorePassword>");
 			System.exit(1);
 		}
 
 		String url = args[0];
 		int serverPort = Integer.parseInt(args[1]);
-
-		new Client(url, serverPort);				
+		String keystorePath = args[2];
+		String keystorePassword = args[3];
+		String truststorePath = args[4];
+		String truststorePassword = args[5];
+		
+		new Client(url, serverPort,
+				keystorePath, keystorePassword,
+				truststorePath, truststorePassword);				
 	}
 
 	// Taken from https://www.mkyong.com/webservices/jax-ws/java-security-cert-certificateexception-no-name-matching-localhost-found/
@@ -115,13 +121,15 @@ public class Client implements ClientAPI {
 				});
 	}
 
-	public Client(String url, int serverPort) {
+	public Client(String url, int serverPort,
+			String keystorePath, String keystorePassword,
+			String truststorePath, String truststorePassword) {
 
 		AuctionServerTLSConfigurationReader tlsConfigurationReader = null;
-		AuctionServerKeyStoreConfigurationReader storesConfigurationReader = null;
+//		AuctionServerKeyStoreConfigurationReader storesConfigurationReader = null;
 		try {
 			tlsConfigurationReader = new AuctionServerTLSConfigurationReader(USER_TLS_CONFIGURATION_PATH);
-			storesConfigurationReader = new AuctionServerKeyStoreConfigurationReader(USER_STORES_CONFIGURATION_PATH);
+//			storesConfigurationReader = new AuctionServerKeyStoreConfigurationReader(USER_STORES_CONFIGURATION_PATH);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -130,12 +138,12 @@ public class Client implements ClientAPI {
 		//SSL Connection
 
 		try {
-			System.setProperty("javax.net.ssl.keyStore", storesConfigurationReader.getKeyStoreFileLocationPath());
-			System.setProperty("javax.net.ssl.keyStorePassword", storesConfigurationReader.getKeyStorePassword());
-			System.setProperty("javax.net.ssl.trustStore", storesConfigurationReader.getTrustStoreFileLocationPath());
-			System.setProperty("javax.net.ssl.trustStorePassword", storesConfigurationReader.getTrustStorePassword());
+			System.setProperty("javax.net.ssl.keyStore", keystorePath);
+			System.setProperty("javax.net.ssl.keyStorePassword",keystorePassword);
+			System.setProperty("javax.net.ssl.trustStore", truststorePath);
+			System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
-			//			System.setProperty("javax.net.debug", "SSL,handshake");
+			System.setProperty("javax.net.debug", "SSL,handshake");
 
 			SSLContext sslContext = SSLContext.getDefault();
 
