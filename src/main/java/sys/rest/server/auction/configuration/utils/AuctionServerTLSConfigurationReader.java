@@ -38,7 +38,7 @@ public class AuctionServerTLSConfigurationReader {
 	public AuctionServerTLSConfigurationReader(String tlsConfigurationsFilePath) 
 		   throws FileNotFoundException {
 
-		this.readTLSConfigurations();
+		this.readTLSConfigurations(tlsConfigurationsFilePath);
 
 		System.out.println();
 		System.out.println();
@@ -74,7 +74,7 @@ public class AuctionServerTLSConfigurationReader {
 	}
 
 
-	private void readTLSConfigurations() throws FileNotFoundException {
+	private void readTLSConfigurations(String tlsConfigurationsPath) throws FileNotFoundException {
 
 		List<String> availableTLSVersionsList = new ArrayList<String>();
 
@@ -83,7 +83,7 @@ public class AuctionServerTLSConfigurationReader {
 		List<String> availableTLSAuthenticationModesList = new ArrayList<String>();
 
 
-		File auctionServerTLSConfigurationFile = new File("src/main/java/sys/rest/server/auction/configuration/auction-server-tls-configuration.conf");
+		File auctionServerTLSConfigurationFile = new File(tlsConfigurationsPath);
 
 		String auctionServerTLSConfigurationFileAbsolutePath = auctionServerTLSConfigurationFile.getAbsolutePath();
 

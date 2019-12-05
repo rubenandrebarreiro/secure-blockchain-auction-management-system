@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -17,12 +16,9 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.Random;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocket;
-import javax.ws.rs.core.UriBuilder;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSocket;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -33,9 +29,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-
 import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
@@ -51,45 +44,21 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	private static final String AUCTION_SERVER_REPOSITORY_ADDRESS = "http://localhost:8080/products-auctions";
 
 	private static final String URL_SPACE = "%20";
-	
-	private int currentAuctionID;
+
 	private int currentSerialNumber;
 
 	private Gson gson;
 
 	HttpClient httpClient;
 
-	private SSLServerSocket serverSocket;
 	private SSLSocket responseSocket;
+	private Random random;
 
-	public static void main(String[] args) throws NoSuchAlgorithmException, IOException, UnrecoverableKeyException, KeyManagementException, KeyStoreException, CertificateException {
-
-		new AuctionServer();
-
-	}
-
-	public AuctionServer() throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
-
-		//		System.setProperty("javax.net.debug", "SSL,handshake");
-
-		System.setProperty("javax.net.ssl.keyStore", "res/keystores/auctionServerKeystore.jks");
-		System.setProperty("javax.net.ssl.keyStorePassword", "auctionServer1920");
-
-		System.setProperty("javax.net.ssl.trustStore", "res/truststores/auctionServerTruststore.jks");
-		System.setProperty("javax.net.ssl.trustStorePassword", "auctionServer1920");
-
-		currentAuctionID = 0;
-		currentSerialNumber = 0;
-
-		gson = new Gson();
-		httpClient = HttpClients.createDefault();
-
-		SSLContext sslContext = SSLContext.getDefault();
-		SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
-		serverSocket = (SSLServerSocket)serverSocketFactory.createServerSocket(8443);
-//		serverSocket.setWantClientAuth(true);
-
-		start();
+	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+		this.responseSocket = responseSocket;
+		this.gson = new Gson();
+		this.httpClient = HttpClients.createDefault();
+		this.random = new Random();
 	}
 
 	public void run() {
@@ -97,8 +66,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		HttpResponse response = null;
 
 		try {
-			responseSocket = (SSLSocket) serverSocket.accept();
-			responseSocket.startHandshake();
 			while(true) {
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
 				//					SSLSession session = responseSocket.getSession();
@@ -229,12 +196,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
-			try {
-				responseSocket.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			e.getMessage();
 			e.printStackTrace();
 		}
@@ -253,7 +214,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 		// TODO Change some values
 		Auction newAuction = new Auction(
-				String.valueOf(currentAuctionID++), 
+				String.valueOf(random.nextInt()), 
 				currentSerialNumber++,
 				auctionDescription, 
 				userAuctionInfo.getBidType(),

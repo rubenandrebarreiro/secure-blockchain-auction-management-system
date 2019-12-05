@@ -22,6 +22,14 @@ public class AuctionServerKeyStoreConfigurationReader {
 
 	private static final String KEY_MANAGER_FACTORY_END = "</KEY_MANAGER_FACTORY>";
 	
+	private static final String TRUST_STORE_FILE_LOCATION_PATH_START = "<TRUST_STORE_FILE_LOCATION_PATH>";
+                                
+	private static final String TRUST_STORE_FILE_LOCATION_PATH_END = "</TRUST_STORE_FILE_LOCATION_PATH>";
+                                
+	private static final String TRUST_STORE_PASSWORD_START = "<TRUST_STORE_PASSWORD>";
+                                
+	private static final String TRUST_STORE_PASSWORD_END = "</TRUST_STORE_PASSWORD>";
+	
 	
 		
 	private String keyStoreFileLocationPath;
@@ -32,6 +40,9 @@ public class AuctionServerKeyStoreConfigurationReader {
 
 	private String keyManagerFactoryInstance;
 	
+	private String trustStoreFileLocationPath;
+	
+	private String trustStorePassword;
 	
 	
 	public AuctionServerKeyStoreConfigurationReader(String keyStoreConfigurationsFilePath) throws FileNotFoundException {
@@ -188,6 +199,60 @@ public class AuctionServerKeyStoreConfigurationReader {
 
 				}
 			}
+			
+			if(nextLine.equalsIgnoreCase(TRUST_STORE_FILE_LOCATION_PATH_START)) {
+				
+				System.out.println
+				(String.format("Reading the Available Configuration for "
+						+ "the TrustStore File Location/Path..."));
+
+				System.out.println();
+				
+				nextLine = auctionServerKeyStoreConfigurationFileReader.nextLine();
+
+				while(auctionServerKeyStoreConfigurationFileReader.hasNextLine() && 
+						!nextLine.equalsIgnoreCase(TRUST_STORE_FILE_LOCATION_PATH_END)) {
+
+					nextLine = nextLine.trim();
+
+					System.out.println(String.format("- Reading the TrustStore File Location/Path: %s!!!", nextLine));
+
+					this.trustStoreFileLocationPath = nextLine;
+
+					nextLine = auctionServerKeyStoreConfigurationFileReader.nextLine();
+
+				}
+			
+				System.out.println();
+				System.out.println();
+
+			}
+			
+			if(nextLine.equalsIgnoreCase(TRUST_STORE_PASSWORD_START)) {
+
+				System.out.println
+			   (String.format("Reading the Available Configurations for "
+							+ "the Access Password to the TrustStore..."));
+				
+				System.out.println();
+				
+				nextLine = auctionServerKeyStoreConfigurationFileReader.nextLine();
+
+				while(auctionServerKeyStoreConfigurationFileReader.hasNextLine() && 
+						!nextLine.equalsIgnoreCase(TRUST_STORE_PASSWORD_END)) {
+
+					nextLine = nextLine.trim();
+
+					this.trustStorePassword = nextLine;
+
+					nextLine = auctionServerKeyStoreConfigurationFileReader.nextLine();
+
+				}
+			
+				System.out.println();
+				System.out.println();
+
+			}
 
 		}
 
@@ -195,7 +260,7 @@ public class AuctionServerKeyStoreConfigurationReader {
 
 	}
 
-	
+
 	public String getKeyStoreFileLocationPath() {
 		return keyStoreFileLocationPath;
 	}
@@ -233,6 +298,25 @@ public class AuctionServerKeyStoreConfigurationReader {
 
 	public void setKeyManagerFactoryInstance(String keyManagerFactoryInstance) {
 		this.keyManagerFactoryInstance = keyManagerFactoryInstance;
+	}
+	
+	public String getTrustStoreFileLocationPath() {
+		return trustStoreFileLocationPath;
+	}
+
+
+	public void setTrustStoreFileLocationPath(String trustStoreFileLocationPath) {
+		this.trustStoreFileLocationPath = trustStoreFileLocationPath;
+	}
+
+
+	public String getTrustStorePassword() {
+		return trustStorePassword;
+	}
+
+
+	public void setTrustStorePassword(String trustStorePassword) {
+		this.trustStorePassword = trustStorePassword;
 	}
 
 }
