@@ -17,7 +17,6 @@ import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-
 import main.java.common.utils.CommonUtils;
 
 public class SecureBidMessageKeyExchangeAgreement {
@@ -41,9 +40,13 @@ public class SecureBidMessageKeyExchangeAgreement {
 	
 	private byte[] secureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
 	
+	private boolean isSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
+	
 	private int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
 	
-	private boolean isSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
+	private boolean isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedVerified;
+	
+	private boolean isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid;
 	
 	
 	private byte[] secureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned;
@@ -150,10 +153,6 @@ public class SecureBidMessageKeyExchangeAgreement {
 		return this.secureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
 	}
 	
-	public int getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned() {
-		return this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
-	}
-	
 	public boolean getIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned() {
 		return this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
 	}
@@ -166,6 +165,35 @@ public class SecureBidMessageKeyExchangeAgreement {
 	
 	}
 	
+	public int getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned() {
+		return this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
+	}
+	
+	public boolean getIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedVerified() {
+		return this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedVerified;
+	}
+	
+	public void setIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedVerified
+	      (boolean isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedVerified) {
+		
+		this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedVerified = 
+				isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedVerified;
+		
+	}
+	
+	public boolean getIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid() {
+		return this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid;
+	}
+	
+	public void setIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid
+    	  (boolean isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid) {
+	
+		this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid = 
+				isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid;
+		
+	}
+	
+		
 	public byte[] getSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned() {
 		return this.secureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned;
 	}
@@ -182,8 +210,53 @@ public class SecureBidMessageKeyExchangeAgreement {
 	
 	}
 	
-	
-	
+	public void buildSecureBidMessageKeyExchangeAgreementToSend() 
+		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+
+		boolean isPossibleToBuildSecureBidMessageKeyExchangeAgreementToSend = 
+				( !this.getIsSecureBidMessageKeyExchangeAgreementSerialized() && 
+				  !this.getIsSecureBidMessageKeyExchangeAgreementSerializedCiphered() && 
+				  !this.getIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned() &&
+				  !this.getIsSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned() );	
+
+		if(isPossibleToBuildSecureBidMessageKeyExchangeAgreementToSend) {
+
+			this.doSerializationOfSecureBidMessageKeyExchangeAgreement();
+
+			this.encryptSecureBidMessageKeyExchangeAgreementSerialized();
+						
+			this.signSecureBidMessageKeyExchangeAgreementSerializedCiphered();
+
+			this.doSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned();
+			
+		}
+
+	}
+		
+	public void buildSecureBidMessageDataPersonalReceived()
+		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+		
+		boolean isPossibleToBuildSecureBidMessageKeyExchangeAgreementReceived = 
+				( this.getIsSecureBidMessageKeyExchangeAgreementSerialized() && 
+				  this.getIsSecureBidMessageKeyExchangeAgreementSerializedCiphered() && 
+				  this.getIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned() &&
+				  this.getIsSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned() );	
+
+		if(isPossibleToBuildSecureBidMessageKeyExchangeAgreementReceived) {
+			
+			this.undoSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned();
+						
+			if(this.checkIfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedIsValid()) {
+				
+				this.decryptSecureBidMessageKeyExchangeAgreementSerialized();
+				
+				this.undoSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned();
+
+			}
+			
+		}
+	}
+
 	
 	
 	
@@ -549,7 +622,7 @@ public class SecureBidMessageKeyExchangeAgreement {
 	}
 	
 	
-	public void verifySecureBidMessageKeyExchangeAgreementSerializedCipheredSigned()
+	public boolean checkIfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedIsValid()
 		   throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 			
 		boolean isPossibleToSignSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
@@ -571,12 +644,14 @@ public class SecureBidMessageKeyExchangeAgreement {
 			secureBidMessageKeyExchangeAgreementSerializedCipheredSignature
 			.update(this.secureBidMessageKeyExchangeAgreementSerializedCiphered);
 			
-			if(secureBidMessageKeyExchangeAgreementSerializedCipheredSignature
-			   .verify(this.secureBidMessageKeyExchangeAgreementSerializedCipheredSigned)) {
-	           
-				System.out.println("Valid Signature!!!");
+			this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid = 
+					secureBidMessageKeyExchangeAgreementSerializedCipheredSignature
+					.verify(this.secureBidMessageKeyExchangeAgreementSerializedCipheredSigned);
+		
+			
+			if(this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid) {
 				
-				this.setIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned(false);
+				System.out.println("Valid Signature!!!");
 				
 			}
 	        else {
@@ -585,7 +660,15 @@ public class SecureBidMessageKeyExchangeAgreement {
 	        	
 	        }
 			
+			this.setIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedVerified(true);
+			this.setIsSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned(false);
+			
+			
+			return this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedValid;
+					
 		}
+		
+		return false;
 		
 	}
 
