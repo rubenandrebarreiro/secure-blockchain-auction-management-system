@@ -81,11 +81,11 @@ public class SecureBidMessage {
 		
 		if(!this.isSecureBidMessageSerialized) {
 			
-			this.secureBidMessageMetaHeader.doSecureBidMessageMetaHeaderSerialized();
+			this.secureBidMessageMetaHeader.doSecureBidMessageMetaHeaderSerialization();
 			byte[] secureBidMessageMetaHeaderSerialized = 
 					this.secureBidMessageMetaHeader.getSecureBidMessageMetaHeaderSerialized();
 			
-			this.secureBidMessageComponents.doSerializationOfSecureBidMessageComponents();
+			this.secureBidMessageComponents.doSecureBidMessageComponentsSerialization();
 			byte[] secureBidMessageComponentsSerialized = 
 					this.secureBidMessageComponents.getSecureBidMessageComponentsSerialized();
 			

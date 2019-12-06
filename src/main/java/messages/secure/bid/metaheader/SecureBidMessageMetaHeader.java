@@ -275,7 +275,7 @@ public class SecureBidMessageMetaHeader {
 	
 	
 	
-	public void doSecureBidMessageMetaHeaderSerialized() {
+	public void doSecureBidMessageMetaHeaderSerialization() {
 		
 		if(!this.getIsSecureBidMessageMetaHeaderSerialized()) {
 			
@@ -536,7 +536,7 @@ public class SecureBidMessageMetaHeader {
 	}
 	
 	
-	public void undoSecureBidMessageMetaHeaderSerialized() {
+	public void undoSecureBidMessageMetaHeaderSerialization() {
 		
 		if(this.getIsSecureBidMessageMetaHeaderSerialized()) {
 		

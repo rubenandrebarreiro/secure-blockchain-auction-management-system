@@ -81,7 +81,7 @@ public class SecureCommonHeader {
 	}
 	
 	
-	public void doSerializationOfSecureCommonHeader() {
+	public void doSecureCommonHeaderSerialization() {
 		
 		if(!this.isSecureCommonHeaderSerialized) {
 			
@@ -98,7 +98,7 @@ public class SecureCommonHeader {
 		
 	}
 	
-	public void undoSerializationOfSecureCommonHeader() {
+	public void undoSecureCommonHeaderSerialization() {
 		
 		if(this.isSecureCommonHeaderSerialized) {
 			
