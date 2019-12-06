@@ -12,4 +12,4 @@ mvn clean compile
 gnome-terminal -e 'sh -c "./runAuctionServerRepository.sh'" $repositoryPort "'"'
 gnome-terminal -e 'sh -c "./runAuctionServer.sh;"'
 sleep 1
-gnome-terminal -e 'sh -c "./runClient.sh'" $clientURL $clientPort $clientKeystorePath $clientTruststorePath $clientKeystorePassword $clientTruststorePassword"'"'
+gnome-terminal -e 'sh -c "./runClient.sh'" $clientURL $clientPort $clientKeystorePath $clientKeystorePassword $clientTruststorePath $clientTruststorePassword"'"'

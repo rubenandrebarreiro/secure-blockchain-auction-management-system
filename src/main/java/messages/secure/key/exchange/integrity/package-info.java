@@ -1,1 +1,0 @@
-package main.java.messages.secure.key.exchange.integrity;

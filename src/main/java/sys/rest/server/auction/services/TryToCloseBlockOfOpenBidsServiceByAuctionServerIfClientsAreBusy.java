@@ -3,6 +3,7 @@ package main.java.sys.rest.server.auction.services;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -18,15 +19,15 @@ public class TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy imp
 
 	private byte numBytesToSolveChallengeType;
 	
-	private List<User> usersList;
+	private Map<String, User> usersList;
 	
-	private List<Bid> openBidsList;
+	private Map<Long, Bid> openBidsList;
 	
 	
 	public TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy(byte strategyForTryToCloseBlockOfBids,
 																           byte numBytesToSolveChallengeType,
-															 	           List<User> usersList, 
-															 	           List<Bid> openBidsList) {
+															 	           Map<String, User> usersList, 
+															 	           Map<Long, Bid> openBidsList) {
 		
 		this.strategyForTryToCloseBlockOfBids = strategyForTryToCloseBlockOfBids;
 		this.numBytesToSolveChallengeType = numBytesToSolveChallengeType;
@@ -50,7 +51,7 @@ public class TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy imp
 			
 			boolean tryToCloseBids = true;
 			
-			for(User user : usersList) {
+			for(User user : usersList.values()) {
 				
 				if(!user.getIsSolvingChallenge()) {
 					
@@ -65,7 +66,7 @@ public class TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy imp
 			
 			if(tryToCloseBids) {
 				
-				List<Bid> openBidsToMineList = this.openBidsList.stream()
+				List<Bid> openBidsToMineList = this.openBidsList.values().stream()
 											   .filter(bid -> !bid.getIsBidMined())
 											   .collect(Collectors.toList());
 				
@@ -80,12 +81,15 @@ public class TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy imp
 				
 				int numOpenBidsToMine = 0;
 				
-				while(numOpenBidsToMine == 0) {
+				while( (numOpenBidsToMine == 0) || 
+					   (numOpenBidsToMine < CommonUtils.MIN_NUM_BIDS_TO_TRY_TO_MINE) ) {
+					
 					numOpenBidsToMine = random.nextInt(CommonUtils.MAX_NUM_BIDS_TO_TRY_TO_MINE);
+				
 				}
 				
 				
-				if(numOpenBidsToMine <= numPossibleOpenBidsToMine) {
+				if(numOpenBidsToMine < numPossibleOpenBidsToMine) {
 					
 					while(numChosenOpenBidsToMine < numOpenBidsToMine) {
 						

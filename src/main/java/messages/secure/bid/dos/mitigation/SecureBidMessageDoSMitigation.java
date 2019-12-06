@@ -127,7 +127,7 @@ public class SecureBidMessageDoSMitigation {
 		
 		if(!this.isSecureBidMessageComponentsHashedForDoSMitigation) {
 			
-			this.secureBidMessageComponents.doSerializationOfSecureBidMessageComponents();
+			this.secureBidMessageComponents.doSecureBidMessageComponentsSerialization();
 			this.secureBidMessageComponentsSerialized = 
 					this.secureBidMessageComponents.getSecureBidMessageComponentsSerialized();
 			

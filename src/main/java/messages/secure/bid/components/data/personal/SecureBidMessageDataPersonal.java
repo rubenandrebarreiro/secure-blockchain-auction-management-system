@@ -2,13 +2,14 @@ package main.java.messages.secure.bid.components.data.personal;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
@@ -42,25 +43,29 @@ public class SecureBidMessageDataPersonal {
 	private int sizeOfSecureBidMessageDataPersonalSerialized;
 	
 	
-	private byte[] secureBidMessageDataPersonalSerializedHashed;
+	private byte[] secureBidMessageDataPersonalSerializedCiphered;
 
-	private boolean isSecureBidMessageDataPersonalSerializedHashed;
+	private boolean isSecureBidMessageDataPersonalSerializedCiphered;
 	
-	private int sizeOfSecureBidMessageDataPersonalSerializedHashed;
-	
-	private boolean isSecureBidMessageDataPersonalSerializedHashedVerified;
-	
-	private boolean isSecureBidMessageDataPersonalSerializedHashedValid;
+	private int sizeOfSecureBidMessageDataPersonalSerializedCiphered;
 	
 	
-	private byte[] secureBidMessageDataPersonalSerializedAndHashed;
+	
+	
+	private byte[] secureBidMessageDataPersonalSerializedCipheredHashed;
 
-	private boolean isSecureBidMessageDataPersonalSerializedAndHashed;
+	private boolean isSecureBidMessageDataPersonalSerializedCipheredHashed;
+	
+	private int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
+	
+	private boolean isSecureBidMessageDataPersonalSerializedCipheredHashedVerified;
+	
+	private boolean isSecureBidMessageDataPersonalSerializedCipheredHashedValid;
 	
 
-	private byte[] secureBidMessageDataPersonalSerializedAndHashedCiphered;
+	private byte[] secureBidMessageDataPersonalSerializedCipheredAndHashed;
 
-	private boolean isSecureBidMessageDataPersonalSerializedAndHashedCiphered;
+	private boolean isSecureBidMessageDataPersonalSerializedCipheredAndHashed;
 	
 	
 
@@ -81,44 +86,49 @@ public class SecureBidMessageDataPersonal {
 		this.isSecureBidMessageDataPersonalSerialized = false;
 		this.sizeOfSecureBidMessageDataPersonalSerialized = 0;
 		
-		this.secureBidMessageDataPersonalSerializedHashed = null;
-		this.isSecureBidMessageDataPersonalSerializedHashed = false;
-		this.sizeOfSecureBidMessageDataPersonalSerializedHashed = 0;
-		this.isSecureBidMessageDataPersonalSerializedHashedVerified = false;
-		this.isSecureBidMessageDataPersonalSerializedHashedValid = false;
+		this.secureBidMessageDataPersonalSerializedCiphered = null;
+		this.isSecureBidMessageDataPersonalSerializedCiphered = false;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCiphered = 0;
 		
+		this.secureBidMessageDataPersonalSerializedCipheredHashed = null;
+		this.isSecureBidMessageDataPersonalSerializedCipheredHashed = false;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = 0;
+		this.isSecureBidMessageDataPersonalSerializedCipheredHashedVerified = false;
+		this.isSecureBidMessageDataPersonalSerializedCipheredHashedValid = false;
 		
-		this.secureBidMessageDataPersonalSerializedAndHashed = null;
-		this.isSecureBidMessageDataPersonalSerializedAndHashed = false;
-
-		this.secureBidMessageDataPersonalSerializedAndHashedCiphered = null;
-		this.isSecureBidMessageDataPersonalSerializedAndHashedCiphered = false;
+		this.secureBidMessageDataPersonalSerializedCipheredAndHashed = null;
+		this.isSecureBidMessageDataPersonalSerializedCipheredAndHashed = false;
 		
 	}
 
 
-	public SecureBidMessageDataPersonal(byte[] secureBidMessageDataPersonalSerializedAndHashedCiphered,
+	public SecureBidMessageDataPersonal(byte[] secureBidMessageDataPersonalSerializedCipheredAndHashed,
+										int sizeOfSecureBidMessageDataPersonalSerializedCiphered,
+										int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
 										int sizeOfSecureBidMessageDataPersonalSerialized,
-										int sizeOfSecureBidMessageDataPersonalSerializedHashed,
-										int sizeOfUserEmailSerialized, int sizeOfUserHomeAddressSerialized,
+										int sizeOfUserEmailSerialized,
+										int sizeOfUserHomeAddressSerialized,
 										int sizeOfUserBankAccountNIBSerialized) {
 		
-		this.secureBidMessageDataPersonalSerializedAndHashedCiphered = secureBidMessageDataPersonalSerializedAndHashedCiphered;
-		this.isSecureBidMessageDataPersonalSerializedAndHashedCiphered = true;
+		this.secureBidMessageDataPersonalSerializedCipheredAndHashed = secureBidMessageDataPersonalSerializedCipheredAndHashed;
+		this.isSecureBidMessageDataPersonalSerializedCipheredAndHashed = true;
 		
-		this.secureBidMessageDataPersonalSerializedAndHashed = null;
-		this.isSecureBidMessageDataPersonalSerializedAndHashed = true;
+		this.secureBidMessageDataPersonalSerializedCiphered = null;
+		this.isSecureBidMessageDataPersonalSerializedCiphered = true;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCiphered = 
+				sizeOfSecureBidMessageDataPersonalSerializedCiphered;
+		
+		this.secureBidMessageDataPersonalSerializedCipheredHashed = null;
+		this.isSecureBidMessageDataPersonalSerializedCipheredHashed = true;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = 
+				sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
+		this.isSecureBidMessageDataPersonalSerializedCipheredHashedVerified = false;
+		this.isSecureBidMessageDataPersonalSerializedCipheredHashedValid = false;
 		
 		this.secureBidMessageDataPersonalSerialized = null;
 		this.isSecureBidMessageDataPersonalSerialized = true;
-		this.sizeOfSecureBidMessageDataPersonalSerialized = sizeOfSecureBidMessageDataPersonalSerialized;
-		
-		this.secureBidMessageDataPersonalSerializedHashed = null;
-		this.isSecureBidMessageDataPersonalSerializedHashed = true;
-		this.sizeOfSecureBidMessageDataPersonalSerializedHashed = sizeOfSecureBidMessageDataPersonalSerializedHashed;
-		this.isSecureBidMessageDataPersonalSerializedHashedVerified = false;
-		this.isSecureBidMessageDataPersonalSerializedHashedValid = false;
-		
+		this.sizeOfSecureBidMessageDataPersonalSerialized = 
+				sizeOfSecureBidMessageDataPersonalSerialized;
 		
 		this.userEmail = null;
 		this.sizeOfUserEmailSerialized = sizeOfUserEmailSerialized;
@@ -162,77 +172,87 @@ public class SecureBidMessageDataPersonal {
 	}
 
 	
-	public byte[] getSecureBidMessageDataPersonalSerializedHashed() {
-		return this.secureBidMessageDataPersonalSerializedHashed;
+	public byte[] getSecureBidMessageDataPersonalSerializedCiphered() {
+		return this.secureBidMessageDataPersonalSerializedCiphered;
 	}
 
-	public boolean getIsSecureBidMessageDataPersonalSerializedHashed() {
-		return this.isSecureBidMessageDataPersonalSerializedHashed;
+	public boolean getIsSecureBidMessageDataPersonalSerializedCiphered() {
+		return this.isSecureBidMessageDataPersonalSerializedCiphered;
 	}
 	
-	public void setIsSecureBidMessageDataPersonalSerializedHashed
-		  (boolean isSecureBidMessageDataPersonalSerializedHashed) {
+	public void setIsSecureBidMessageDataPersonalSerializedCiphered
+		  (boolean isSecureBidMessageDataPersonalSerializedCiphered) {
 		
-		this.isSecureBidMessageDataPersonalSerializedHashed = 
-						isSecureBidMessageDataPersonalSerializedHashed;
+		this.isSecureBidMessageDataPersonalSerializedCiphered = 
+						isSecureBidMessageDataPersonalSerializedCiphered;
+	
+	}
+
+	public int getSizeOfSecureBidMessageDataPersonalSerializedCiphered() {
+		return this.sizeOfSecureBidMessageDataPersonalSerializedCiphered;
 	}
 	
-	public boolean getIsSecureBidMessageDataPersonalSerializedHashedVerified() {
-		return this.isSecureBidMessageDataPersonalSerializedHashedVerified;
+	
+	public byte[] getSecureBidMessageDataPersonalSerializedCipheredHashed() {
+		return this.secureBidMessageDataPersonalSerializedCipheredHashed;
+	}
+
+	public boolean getIsSecureBidMessageDataPersonalSerializedCipheredHashed() {
+		return this.isSecureBidMessageDataPersonalSerializedCipheredHashed;
 	}
 	
-	public void setIsSecureBidMessageDataPersonalSerializedHashedVerified
-	      (boolean isSecureBidMessageDataPersonalSerializedHashedVerified) {
+	public void setIsSecureBidMessageDataPersonalSerializedCipheredHashed
+		  (boolean isSecureBidMessageDataPersonalSerializedCipheredHashed) {
 		
-		this.isSecureBidMessageDataPersonalSerializedHashedVerified = 
-					isSecureBidMessageDataPersonalSerializedHashedVerified;
+		this.isSecureBidMessageDataPersonalSerializedCipheredHashed = 
+					isSecureBidMessageDataPersonalSerializedCipheredHashed;
+	
+	}
+	
+	public int getSizeOfSecureBidMessageDataPersonalSerializedCipheredHashed() {
+		return this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
+	}
+	
+	public boolean getIsSecureBidMessageDataPersonalSerializedCipheredHashedVerified() {
+		return this.isSecureBidMessageDataPersonalSerializedCipheredHashedVerified;
+	}
+	
+	public void setIsSecureBidMessageDataPersonalSerializedCipheredHashedVerified
+		  (boolean isSecureBidMessageDataPersonalSerializedCipheredHashedVerified) {
+	
+		this.isSecureBidMessageDataPersonalSerializedCipheredHashedVerified =
+				isSecureBidMessageDataPersonalSerializedCipheredHashedVerified;
+
+	}
+	
+	public boolean getIsSecureBidMessageDataPersonalSerializedCipheredHashedValid() {
+		return this.isSecureBidMessageDataPersonalSerializedCipheredHashedValid;
+	}
+	
+	public void setIsSecureBidMessageDataPersonalSerializedCipheredHashedValid
+		  (boolean isSecureBidMessageDataPersonalSerializedCipheredHashedValid) {
+	
+		this.isSecureBidMessageDataPersonalSerializedCipheredHashedValid =
+				isSecureBidMessageDataPersonalSerializedCipheredHashedValid;
+
+	}
+	
+	public byte[] getSecureBidMessageDataPersonalSerializedCipheredAndHashed() {
+		return this.secureBidMessageDataPersonalSerializedCipheredAndHashed;
+	}
+
+	public boolean getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() {
+		return this.isSecureBidMessageDataPersonalSerializedCipheredAndHashed;
+	}
+	
+	public void setIsSecureBidMessageDataPersonalSerializedCipheredAndHashed
+	      (boolean isSecureBidMessageDataPersonalSerializedCipheredAndHashed) {
+		
+		this.isSecureBidMessageDataPersonalSerializedCipheredAndHashed = 
+				isSecureBidMessageDataPersonalSerializedCipheredAndHashed;
 		
 	}
 	
-	public boolean getIsSecureBidMessageDataPersonalSerializedHashedValid() {
-		return this.isSecureBidMessageDataPersonalSerializedHashedValid;
-	}
-	
-	public void setIsSecureBidMessageDataPersonalSerializedHashedValid
-    	  (boolean isSecureBidMessageDataPersonalSerializedHashedValid) {
-	
-		this.isSecureBidMessageDataPersonalSerializedHashedValid = 
-				isSecureBidMessageDataPersonalSerializedHashedValid;
-		
-	}
-	
-	public byte[] getSecureBidMessageDataPersonalSerializedAndHashed() {
-		return this.secureBidMessageDataPersonalSerializedAndHashed;
-	}
-
-	public boolean getIsSecureBidMessageDataPersonalSerializedAndHashed() {
-		return this.isSecureBidMessageDataPersonalSerializedAndHashed;
-	}
-	
-	public void setIsSecureBidMessageDataPersonalSerializedAndHashed
-		  (boolean isSecureBidMessageDataPersonalSerializedAndHashed) {
-
-		this.isSecureBidMessageDataPersonalSerializedAndHashed = 
-				isSecureBidMessageDataPersonalSerializedAndHashed;
-
-	}
-	
-	
-	public byte[] getSecureBidMessageDataPersonalSerializedAndHashedCiphered() {
-		return this.secureBidMessageDataPersonalSerializedAndHashedCiphered;
-	}
-
-	public boolean getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() {
-		return this.isSecureBidMessageDataPersonalSerializedAndHashedCiphered;
-	}
-	
-	public void setIsSecureBidMessageDataPersonalSerializedAndHashedCiphered
-		  (boolean isSecureBidMessageDataPersonalSerializedAndHashedCiphered) {
-
-		this.isSecureBidMessageDataPersonalSerializedAndHashedCiphered = 
-				isSecureBidMessageDataPersonalSerializedAndHashedCiphered;
-		
-	}
 	
 	
 	public void buildSecureBidMessageDataPersonalToSend()
@@ -241,19 +261,19 @@ public class SecureBidMessageDataPersonal {
 
 		boolean isPossibleToBuildSecureBidMessageDataPersonalToSend = 
 				( !this.getIsSecureBidMessageDataPersonalSerialized() && 
-				  !this.getIsSecureBidMessageDataPersonalSerializedHashed() && 
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );	
+				  !this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );	
 
 		if(isPossibleToBuildSecureBidMessageDataPersonalToSend) {
 
 			this.doSerializationOfSecureBidMessageDataPersonal();
 
-			this.doHashOfSecureBidMessageDataPersonalSerialized();
-						
-			this.doSecureBidMessageDataPersonalSerializedAndHashed();
-
-			this.encryptSecureBidMessageDataPersonalSerializedAndHashed();
+			this.encryptSecureBidMessageDataPersonalSerialized();
+			
+			this.doHashOfSecureBidMessageDataPersonalSerializedCiphered();
+			
+			this.doSecureBidMessageDataPersonalSerializedCipheredAndHashed();
 			
 		}
 
@@ -262,18 +282,19 @@ public class SecureBidMessageDataPersonal {
 	public void buildSecureBidMessageDataPersonalReceived() throws NoSuchAlgorithmException {
 		
 		boolean isPossibleToBuildSecureBidMessageDataPersonalReceived = 
-				( !this.getIsSecureBidMessageDataPersonalSerialized() && 
-				  !this.getIsSecureBidMessageDataPersonalSerializedHashed() && 
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );
+				( this.getIsSecureBidMessageDataPersonalSerialized() && 
+				  this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				  this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				  this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );	
 		
 		if(isPossibleToBuildSecureBidMessageDataPersonalReceived) {
 			
-			this.decryptSecureBidMessageDataPersonalSerialized();
+			this.undoSecureBidMessageDataPersonalSerializedCipheredAndHashed();
 			
-			this.undoSecureBidMessageDataPersonalSerializedAndHashed();
-			
-			if(this.checkIfHashOfSerializedSecureBidMessageDataPersonalIsValid()) {
+			if(this.checkIfHashOfSecureBidMessageDataPersonalSerializedCipheredIsValid()) {
+				
+				this.decryptSecureBidMessageDataPersonalSerialized();
+				
 				this.undoSecureBidMessageDataPersonalSerialization();
 			}
 			
@@ -284,10 +305,10 @@ public class SecureBidMessageDataPersonal {
 	public void doSerializationOfSecureBidMessageDataPersonal() {
 
 		boolean isPossibleToDoSecureBidMessageDataPersonalSerialization = 
-				( !this.getIsSecureBidMessageDataPersonalSerialized() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );
+				( !this.getIsSecureBidMessageDataPersonalSerialized() && 
+				  !this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );
 
 		if(isPossibleToDoSecureBidMessageDataPersonalSerialization) {
 
@@ -351,197 +372,18 @@ public class SecureBidMessageDataPersonal {
 	public void undoSecureBidMessageDataPersonalSerialization() {
 
 		boolean isPossibleToUndoSecureBidMessageDataPersonalSerialization = 
-				(  this.getIsSecureBidMessageDataPersonalSerialized() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );
+				(  this.getIsSecureBidMessageDataPersonalSerialized() && 
+				  !this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );
 
 		if(isPossibleToUndoSecureBidMessageDataPersonalSerialization) {
 			
-			boolean isSecureBidMessageDataPersonalSerializedHashedVerifiedAndValid = 
-					( this.getIsSecureBidMessageDataPersonalSerializedHashedVerified() && 
-					  this.getIsSecureBidMessageDataPersonalSerializedHashedValid() );
-				
-				if(isSecureBidMessageDataPersonalSerializedHashedVerifiedAndValid) {
-					
-					byte[] userEmailSerialized = new byte[this.sizeOfUserEmailSerialized];
-					
-					byte[] userHomeAddressSerialized = new byte[this.sizeOfUserHomeAddressSerialized];
-					
-					byte[] userBankAccountNIBSerialized = new byte[this.sizeOfUserBankAccountNIBSerialized];
-					
-					
-					// Operations to Fill a Byte Array, with the following parameters:
-					// 1) src - The source of the array to be copied
-					// 2) srcPos - The position from the array to be copied, representing the first element to be copied
-					// 3) dest - The destination of the array to be copied
-					// 4) destPos - The position of the array where will be placed the new copy,
-					//              representing the first element where new data will be placed
-					// 5) length - The length of the data to be copied from the source array to the destination array
-
-					// The offset related to fulfilment of the serialization process
-					int serializationOffset = 0;
-
-					// Fills the byte array of the Block's Serialization with
-					// the correspondent bytes from the current Bid serialized,
-					// From the position corresponding to the length of the previous Bid's Serialization to
-					// the position corresponding to the length of the current Bid's Serialization
-					System.arraycopy(this.secureBidMessageDataPersonalSerialized, serializationOffset, userEmailSerialized, 0, userEmailSerialized.length);
-					serializationOffset += userEmailSerialized.length;
-
-					// Fills the byte array of the Block's Serialization with
-					// the correspondent bytes from the current Bid serialized,
-					// From the position corresponding to the length of the previous Bid's Serialization to
-					// the position corresponding to the length of the current Bid's Serialization
-					System.arraycopy(this.secureBidMessageDataPersonalSerialized, serializationOffset, userHomeAddressSerialized, 0, userHomeAddressSerialized.length);
-					serializationOffset += userHomeAddressSerialized.length;
-
-					// Fills the byte array of the Block's Serialization with
-					// the correspondent bytes from the current Bid serialized,
-					// From the position corresponding to the length of the previous Bid's Serialization to
-					// the position corresponding to the length of the current Bid's Serialization
-					System.arraycopy(this.secureBidMessageDataPersonalSerialized, serializationOffset, userBankAccountNIBSerialized, 0, userBankAccountNIBSerialized.length);
-					
-					
-					this.userEmail = CommonUtils.fromByteArrayToString(userEmailSerialized);
-					
-					this.userHomeAddress = CommonUtils.fromByteArrayToString(userHomeAddressSerialized);
-					
-					this.userBankAccountNIB = CommonUtils.fromByteArrayToString(userBankAccountNIBSerialized);
-					
-					
-					this.setIsSecureBidMessageDataPersonalSerialized(false);
-					
-				}
+			byte[] userEmailSerialized = new byte[this.sizeOfUserEmailSerialized];
 			
-		}
-
-	}
-	
-	
-	public void doHashOfSecureBidMessageDataPersonalSerialized() throws NoSuchAlgorithmException {
-
-		boolean isPossibleToHashOfSecureBidMessageDataPersonalSerialized = 
-						(  this.getIsSecureBidMessageDataPersonalSerialized() &&
-						  !this.getIsSecureBidMessageDataPersonalSerializedHashed() &&
-						  !this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-						  !this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );
-
-		if(isPossibleToHashOfSecureBidMessageDataPersonalSerialized) {
-
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			this.secureBidMessageDataPersonalSerializedHashed = messageDigest.digest(this.secureBidMessageDataPersonalSerialized);
-
-
-			this.setIsSecureBidMessageDataPersonalSerializedHashed(true);
-
-		}
-
-	}
-
-	public boolean checkIfHashOfSerializedSecureBidMessageDataPersonalIsValid() throws NoSuchAlgorithmException {
-
-		boolean isPossibleToCheckHashOfSecureBidMessageDataPersonalSerialized = 
-				(  this.getIsSecureBidMessageDataPersonalSerialized() &&
-				   this.getIsSecureBidMessageDataPersonalSerializedHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );
-
-		if(isPossibleToCheckHashOfSecureBidMessageDataPersonalSerialized) {
+			byte[] userHomeAddressSerialized = new byte[this.sizeOfUserHomeAddressSerialized];
 			
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			byte[] bidSerializedHashedToCompare = messageDigest.digest(this.secureBidMessageDataPersonalSerialized);
-			
-			this.isSecureBidMessageDataPersonalSerializedHashedValid = 
-									  Arrays.areEqual(this.secureBidMessageDataPersonalSerializedHashed, 
-													  bidSerializedHashedToCompare) ? 
-															  true : false;
-			
-			
-			this.setIsSecureBidMessageDataPersonalSerializedHashedVerified(true);
-			this.setIsSecureBidMessageDataPersonalSerializedHashed(false);
-			
-			
-			return this.isSecureBidMessageDataPersonalSerializedHashedValid;
-			
-		}
-		
-		return false;
-	}
-	
-	public void doSecureBidMessageDataPersonalSerializedAndHashed() {
-	
-		boolean isPossibleToDoSecureBidMessageDataPersonalSerializedAndHashed = 
-				(  this.getIsSecureBidMessageDataPersonalSerialized() &&
-				   this.getIsSecureBidMessageDataPersonalSerializedHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );
-
-		if(isPossibleToDoSecureBidMessageDataPersonalSerializedAndHashed) {
-			
-			byte[] secureBidMessageDataPersonalSerialized = this.getSecureBidMessageDataPersonalSerialized();
-
-			this.sizeOfSecureBidMessageDataPersonalSerialized = secureBidMessageDataPersonalSerialized.length;
-			
-			byte[] secureBidMessageDataPersonalSerializedHashed = this.getSecureBidMessageDataPersonalSerializedHashed();
-			
-			this.sizeOfSecureBidMessageDataPersonalSerializedHashed = secureBidMessageDataPersonalSerializedHashed.length;
-			
-			
-			
-			int sizeOfSecureBidMessageDataPersonalSerializedAndHashed = 
-								( this.sizeOfSecureBidMessageDataPersonalSerialized + 
-								  this.sizeOfSecureBidMessageDataPersonalSerializedHashed );
-
-			
-			this.secureBidMessageDataPersonalSerializedAndHashed = 
-					new byte[ sizeOfSecureBidMessageDataPersonalSerializedAndHashed ];
-
-
-			// Operations to Fill a Byte Array, with the following parameters:
-			// 1) src - The source of the array to be copied
-			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
-			// 3) dest - The destination of the array to be copied
-			// 4) destPos - The position of the array where will be placed the new copy,
-			//              representing the first element where new data will be placed
-			// 5) length - The length of the data to be copied from the source array to the destination array
-
-			// The offset related to fulfilment of the serialization process
-			int serializationOffset = 0;
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(secureBidMessageDataPersonalSerialized, 0, this.secureBidMessageDataPersonalSerializedAndHashed, serializationOffset, secureBidMessageDataPersonalSerialized.length);
-			serializationOffset += secureBidMessageDataPersonalSerialized.length;
-
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(secureBidMessageDataPersonalSerializedHashed, 0, this.secureBidMessageDataPersonalSerializedAndHashed, serializationOffset, secureBidMessageDataPersonalSerializedHashed.length);
-			
-			
-			this.setIsSecureBidMessageDataPersonalSerializedAndHashed(true);
-			
-		}
-		
-	}
-	
-	public void undoSecureBidMessageDataPersonalSerializedAndHashed() {
-		
-		boolean isPossibleToUndoSecureBidMessageDataPersonalSerializedAndHashed = 
-				(  this.getIsSecureBidMessageDataPersonalSerialized() &&
-				   this.getIsSecureBidMessageDataPersonalSerializedHashed() &&
-				   this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );
-
-		if(isPossibleToUndoSecureBidMessageDataPersonalSerializedAndHashed) {
-			
-			this.secureBidMessageDataPersonalSerialized = new byte[this.sizeOfSecureBidMessageDataPersonalSerialized];
-
-			this.secureBidMessageDataPersonalSerializedHashed = new byte[this.sizeOfSecureBidMessageDataPersonalSerializedHashed];
+			byte[] userBankAccountNIBSerialized = new byte[this.sizeOfUserBankAccountNIBSerialized];
 			
 			
 			// Operations to Fill a Byte Array, with the following parameters:
@@ -554,39 +396,52 @@ public class SecureBidMessageDataPersonal {
 
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageDataPersonalSerializedAndHashed, serializationOffset, this.secureBidMessageDataPersonalSerialized, 0, this.secureBidMessageDataPersonalSerialized.length);
-			serializationOffset += secureBidMessageDataPersonalSerialized.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageDataPersonalSerializedAndHashed, serializationOffset, this.secureBidMessageDataPersonalSerializedHashed, 0, this.secureBidMessageDataPersonalSerializedHashed.length);
+			System.arraycopy(this.secureBidMessageDataPersonalSerialized, serializationOffset, userEmailSerialized, 0, userEmailSerialized.length);
+			serializationOffset += userEmailSerialized.length;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.secureBidMessageDataPersonalSerialized, serializationOffset, userHomeAddressSerialized, 0, userHomeAddressSerialized.length);
+			serializationOffset += userHomeAddressSerialized.length;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.secureBidMessageDataPersonalSerialized, serializationOffset, userBankAccountNIBSerialized, 0, userBankAccountNIBSerialized.length);
 			
 			
+			this.userEmail = CommonUtils.fromByteArrayToString(userEmailSerialized);
+			
+			this.userHomeAddress = CommonUtils.fromByteArrayToString(userHomeAddressSerialized);
+			
+			this.userBankAccountNIB = CommonUtils.fromByteArrayToString(userBankAccountNIBSerialized);
 			
 			
-			this.setIsSecureBidMessageDataPersonalSerializedAndHashed(false);
-			
+			this.setIsSecureBidMessageDataPersonalSerialized(false);
+						
 		}
-		
+
 	}
 	
-	public void encryptSecureBidMessageDataPersonalSerializedAndHashed() {
+	
+	public void encryptSecureBidMessageDataPersonalSerialized() {
 
-		boolean isPossibleToEncryptSecureBidMessageDataPersonalSerializedAndHashed = 
-				(  this.getIsSecureBidMessageDataPersonalSerialized() &&
-				   this.getIsSecureBidMessageDataPersonalSerializedHashed() &&
-				   this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-				  !this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );
+		boolean isPossibleToEncryptSecureBidMessageDataPersonalSerialized = 
+				(  this.getIsSecureBidMessageDataPersonalSerialized() && 
+				  !this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );
 
 
-		if(isPossibleToEncryptSecureBidMessageDataPersonalSerializedAndHashed) {
+		if(isPossibleToEncryptSecureBidMessageDataPersonalSerialized) {
 
 			// TODO - to complete
 
@@ -605,7 +460,7 @@ public class SecureBidMessageDataPersonal {
 
 
 				String provider = "BC";
-				Cipher secureBidMessageDataPersonalSerializedAndHashedSymmetricEncryptionCipher = 
+				Cipher secureBidMessageDataPersonalSerializedSymmetricEncryptionCipher = 
 						Cipher.getInstance(String.format("%s/%s/%s",
 								symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								provider );
@@ -618,7 +473,7 @@ public class SecureBidMessageDataPersonal {
 					// The parameter specifications for the IV (Initialisation Vector)	
 					System.out.println("[SecureBidMessageDataPersonal.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
 					initialisationVectorBytes = 
-							CommonUtils.generateIV(secureBidMessageDataPersonalSerializedAndHashedSymmetricEncryptionCipher);
+							CommonUtils.generateIV(secureBidMessageDataPersonalSerializedSymmetricEncryptionCipher);
 
 					// Showing the randomly defined IV (Initialisation Vector)
 					System.out.println("[SecureBidMessageDataPersonal.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
@@ -626,7 +481,7 @@ public class SecureBidMessageDataPersonal {
 
 					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
 					
-					secureBidMessageDataPersonalSerializedAndHashedSymmetricEncryptionCipher
+					secureBidMessageDataPersonalSerializedSymmetricEncryptionCipher
 							.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
 
 				}
@@ -636,17 +491,17 @@ public class SecureBidMessageDataPersonal {
 					// The parameter specifications for the IV (Initialisation Vector)
 					System.out.println("[SecureBidMessageDataPersonal.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
 
-					secureBidMessageDataPersonalSerializedAndHashedSymmetricEncryptionCipher
+					secureBidMessageDataPersonalSerializedSymmetricEncryptionCipher
 					.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
 
 				}
 
-				this.secureBidMessageDataPersonalSerializedAndHashedCiphered = 
-						secureBidMessageDataPersonalSerializedAndHashedSymmetricEncryptionCipher
+				this.secureBidMessageDataPersonalSerializedCiphered = 
+						secureBidMessageDataPersonalSerializedSymmetricEncryptionCipher
 						.doFinal(this.secureBidMessageDataPersonalSerialized);
 
 
-				this.setIsSecureBidMessageDataPersonalSerializedAndHashedCiphered(true);		
+				this.setIsSecureBidMessageDataPersonalSerializedCiphered(true);		
 
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
@@ -690,14 +545,14 @@ public class SecureBidMessageDataPersonal {
 
 	public void decryptSecureBidMessageDataPersonalSerialized() {
 		
-		boolean isPossibleToDecryptSecureBidMessageDataPersonalSerializedAndHashed = 
-				(  this.getIsSecureBidMessageDataPersonalSerialized() &&
-				   this.getIsSecureBidMessageDataPersonalSerializedHashed() &&
-				   this.getIsSecureBidMessageDataPersonalSerializedAndHashed() &&
-				   this.getIsSecureBidMessageDataPersonalSerializedAndHashedCiphered() );
+		boolean isPossibleToDecryptSecureBidMessageDataPersonalSerializedCiphered = 
+				(  this.getIsSecureBidMessageDataPersonalSerialized() && 
+				   this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );
 
 
-		if(isPossibleToDecryptSecureBidMessageDataPersonalSerializedAndHashed) {
+		if(isPossibleToDecryptSecureBidMessageDataPersonalSerializedCiphered) {
 			
 			byte[] secretKeyBytes = null;
 			
@@ -746,25 +601,25 @@ public class SecureBidMessageDataPersonal {
 					
 				}
 				
-				int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered = 
-						this.secureBidMessageDataPersonalSerializedAndHashedCiphered.length;
+				this.sizeOfSecureBidMessageDataPersonalSerializedCiphered = 
+						this.secureBidMessageDataPersonalSerializedCiphered.length;
 				
 			  	// The Plain Text of the bytes of the data input received through the communication channel
-			  	this.secureBidMessageDataPersonalSerializedAndHashed = 
+			  	this.secureBidMessageDataPersonalSerialized = 
 			  			new byte[ secureBidMessageDataPersonalSerializedAndHashedSymmetricEncryptionDecipher
-			  	                  .getOutputSize(sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered) ];
+			  	                  .getOutputSize(sizeOfSecureBidMessageDataPersonalSerializedCiphered) ];
 			    
-			  	int sizeOfSecureBidMessageDataPersonalSerializedAndHashed = secureBidMessageDataPersonalSerializedAndHashedSymmetricEncryptionDecipher
-										  									    .update(this.secureBidMessageDataPersonalSerializedAndHashedCiphered, 
-										  										   	    0, sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered,
-										  											    this.secureBidMessageDataPersonalSerializedAndHashed, 0);
+			  	this.sizeOfSecureBidMessageDataPersonalSerialized = secureBidMessageDataPersonalSerializedAndHashedSymmetricEncryptionDecipher
+										  								    .update(this.secureBidMessageDataPersonalSerializedCiphered, 
+										  									   	    0, sizeOfSecureBidMessageDataPersonalSerializedCiphered,
+										  										    this.secureBidMessageDataPersonalSerialized, 0);
 			  	
 			  	secureBidMessageDataPersonalSerializedAndHashedSymmetricEncryptionDecipher
-			  									   .doFinal(this.secureBidMessageDataPersonalSerializedAndHashed,
-			  											    sizeOfSecureBidMessageDataPersonalSerializedAndHashed);
+			  									   .doFinal(this.secureBidMessageDataPersonalSerialized,
+			  											    this.sizeOfSecureBidMessageDataPersonalSerialized);
 			    
 			  	
-				this.setIsSecureBidMessageDataPersonalSerializedAndHashedCiphered(false);		
+				this.setIsSecureBidMessageDataPersonalSerializedCiphered(false);		
 				
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
@@ -809,6 +664,234 @@ public class SecureBidMessageDataPersonal {
 			}
 			
 		}
+	}	
+	
+	public void doHashOfSecureBidMessageDataPersonalSerializedCiphered() throws NoSuchAlgorithmException {
+
+		boolean isPossibleToHashOfSecureBidMessageDataPersonalSerializedCiphered = 
+				(  this.getIsSecureBidMessageDataPersonalSerialized() && 
+				   this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );
+
+		if(isPossibleToHashOfSecureBidMessageDataPersonalSerializedCiphered) {
+
+			// Starts the MAC Hash process over the Secure Message serialized (applying the HMAC or CMAC operation),
+			// before the sending of the final concatenation of it with Secure Message serialized
+			try {
+				
+				// The Initialization Vector and its Parameter's Specifications
+				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils
+						.convertStringToKey(""/*keystoreInterface.load(propertiesReader.getProperty("ip") + ":" + 
+								propertiesReader.getProperty("port") + ":" +
+								"mac")*/); //TODO
+				
+				// The configuration, initialization and update of the MAC Hash process
+				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/);
+				mac.init(secretHMACKeyForDoSMitigationMACKey);
+				mac.update(this.secureBidMessageDataPersonalSerializedCiphered);
+				
+				// Performs the final operation of MAC Hash process over the Secure Message serialized
+				// (applying the HMAC or CMAC operation)
+				this.secureBidMessageDataPersonalSerializedCipheredHashed = mac.doFinal();
+			}
+			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("- Cryptographic Algorithm not found!!!");
+				noSuchAlgorithmException.printStackTrace();
+			}
+			catch (InvalidKeyException invalidKeyException) {
+				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("- Invalid Secret Key!!!");
+				invalidKeyException.printStackTrace();
+			}
+			
+			
+			this.setIsSecureBidMessageDataPersonalSerializedCipheredHashed(true);
+			
+		}
+
+	}
+
+	public boolean checkIfHashOfSecureBidMessageDataPersonalSerializedCipheredIsValid() throws NoSuchAlgorithmException {
+
+		boolean isPossibleToCheckHashOfSecureBidMessageDataPersonalSerializedCiphered = 
+				(  this.getIsSecureBidMessageDataPersonalSerialized() && 
+				   this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				   this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );
+
+		if(isPossibleToCheckHashOfSecureBidMessageDataPersonalSerializedCiphered) {
+			
+			byte[] secureBidMessageDataPersonalSerializedHashedToCompare = this.secureBidMessageDataPersonalSerializedCiphered;
+			
+			// Starts the MAC Hash process over the Secure Message serialized received (applying the HMAC or CMAC operation),
+			// comparing it with Secure Message serialized hashed received (the MAC Hash process related to the Fast Secure Message Check)
+			try {
+			
+				// The Initialization Vector and its Parameter's Specifications
+				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils
+						.convertStringToKey(""/*keystoreInterface.load(propertiesReader.getProperty("ip") + ":" + 
+								propertiesReader.getProperty("port") + ":" +
+								"mac")*/);
+				
+				// The configuration, initialization and update of the MAC Hash process
+				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/); //TODO
+				mac.init(secretHMACKeyForDoSMitigationMACKey);
+				mac.update(secureBidMessageDataPersonalSerializedHashedToCompare);
+				
+				// Performs the final operation of MAC Hash process over the Secure Message serialized
+				// (applying the HMAC or CMAC operation)
+				secureBidMessageDataPersonalSerializedHashedToCompare = mac.doFinal();
+			}
+			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("- Cryptographic Algorithm not found!!!");
+				noSuchAlgorithmException.printStackTrace();
+			}
+			catch (InvalidKeyException invalidKeyException) {
+				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("- Invalid Secret Key!!!");
+				invalidKeyException.printStackTrace();
+			}
+			
+			this.isSecureBidMessageDataPersonalSerializedCipheredHashedValid = 
+									  Arrays.areEqual(this.secureBidMessageDataPersonalSerializedCipheredHashed, 
+											  		  secureBidMessageDataPersonalSerializedHashedToCompare) ? 
+															  true : false;
+			
+			if(!this.isSecureBidMessageDataPersonalSerializedCipheredHashedValid) {
+				System.err.println("The Fast Secure Message Check it's not valid:");
+				System.err.println("- The Secure Message will be ignored!!!");
+			}
+			
+			this.setIsSecureBidMessageDataPersonalSerializedCipheredHashedVerified(true);
+			this.setIsSecureBidMessageDataPersonalSerializedCipheredHashed(false);
+			
+			
+			return this.isSecureBidMessageDataPersonalSerializedCipheredHashedValid;
+			
+		}
+		
+		return false;
+	}
+	
+	public void doSecureBidMessageDataPersonalSerializedCipheredAndHashed() {
+	
+		boolean isPossibleToDoSecureBidMessageDataPersonalSerializedCipheredAndHashed = 
+				(  this.getIsSecureBidMessageDataPersonalSerialized() && 
+				   this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				   this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				  !this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );
+
+		if(isPossibleToDoSecureBidMessageDataPersonalSerializedCipheredAndHashed) {
+			
+			byte[] secureBidMessageDataPersonalSerializedCiphered = this.getSecureBidMessageDataPersonalSerializedCiphered();
+
+			this.sizeOfSecureBidMessageDataPersonalSerializedCiphered = secureBidMessageDataPersonalSerializedCiphered.length;
+			
+			byte[] secureBidMessageDataPersonalSerializedCipheredHashed = 
+						this.getSecureBidMessageDataPersonalSerializedCipheredHashed();
+			
+			this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = 
+					secureBidMessageDataPersonalSerializedCipheredHashed.length;
+			
+			
+			
+			int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed = 
+								( this.sizeOfSecureBidMessageDataPersonalSerializedCiphered + 
+								  this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed );
+
+			
+			this.secureBidMessageDataPersonalSerializedCipheredAndHashed = 
+					new byte[ sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed ];
+
+
+			// Operations to Fill a Byte Array, with the following parameters:
+			// 1) src - The source of the array to be copied
+			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
+			// 3) dest - The destination of the array to be copied
+			// 4) destPos - The position of the array where will be placed the new copy,
+			//              representing the first element where new data will be placed
+			// 5) length - The length of the data to be copied from the source array to the destination array
+
+			// The offset related to fulfilment of the serialization process
+			int serializationOffset = 0;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(secureBidMessageDataPersonalSerializedCiphered,
+							 0, this.secureBidMessageDataPersonalSerializedCipheredAndHashed,
+							 serializationOffset, secureBidMessageDataPersonalSerializedCiphered.length);
+			serializationOffset += secureBidMessageDataPersonalSerialized.length;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(secureBidMessageDataPersonalSerializedCipheredHashed,
+					         0, this.secureBidMessageDataPersonalSerializedCipheredAndHashed,
+					         serializationOffset, secureBidMessageDataPersonalSerializedCipheredHashed.length);
+			
+			
+			this.setIsSecureBidMessageDataPersonalSerializedCipheredAndHashed(true);
+			
+		}
 		
 	}
+	
+	public void undoSecureBidMessageDataPersonalSerializedCipheredAndHashed() {
+		
+		boolean isPossibleToUndoSecureBidMessageDataPersonalSerializedCipheredAndHashed = 
+				(  this.getIsSecureBidMessageDataPersonalSerialized() && 
+				   this.getIsSecureBidMessageDataPersonalSerializedCiphered() && 
+				   this.getIsSecureBidMessageDataPersonalSerializedCipheredHashed() &&
+				   this.getIsSecureBidMessageDataPersonalSerializedCipheredAndHashed() );
+
+
+		if(isPossibleToUndoSecureBidMessageDataPersonalSerializedCipheredAndHashed) {
+			
+			this.secureBidMessageDataPersonalSerializedCiphered = 
+					new byte[this.sizeOfSecureBidMessageDataPersonalSerializedCiphered];
+
+			this.secureBidMessageDataPersonalSerializedCipheredHashed = 
+					new byte[this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed];
+			
+			
+			// Operations to Fill a Byte Array, with the following parameters:
+			// 1) src - The source of the array to be copied
+			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
+			// 3) dest - The destination of the array to be copied
+			// 4) destPos - The position of the array where will be placed the new copy,
+			//              representing the first element where new data will be placed
+			// 5) length - The length of the data to be copied from the source array to the destination array
+
+			// The offset related to fulfilment of the serialization process
+			int serializationOffset = 0;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.secureBidMessageDataPersonalSerializedCipheredAndHashed,
+							 serializationOffset, this.secureBidMessageDataPersonalSerializedCiphered, 
+							 0, this.secureBidMessageDataPersonalSerializedCiphered.length);
+			serializationOffset += secureBidMessageDataPersonalSerializedCiphered.length;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.secureBidMessageDataPersonalSerializedCipheredAndHashed,
+							 serializationOffset, this.secureBidMessageDataPersonalSerializedCipheredHashed,
+							 0, this.secureBidMessageDataPersonalSerializedCipheredHashed.length);
+			
+			
+			this.setIsSecureBidMessageDataPersonalSerializedCipheredAndHashed(false);
+			
+		}
+		
+	}	
 }

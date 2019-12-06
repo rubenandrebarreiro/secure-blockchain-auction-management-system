@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -989,7 +990,8 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 	@Override
 	public Response listAllProductsAuctions() throws SQLException {
 
-		List<Auction> allProductsAuctions = this.allProductsAuctionsRepositoryDao.queryForAll();
+		List<Auction> allProductsAuctions = 
+				this.allProductsAuctionsRepositoryDao.queryForAll();
 		
 		if(!this.verifyExistenceOfAnyProductsAuctions(allProductsAuctions)) {
 
