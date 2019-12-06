@@ -202,8 +202,8 @@ public class SecureBidMessageKeyExchange {
 			
 			this.secureBidMessageKeyExchangeAgreement = 
 					new SecureBidMessageKeyExchangeAgreement(secureBidMessageKeyExchangeAgreementSerialized,
-															 serializationOffset,
-															 serializationOffset);
+															 sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered,
+															 sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned);
 			
 			this.secureBidMessageKeyExchangeIntegrity =
 					new SecureBidMessageKeyExchangeIntegrity(secureBidMessageKeyExchangeAgreementSerialized,

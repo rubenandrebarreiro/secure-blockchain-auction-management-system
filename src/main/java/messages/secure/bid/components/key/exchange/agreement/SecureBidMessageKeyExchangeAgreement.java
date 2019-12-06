@@ -420,7 +420,7 @@ public class SecureBidMessageKeyExchangeAgreement {
 				Cipher secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher = 
 						Cipher.getInstance(String.format("%s/%s/%s",
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
-								           provider );
+								           provider);
 				
 				byte[] initialisationVectorBytes = null;
 			
