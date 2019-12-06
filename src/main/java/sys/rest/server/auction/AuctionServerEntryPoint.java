@@ -23,13 +23,14 @@ public class AuctionServerEntryPoint extends Thread{
 	private static final String AUCTION_SERVER_TLS_CONFIGURATION_PATH = "res/configurations/auction-server-tls-configuration.conf";
 	private static final String AUCTION_SERVER_STORES_CONFIGURATION_PATH = "res/configurations/auction-server-keystore-configuration.conf";
 	
-	private static final String TLS_CONF_CLIENT_ONLY = "CLIENT-ONLY";
-	private static final String TLS_CONF_SERVER_ONLY = "SERVER-ONLY";
-	private static final String TLS_CONF_MUTUAL = "MUTUAL";
+	public static final String TLS_CONF_CLIENT_ONLY = "CLIENT-ONLY";
+	public static final String TLS_CONF_SERVER_ONLY = "SERVER-ONLY";
+	public static final String TLS_CONF_MUTUAL = "MUTUAL";
 	
 	private SSLServerSocketFactory serverSocketFactory;
 	private SSLServerSocket serverSocket;
 	private SSLSocket responseSocket;
+	
 	
 	private Map<String, String> connectedClientsMap;
 	
@@ -85,7 +86,7 @@ public class AuctionServerEntryPoint extends Thread{
 				responseSocket = (SSLSocket) serverSocket.accept();
 				responseSocket.startHandshake();
 				connectedClientsMap.put(responseSocket.getRemoteSocketAddress().toString(),"Client IP:port");
-				Thread t = new AuctionServer(serverSocket, responseSocket, connectedClientsMap);
+				Thread t = new AuctionServer(serverSocket, responseSocket, connectedClientsMap, mutualAuth[0]);
 				t.start();
 			} catch (Exception e) {
 				printErrorStringWithClassName(e.getMessage());

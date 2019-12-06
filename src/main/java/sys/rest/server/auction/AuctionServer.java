@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -55,13 +57,18 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	private SSLSocket responseSocket;
 	private Random random;
 	private Map<String, String> connectedClientsMap;
+	private boolean mutualAuth;
 
-	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, String> connectedClientsMap) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, String> connectedClientsMap, String mutualAuth) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
 		this.responseSocket = responseSocket;
 		this.connectedClientsMap = connectedClientsMap;
 		this.gson = new Gson();
 		this.httpClient = HttpClients.createDefault();
 		this.random = new Random();
+		if(mutualAuth.contentEquals(AuctionServerEntryPoint.TLS_CONF_SERVER_ONLY))
+			this.mutualAuth = false;
+		else this.mutualAuth = true;
+			
 	}
 
 	public void run() {
@@ -73,9 +80,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				System.out.println("Connected clients are: " );
 				connectedClientsMap.forEach((x,y) -> System.out.println(x + " " + y));
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
-				//					SSLSession session = responseSocket.getSession();
-				//					Principal clientID = session.getPeerPrincipal();
-				//					System.out.println("Client has been identified as: " + clientID);
+				if(mutualAuth) {
+					SSLSession session = responseSocket.getSession();
+					Principal clientID = session.getPeerPrincipal();
+					System.out.println("Client has been identified as: " + clientID);
+				}
 				SSLSocketMessage message = gson.fromJson(jsonMessage, SSLSocketMessage.class);
 				if(message != null) {
 
