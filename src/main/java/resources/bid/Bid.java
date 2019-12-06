@@ -35,7 +35,7 @@ public class Bid implements Serializable {
 	
 	public Bid() {
 		
-		// Obsolete/Empty Consructor
+		// Obsolete/Empty Constructor
 		
 	}
 	
