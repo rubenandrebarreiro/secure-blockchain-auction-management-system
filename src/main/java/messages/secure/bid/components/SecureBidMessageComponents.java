@@ -51,6 +51,11 @@ public class SecureBidMessageComponents {
 	private int sizeOfUserBankAccountNIBSerialized;
 	
 	
+	private int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
+	
+	private int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
+	
+	
 	public SecureBidMessageComponents(SecureCommonHeader secureCommonHeader,
 								      SecureBidMessageData secureBidMessageData,
 								      SecureBidMessageKeyExchange secureBidMessageKeyExchange) {
@@ -77,7 +82,9 @@ public class SecureBidMessageComponents {
 									  int sizeOfSecureBidMessageDataPersonalSerialized,
 									  int sizeOfSecureBidMessageDataPersonalSerializedHashed,
 									  int sizeOfUserEmailSerialized, int sizeOfUserHomeAddressSerialized, 
-									  int sizeOfUserBankAccountNIBSerialized) {
+									  int sizeOfUserBankAccountNIBSerialized,
+									  int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered,
+									  int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned) {
 
 		this.secureBidMessageComponentsSerialized = secureBidMessageComponentsSerialized;
 		this.isSecureBidMessageComponentsSerialized = true;
@@ -103,6 +110,11 @@ public class SecureBidMessageComponents {
 		this.sizeOfUserEmailSerialized = sizeOfUserEmailSerialized;
 		this.sizeOfUserHomeAddressSerialized = sizeOfUserEmailSerialized; 
 		this.sizeOfUserBankAccountNIBSerialized = sizeOfUserBankAccountNIBSerialized;
+		
+		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
+				sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
+		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned = 
+				sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
 		
 	}
 	
@@ -286,7 +298,10 @@ public class SecureBidMessageComponents {
 			this.secureBidMessageData.undoSecureBidMessageDataSerialization();
 			
 			
-			this.secureBidMessageKeyExchange = new SecureBidMessageKeyExchange(secureBidMessageKeyExchangeSerialized);
+			this.secureBidMessageKeyExchange = new SecureBidMessageKeyExchange(secureBidMessageKeyExchangeSerialized,
+																			   this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered,
+																			   this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned);
+			
 			this.secureBidMessageKeyExchange.undoSecureBidMessageKeyExchangeSerialization();
 			
 			this.setIsSecureBidMessageComponentsSerialized(false);

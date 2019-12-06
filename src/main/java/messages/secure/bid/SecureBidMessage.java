@@ -229,6 +229,11 @@ public class SecureBidMessage {
 			int sizeOfUserBankAccountNIBSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfUserBankAccountNIBSerialized();
 
+			int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
+					this.secureBidMessageMetaHeader.getSizeOfUserBankAccountNIBSerialized();
+			int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned = 
+					this.secureBidMessageMetaHeader.getSizeOfUserBankAccountNIBSerialized();
+			
 			
 			this.secureBidMessageComponents = 
 					new SecureBidMessageComponents(secureBidMessageComponentsSerialized,
@@ -242,7 +247,9 @@ public class SecureBidMessage {
 												   sizeOfSecureBidMessageDataPersonalSerializedHashed,
 												   sizeOfUserEmailSerialized,
 												   sizeOfUserHomeAddressSerialized,
-												   sizeOfUserBankAccountNIBSerialized);
+												   sizeOfUserBankAccountNIBSerialized,
+												   sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered,
+												   sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned);
 			
 			this.secureBidMessageDoSMitigation = 
 					new SecureBidMessageDoSMitigation(secureBidMessageComponentsSerialized,

@@ -10,7 +10,13 @@ public class SecureBidMessageKeyExchange {
 
 	private SecureBidMessageKeyExchangeAgreement secureBidMessageKeyExchangeAgreement;
 	
+	private int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
+	
+	private int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
+	
+	
 	private SecureBidMessageKeyExchangeIntegrity secureBidMessageKeyExchangeIntegrity;
+	
 	
 	private byte[] secureBidMessageKeyExchangeSerialized;
 	
@@ -30,16 +36,26 @@ public class SecureBidMessageKeyExchange {
 		
 	}
 	
-	public SecureBidMessageKeyExchange(byte[] secureBidMessageKeyExchangeSerialized) {
+	public SecureBidMessageKeyExchange(byte[] secureBidMessageKeyExchangeSerialized,
+									   int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered,
+									   int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned) {
 
 		this.secureBidMessageKeyExchangeSerialized = secureBidMessageKeyExchangeSerialized;
 		
+		
 		this.isSecureBidMessageKeyExchangeSerialized = true;
+		
 		
 		this.secureBidMessageKeyExchangeAgreement = null;
 		
-		this.secureBidMessageKeyExchangeIntegrity = null;
+		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
+			 sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
 		
+		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned =
+			 sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
+		
+		
+		this.secureBidMessageKeyExchangeIntegrity = null;
 		
 	}
 	
@@ -48,6 +64,15 @@ public class SecureBidMessageKeyExchange {
 	public SecureBidMessageKeyExchangeAgreement getSecureKeyExchangeMessageAgreement() {
 		return this.secureBidMessageKeyExchangeAgreement;
 	}
+	
+	public int getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered() {
+		return this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
+	}
+	
+	public int getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned() {
+		return this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
+	}
+	
 	
 	public SecureBidMessageKeyExchangeIntegrity getSecureKeyExchangeMessageIntegrity() {
 		return this.secureBidMessageKeyExchangeIntegrity;
@@ -176,7 +201,9 @@ public class SecureBidMessageKeyExchange {
 
 			
 			this.secureBidMessageKeyExchangeAgreement = 
-					new SecureBidMessageKeyExchangeAgreement(secureBidMessageKeyExchangeAgreementSerialized);
+					new SecureBidMessageKeyExchangeAgreement(secureBidMessageKeyExchangeAgreementSerialized,
+															 serializationOffset,
+															 serializationOffset);
 			
 			this.secureBidMessageKeyExchangeIntegrity =
 					new SecureBidMessageKeyExchangeIntegrity(secureBidMessageKeyExchangeAgreementSerialized,
