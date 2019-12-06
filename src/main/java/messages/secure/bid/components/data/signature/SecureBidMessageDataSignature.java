@@ -2,49 +2,43 @@ package main.java.messages.secure.bid.components.data.signature;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
-import org.bouncycastle.util.Arrays;
-
-import main.java.common.utils.CommonUtils;
 import main.java.resources.bid.Bid;
 
 public class SecureBidMessageDataSignature {
 
 	private Bid bid;
 
+	
 	private byte[] bidSerialized;
 
 	private boolean isBidSerialized;
 
 	private int sizeOfBidSerialized;
-
-	private int sizeOfBidSerializedHashedCiphered;
 	
 	private int sizeOfBidderUserClientIDSerialized;
 
-	private byte[] bidSerializedHashed;
-
-	private boolean isBidSerializedHashed;
 	
-	private boolean isBidSerializedHashedVerified;
 	
-	private boolean isBidSerializedHashedValid;
+	private byte[] bidSerializedDigitalSigned;
 	
-	private byte[] bidSerializedHashedCiphered;
-
-	private boolean isBidSerializedHashedCiphered;
-
+	private boolean isBidSerializedDigitalSigned;
+	
+	private int sizeOfBidSerializedDigitalSigned;
+	
+	private boolean isBidSerializedDigitalSignedVerified;
+	
+	private boolean isBidSerializedDigitalSignedValid;
+	
+	
 	private byte[] bidDigitalSigned;
 
 	private boolean isBidDigitalSigned;
@@ -59,13 +53,11 @@ public class SecureBidMessageDataSignature {
 		this.sizeOfBidSerialized = 0;
 		this.sizeOfBidderUserClientIDSerialized = 0;
 
-		this.bidSerializedHashed = null;
-		this.isBidSerializedHashed = false;
-		this.isBidSerializedHashedVerified = false;
-		this.isBidSerializedHashedValid = false;
-		
-		this.bidSerializedHashedCiphered = null;
-		this.isBidSerializedHashedCiphered = false;
+		this.bidSerializedDigitalSigned = null;
+		this.isBidSerializedDigitalSigned = false;
+		this.sizeOfBidSerializedDigitalSigned = 0;
+		this.isBidSerializedDigitalSignedVerified = false;
+		this.isBidSerializedDigitalSignedValid = false;
 
 		this.bidDigitalSigned = null;
 		this.isBidDigitalSigned = false;
@@ -74,47 +66,36 @@ public class SecureBidMessageDataSignature {
 
 	public SecureBidMessageDataSignature(byte[] bidDigitalSigned,
 										 int sizeOfBidSerialized,
-										 int sizeOfBidSerializedHashedCiphered,
-										 int sizeOfBidderUserClientIDSerialized) {
+										 int sizeOfBidderUserClientIDSerialized,
+										 int sizeOfBidSerializedDigitalSigned) {
 
 		this.bidDigitalSigned = bidDigitalSigned;
 		this.isBidDigitalSigned = true;
 
-		this.bidSerializedHashedCiphered = null;
-		this.isBidSerializedHashedCiphered = true;
-
-		this.bidSerializedHashed = null;
-		this.isBidSerializedHashed = true;
-		this.isBidSerializedHashedVerified = false;
-		this.isBidSerializedHashedValid = false;
-		
 		this.bidSerialized = null;
-		this.isBidSerialized = true;
-		
+		this.isBidSerialized = false;
 		this.sizeOfBidSerialized = sizeOfBidSerialized;
-		this.sizeOfBidSerializedHashedCiphered = sizeOfBidSerializedHashedCiphered;
 		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
+		
+		this.bidSerializedDigitalSigned = null;
+		this.isBidSerializedDigitalSigned = false;
+		this.sizeOfBidSerializedDigitalSigned = sizeOfBidSerializedDigitalSigned;
+		this.isBidSerializedDigitalSignedVerified = false;
+		this.isBidSerializedDigitalSignedValid = false;
 
 		this.bid = null;
 
 	}
 
+	
 	public Bid getBid() {
 		return this.bid;
 	}
-
-	public void setBid(Bid bid) {
-		this.bid = bid;
-	}
-
+	
 	public byte[] getBidSerialized() {
 		return this.bidSerialized;
 	}
-
-	public void setBidSerialized(byte[] bidSerialized) {
-		this.bidSerialized = bidSerialized;
-	}
-
+	
 	public boolean getIsBidSerialized() {
 		return this.isBidSerialized;
 	}
@@ -122,73 +103,55 @@ public class SecureBidMessageDataSignature {
 	public void setIsBidSerialized(boolean isBidSerialized) {
 		this.isBidSerialized = isBidSerialized;
 	}
-
+	
 	public int getSizeOfBidSerialized() {
 		return this.sizeOfBidSerialized;
 	}
-
-	public void setSizeOfBidSerialized(int sizeOfBidSerialized) {
-		this.sizeOfBidSerialized = sizeOfBidSerialized;
+	
+	public int getSizeOfBidderUserClientIDSerialized() {
+		return this.sizeOfBidderUserClientIDSerialized;
 	}
-
-	public byte[] getBidSerializedHashed() {
-		return this.bidSerializedHashed;
+	
+	public byte[] getBidSerializedDigitalSigned() {
+		return this.bidSerializedDigitalSigned;
 	}
-
-	public void setBidSerializedHashed(byte[] bidSerializedHashed) {
-		this.bidSerializedHashed = bidSerializedHashed;
+	
+	public boolean getIsBidSerializedDigitalSigned() {
+		return this.isBidSerializedDigitalSigned;
 	}
-
-	public boolean getIsBidSerializedHashed() {
-		return this.isBidSerializedHashed;
+	
+	public void setIsBidSerializedDigitalSigned(boolean isBidSerializedDigitalSigned) {
+		this.isBidSerializedDigitalSigned = isBidSerializedDigitalSigned;
 	}
-
-	public void setIsBidSerializedHashed(boolean isBidSerializedHashed) {
-		this.isBidSerializedHashed = isBidSerializedHashed;
+	
+	public int getSizeOfBidSerializedDigitalSigned() {
+		return this.sizeOfBidSerializedDigitalSigned;
 	}
-
-	public boolean getIsBidSerializedHashedVerified() {
-		return this.isBidSerializedHashedVerified;
+	
+	public boolean getIsBidSerializedDigitalSignedVerified() {
+		return this.isBidSerializedDigitalSignedVerified;
 	}
-
-	public void setIsBidSerializedHashedVerified(boolean isBidSerializedHashedVerified) {
-		this.isBidSerializedHashedVerified = isBidSerializedHashedVerified;
-	}
-
-	public boolean getIsBidSerializedHashedValid() {
-		return this.isBidSerializedHashedValid;
-	}
-
-	public void setIsBidSerializedHashedValid(boolean isBidSerializedHashedValid) {
-		this.isBidSerializedHashedValid = isBidSerializedHashedValid;
-	}
+	
+	public void setIsBidSerializedDigitalSignedVerified
+	      (boolean isBidSerializedDigitalSignedVerified) {
 		
-	public byte[] getBidSerializedHashedCiphered() {
-		return this.bidSerializedHashedCiphered;
+		this.isBidSerializedDigitalSignedVerified = isBidSerializedDigitalSignedVerified;
+	
 	}
 
-	public void setBidSerializedHashedCiphered(byte[] bidSerializedHashedCiphered) {
-		this.bidSerializedHashedCiphered = bidSerializedHashedCiphered;
+	public boolean getIsBidSerializedDigitalSignedValid() {
+		return this.isBidSerializedDigitalSignedValid;
 	}
-
-	public boolean getIsBidSerializedHashedCiphered() {
-		return this.isBidSerializedHashedCiphered;
-	}
-
-	public void setIsBidSerializedHashedCiphered(boolean isBidSerializedHashedCiphered) {
-		this.isBidSerializedHashedCiphered = isBidSerializedHashedCiphered;
-	}
-
-	public int getSizeOfBidSerializedHashedCiphered() {
-		return this.sizeOfBidSerializedHashedCiphered;
-	}
+	
+	public void setIsBidSerializedDigitalSignedValid
+	      (boolean isBidSerializedDigitalSignedValid) {
+		
+		this.isBidSerializedDigitalSignedValid = isBidSerializedDigitalSignedValid;
+	
+	}	
 	
 	public byte[] getBidDigitalSigned() {
 		return this.bidDigitalSigned;
-	}
-
-	public void setBidDigitalSigned(byte[] bidDigitalSigned) {
-		this.bidDigitalSigned = bidDigitalSigned;
 	}
 
 	public boolean getIsBidDigitalSigned() {
@@ -198,25 +161,21 @@ public class SecureBidMessageDataSignature {
 	public void setIsBidDigitalSigned(boolean isBidDigitalSigned) {
 		this.isBidDigitalSigned = isBidDigitalSigned;
 	}
-
+	
+	
 	public void buildSecureBidMessageDataSignatureToSend()
 		   throws NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException,
 		          NoSuchPaddingException, InvalidAlgorithmParameterException {
 
 		boolean isPossibleToBuildSecureBidMessageSignatureToSend = 
-				( !this.getIsBidSerialized() && !this.getIsBidSerializedHashed() && 
-					!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );	
+				( !this.getIsBidSerialized() && !this.getIsBidSerializedDigitalSigned() && 
+				  !this.getIsBidDigitalSigned() );	
 
 		if(isPossibleToBuildSecureBidMessageSignatureToSend) {
 
 			this.doSerializationOfBid();
 
-			this.doHashOfSerializedBid();
 						
-			this.encryptSerializedHashedBid();
-
-			this.doDigitalSignatureOfSerializedHashedEncryptedBid();
-			
 		}
 
 	}
@@ -224,27 +183,22 @@ public class SecureBidMessageDataSignature {
 	public void buildSecureBidMessageDataSignatureReceived() throws NoSuchAlgorithmException {
 		
 		boolean isPossibleToBuildSecureBidMessageSignatureReceived = 
-				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						this.getIsBidSerializedHashedCiphered() && this.getIsBidDigitalSigned() );
+				( this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
+				  this.getIsBidDigitalSigned() );
 		
 		if(isPossibleToBuildSecureBidMessageSignatureReceived) {
 			
-			this.undoDigitalSignatureOfSerializedHashedEncryptedBid();
 			
-			this.decryptSerializedHashedBid();
 			
-			if(this.checkIfHashOfSerializedBidIsValid()) {
-				this.undoSerializationOfBid();
-			}
 		}
 	}
 
 	public void doSerializationOfBid() {
 		
 		boolean isPossibleToDoSerializationOfBid = 
-				( !this.getIsBidSerialized() && !this.getIsBidSerializedHashed() && 
-						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );	
-			
+				( !this.getIsBidSerialized() && !this.getIsBidSerializedDigitalSigned() && 
+				  !this.getIsBidDigitalSigned() );
+		
 		if(isPossibleToDoSerializationOfBid) {
 			
 			this.bid.doSerialization();
@@ -260,15 +214,16 @@ public class SecureBidMessageDataSignature {
 	public void undoSerializationOfBid() {
 		
 		boolean isPossibleToUndoSerializationOfBid = 
-				( this.getIsBidSerialized() && !this.getIsBidSerializedHashed() && 
-						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );	
+				(  this.getIsBidSerialized() && !this.getIsBidSerializedDigitalSigned() && 
+				  !this.getIsBidDigitalSigned() );	
 		
 		if(isPossibleToUndoSerializationOfBid) {
 			
-			boolean isBidSerializedHashedVerifiedAndValid = 
-				( this.getIsBidSerializedHashedVerified() && this.getIsBidSerializedHashedValid() );
+			boolean isBidSerializedDigitalSignedVerifiedAndValid = 
+				( this.getIsBidSerializedDigitalSignedVerified() &&
+				  this.getIsBidSerializedDigitalSignedValid() );
 			
-			if(isBidSerializedHashedVerifiedAndValid) {
+			if(isBidSerializedDigitalSignedVerifiedAndValid) {
 				
 				this.bid = new Bid(this.bidSerialized, this.sizeOfBidderUserClientIDSerialized);
 				
@@ -282,288 +237,94 @@ public class SecureBidMessageDataSignature {
 		
 	}
 
-	public void doHashOfSerializedBid() throws NoSuchAlgorithmException {
+	public void signSecureBidMessageBidSerialized()
+		   throws SignatureException, InvalidKeyException, NoSuchAlgorithmException {
 
-		boolean isPossibleToDoHashOfBidSerialized = 
-				( this.getIsBidSerialized() && !this.getIsBidSerializedHashed() && 
-						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );	
+		boolean isPossibleToSignBidSerialized = 
+				(  this.getIsBidSerialized() && !this.getIsBidSerializedDigitalSigned() && 
+				  !this.getIsBidDigitalSigned() );	
 		
-		if(isPossibleToDoHashOfBidSerialized) {
+		if(isPossibleToSignBidSerialized) {
 
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			this.bidSerializedHashed = messageDigest.digest(this.bidSerialized);
-
-			this.setIsBidSerializedHashed(true);			
+			Signature secureBidMessageDataSignatureBidSerialized = 
+					  Signature.getInstance("SHA256withDSA");
+			
+			PrivateKey userClientPrivateKey = null; //TODO
+			
+			secureBidMessageDataSignatureBidSerialized.initSign(userClientPrivateKey);
+			
+			secureBidMessageDataSignatureBidSerialized.update(this.bidSerialized);
+			
+			this.bidSerializedDigitalSigned = secureBidMessageDataSignatureBidSerialized.sign();
+			
+			
+			this.setIsBidSerializedDigitalSigned(true);			
 		}
 		
 	}
 
-	public boolean checkIfHashOfSerializedBidIsValid() throws NoSuchAlgorithmException {
-		
-		boolean isPossibleToCheckHashOfBidSerialized = 
-				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() &&
-						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
-		
-		if(isPossibleToCheckHashOfBidSerialized) {
-			
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			byte[] bidSerializedHashedToCompare = messageDigest.digest(this.bidSerialized);
-			
-			this.isBidSerializedHashedValid = Arrays.areEqual(this.bidSerializedHashed, 
-															  bidSerializedHashedToCompare) ? 
-																	  true : false;
-			
-			
-			this.setIsBidSerializedHashedVerified(true);
-			this.setIsBidSerializedHashed(false);
-			
-			
-			return this.isBidSerializedHashedValid;
-			
+	public boolean checkIfSecureBidMessageDataSignatureBidSerializedSignedIsValid()
+			   throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+				
+		boolean isPossibleToVerifySecureBidMessageDataSignatureBidSerializedDigitalSigned = 
+				(  this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
+						  !this.getIsBidDigitalSigned() );
+
+
+		if(isPossibleToVerifySecureBidMessageDataSignatureBidSerializedDigitalSigned) {
+
+			Signature secureBidMessageDataSignatureBidSerializedSignature = 
+					Signature.getInstance("SHA256withDSA");
+
+			PublicKey userClientPublicKey = null; //TODO
+
+			secureBidMessageDataSignatureBidSerializedSignature.initVerify(userClientPublicKey);
+
+			secureBidMessageDataSignatureBidSerializedSignature.update(this.bidSerialized);
+
+			this.isBidSerializedDigitalSignedValid = 
+					secureBidMessageDataSignatureBidSerializedSignature
+					.verify(this.bidSerializedDigitalSigned);
+
+
+			if(this.isBidSerializedDigitalSignedValid) {
+
+				System.out.println("Valid Signature!!!");
+
+			}
+			else {
+
+				System.out.println("Invalid Signature!!!");
+
+			}
+
+			this.setIsBidSerializedDigitalSignedVerified(true);
+			this.setIsBidSerializedDigitalSigned(false);
+
+
+			return this.isBidSerializedDigitalSignedValid;
+
 		}
-		
+
 		return false;
-	}
-	
-	private void encryptSerializedHashedBid()
-			throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException,
-			       InvalidKeyException, InvalidAlgorithmParameterException {
-		
-		boolean isPossibleToEncryptBidSerializedHashed = 
-				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						!this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
-	
-		if(isPossibleToEncryptBidSerializedHashed) {
-			
-			// TODO - to complete
-			
-			byte[] secretKeyBytes = null;
-			
-			try {
-				
-				String symmetricEncryptionAlgorithm = "AES";
-				String symmetricEncryptionMode = "CBC";
-		 	    String symmetricEncryptionPadding = "NoPadding";
-				
-				
-				// Set the Secret Key and its specifications,
-		 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
-				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
-				
-				
-				String provider = "BC";
-				Cipher secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher = 
-						Cipher.getInstance(String.format("%s/%s/%s",
-										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
-								           provider );
-				
-				byte[] initialisationVectorBytes = null;
-				
-				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
 
-					// Algorithms that don't need IV (Initialisation Vector): ECB
-					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureBidMessageSignatureProposal.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
-					initialisationVectorBytes = 
-							CommonUtils.generateIV(secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher);
-					
-					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
-					
-					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
-					secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher
-						.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
-					
-				}
-				else {
-					
-					// Algorithms that need IV (Initialisation Vector)
-					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
-					
-					secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher
-						.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
-					
-				}
-				
-				this.bidSerializedHashedCiphered = 
-						secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionCipher.doFinal(this.bidSerializedHashed);
-				
-				
-				this.setIsBidSerializedHashedCiphered(true);		
-				
-			}
-			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
-				System.err.println("- Cryptographic Algorithm not found!!!");
-				noSuchAlgorithmException.printStackTrace();
-			}
-			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
-				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
-				invalidAlgorithmParameterException.printStackTrace();
-			}
-			catch (NoSuchProviderException noSuchProviderException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
-				System.err.println("- Cryptograhic Provider not found!!!");
-				noSuchProviderException.printStackTrace();
-			}
-			catch (NoSuchPaddingException noSuchPaddingException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
-				System.err.println("- Padding Method not found!!!");
-				noSuchPaddingException.printStackTrace();
-			}
-			catch (BadPaddingException badPaddingException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
-				System.err.println("- Bad/Wrong Padding Method in use!!!");
-				badPaddingException.printStackTrace();
-			}
-			catch (InvalidKeyException invalidKeyException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
-				System.err.println("- Invalid Cryptographic Algorithm's Secret Key!!!");
-				invalidKeyException.printStackTrace();
-			}
-			catch (IllegalBlockSizeException illegalBlockSizeException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
-				System.err.println("- Illegal Cryptographic Algorithm's Block Size!!!");
-				illegalBlockSizeException.printStackTrace();
-			}	
-		}
-		
 	}
 	
-	private void decryptSerializedHashedBid() {
-	
-		boolean isPossibleToDecryptBidSerializedHashed = 
-				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
+	public void doSecureBidMessageDataSignatureBidSerializedAndSigned() {
 		
-		if(isPossibleToDecryptBidSerializedHashed) {
-			
-			byte[] secretKeyBytes = null;
-			
-			try {
-				
-				String symmetricEncryptionAlgorithm = "AES";
-				String symmetricEncryptionMode = "CBC";
-		 	    String symmetricEncryptionPadding = "NoPadding";
-				
-				
-				// Set the Secret Key and its specifications,
-		 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
-				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
-				
-				
-				String provider = "BC";
-				Cipher secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher = 
-						Cipher.getInstance(String.format("%s/%s/%s",
-										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
-								           provider );
-				
-				byte[] initialisationVectorBytes = null;
-			
-				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
-					
-					// Algorithms that don't need IV (Initialisation Vector): ECB
-					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
-					
-					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
-					
-					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
-					secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
-						.init(Cipher.DECRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
-				}
-				else {
-					
-					// Algorithms that need IV (Initialisation Vector)
-					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
-					
-					secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
-						.init(Cipher.DECRYPT_MODE, secretKeySpecifications);
-					
-				}
-				
-				int sizeOfBidSerializedHashedCiphered = 
-						this.bidSerializedHashedCiphered.length;
-				
-			  	// The Plain Text of the bytes of the data input received through the communication channel
-			  	this.bidSerializedHashed = new byte[ secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
-			  	                                                .getOutputSize(sizeOfBidSerializedHashedCiphered) ];
-			    
-			  	int sizeOfBidSerializedHashed = secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
-				  									     .update(this.bidSerializedHashedCiphered, 
-				  										   	     0, sizeOfBidSerializedHashedCiphered,
-				  											     this.bidSerializedHashed, 0);
-			  	
-			  	secureBidMessageSignatureProposalSerializedHashedSymmetricEncryptionDecipher
-			  									   .doFinal(this.bidSerializedHashed, sizeOfBidSerializedHashed);
-			    
-			  	
-				this.setIsBidSerializedHashedCiphered(false);		
-				
-			}
-			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- Cryptographic Algorithm not found!!!");
-				noSuchAlgorithmException.printStackTrace();
-			}
-			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
-				invalidAlgorithmParameterException.printStackTrace();
-			}
-			catch (NoSuchProviderException noSuchProviderException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- Cryptograhic Provider not found!!!");
-				noSuchProviderException.printStackTrace();
-			}
-			catch (NoSuchPaddingException noSuchPaddingException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- Padding Method not found!!!");
-				noSuchPaddingException.printStackTrace();
-			}
-			catch (BadPaddingException badPaddingException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- Bad/Wrong Padding Method in use!!!");
-				badPaddingException.printStackTrace();
-			}
-			catch (InvalidKeyException invalidKeyException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- Invalid Cryptographic Algorithm's Secret Key!!!");
-				invalidKeyException.printStackTrace();
-			}
-			catch (IllegalBlockSizeException illegalBlockSizeException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- Illegal Cryptographic Algorithm's Block Size!!!");
-				illegalBlockSizeException.printStackTrace();
-			}
-			catch (ShortBufferException shortBufferException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- The Buffer in use, during the Deciphering process it's not correct!!!");
-				shortBufferException.printStackTrace();
-			}
-		}
-	}
-	
-	private void doDigitalSignatureOfSerializedHashedEncryptedBid() {
+		boolean isPossibleToDoSecureBidMessageDataSignatureBidSerializedAndSigned = 
+				(  this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
+				  !this.getIsBidDigitalSigned() );
 		
-		boolean isPossibleToSignSerializedHashedEncryptedBid = 
-				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						this.getIsBidSerializedHashedCiphered() && !this.getIsBidDigitalSigned() );
 		
-		if(isPossibleToSignSerializedHashedEncryptedBid) {
+		if(isPossibleToDoSecureBidMessageDataSignatureBidSerializedAndSigned) {
 			
-			byte[] bidSerialized = this.getBidSerialized();
-			byte[] bidSerializedHashedCiphered = this.getBidSerializedHashedCiphered();
+			int sizeOfSecureBidMessageDataSignatureBidSerializedAndSigned =
+					( this.bidSerialized.length +
+					  this.bidSerializedDigitalSigned.length );
 			
-			int sizeOfBidDigitalSigned = (bidSerialized.length + bidSerializedHashedCiphered.length);
-			
-			this.bidDigitalSigned = new byte[sizeOfBidDigitalSigned];
+			this.bidDigitalSigned = new byte[ sizeOfSecureBidMessageDataSignatureBidSerializedAndSigned ];
+
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -572,41 +333,44 @@ public class SecureBidMessageDataSignature {
 			// 4) destPos - The position of the array where will be placed the new copy,
 			//              representing the first element where new data will be placed
 			// 5) length - The length of the data to be copied from the source array to the destination array
-			
+
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 			
-			// Fills the byte array of the Bid Digital Signed with the Bid's Serialization,
-			// From the initial position to the corresponding to the length of Bid's Serialization
-			System.arraycopy(bidSerialized, 0, this.bidDigitalSigned, serializationOffset, bidSerialized.length);
-			serializationOffset += bidSerialized.length;
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.bidSerialized, 0, this.bidDigitalSigned,
+							 serializationOffset, this.bidSerialized.length);
+			serializationOffset += this.bidSerialized.length;
 			
-			// Fills the byte array of the Bid Digital Signed with the Hash of the Bid's Serialization Ciphered,
-			// From the position corresponding to the length of Bid's Serialization to
-			// the corresponding of the length of the Hash of the Bid's Serialization Ciphered
-			System.arraycopy(bidSerializedHashedCiphered, 0, this.bidDigitalSigned, serializationOffset, bidSerializedHashedCiphered.length);
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.bidSerializedDigitalSigned, 0, this.bidDigitalSigned,
+					         serializationOffset, this.bidSerializedDigitalSigned.length);
 			
 			
 			this.setIsBidDigitalSigned(true);
 			
 		}
+		
 	}
 	
-	private void undoDigitalSignatureOfSerializedHashedEncryptedBid() {
+	public void undoSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned() {
 		
-		boolean isPossibleToUndoBidSerializedHashedEncryptedSigned = 
-				( this.getIsBidSerialized() && this.getIsBidSerializedHashed() && 
-						this.getIsBidSerializedHashedCiphered() && this.getIsBidDigitalSigned() );
+		boolean isPossibleToUndoSecureBidMessageDataSignatureBidSerializedAndSigned = 
+				(  this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
+				   this.getIsBidDigitalSigned() );
 		
-		if(isPossibleToUndoBidSerializedHashedEncryptedSigned) {
-			
-			byte[] bidDigitalSigned = this.getBidDigitalSigned();
-			int sizeOfBidDigitalSigned = bidDigitalSigned.length;
-			
-			this.bidSerialized = new byte[ this.getSizeOfBidSerialized() ];
-			this.bidSerializedHashedCiphered = 
-					new byte[ ( sizeOfBidDigitalSigned - this.getSizeOfBidSerialized() ) ];
-			
+		
+		if(isPossibleToUndoSecureBidMessageDataSignatureBidSerializedAndSigned) {
+				
+			this.bidSerialized = new byte[ this.sizeOfBidSerialized ];
+
+			this.bidSerializedDigitalSigned = new byte[ this.sizeOfBidSerializedDigitalSigned ];
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -615,25 +379,29 @@ public class SecureBidMessageDataSignature {
 			// 4) destPos - The position of the array where will be placed the new copy,
 			//              representing the first element where new data will be placed
 			// 5) length - The length of the data to be copied from the source array to the destination array
-			
+	
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 			
-			// Fills the byte array of the Bid's Serialization with
-			// the correspondent bytes from the Bid Digital Signed,
-			// From the initial position to the corresponding to the length of Bid's Serialization
-			System.arraycopy(bidDigitalSigned, serializationOffset, this.bidSerialized, 0, this.bidSerialized.length);
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.bidDigitalSigned, serializationOffset,
+							 this.bidSerialized, 0, this.bidSerialized.length);
 			serializationOffset += this.bidSerialized.length;
 			
-			// Fills the byte array of the Bid's Serialization Ciphered with
-			// the correspondent bytes from the Hash of the Bid Digital Signed,
-			// From the position corresponding to the length of Bid's Serialization to
-			// the corresponding of the length of the Hash of the Bid's Serialization Ciphered
-			System.arraycopy(bidDigitalSigned, serializationOffset, this.bidSerializedHashedCiphered, 0, this.bidSerializedHashedCiphered.length);
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.bidDigitalSigned, serializationOffset,
+					         this.bidSerializedDigitalSigned, 0, this.bidSerializedDigitalSigned.length);
 			
 			
 			this.setIsBidDigitalSigned(false);
-		
+			
 		}
 	}
+	
 }

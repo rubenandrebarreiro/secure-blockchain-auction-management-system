@@ -256,8 +256,6 @@ public class SecureBidMessageKeyExchangeAgreement {
 			
 		}
 	}
-
-	
 	
 	
 	public void doSerializationOfSecureBidMessageKeyExchangeAgreement() {
@@ -603,7 +601,7 @@ public class SecureBidMessageKeyExchangeAgreement {
 			Signature secureBidMessageKeyExchangeAgreementSerializedCipheredSignature = 
 					  Signature.getInstance("SHA256withDSA");
 			
-			PrivateKey userClientPrivateKey = null;
+			PrivateKey userClientPrivateKey = null; //TODO
 			
 			secureBidMessageKeyExchangeAgreementSerializedCipheredSignature.initSign(userClientPrivateKey);
 			
@@ -625,19 +623,19 @@ public class SecureBidMessageKeyExchangeAgreement {
 	public boolean checkIfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedIsValid()
 		   throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 			
-		boolean isPossibleToSignSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
+		boolean isPossibleToVerifySecureBidMessageKeyExchangeAgreementSerializedCipheredSigned = 
 				(  this.isSecureBidMessageKeyExchangeAgreementSerialized && 
 				   this.isSecureBidMessageKeyExchangeAgreementSerializedCiphered &&
 				   this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned &&
 				  !this.isSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned);
 		
 		
-		if(isPossibleToSignSecureBidMessageKeyExchangeAgreementSerializedCiphered) {
+		if(isPossibleToVerifySecureBidMessageKeyExchangeAgreementSerializedCipheredSigned) {
 			
 			Signature secureBidMessageKeyExchangeAgreementSerializedCipheredSignature = 
 					  Signature.getInstance("SHA256withDSA");
 			
-			PublicKey userClientPublicKey = null;
+			PublicKey userClientPublicKey = null; //TODO
 			
 			secureBidMessageKeyExchangeAgreementSerializedCipheredSignature.initVerify(userClientPublicKey);
 			

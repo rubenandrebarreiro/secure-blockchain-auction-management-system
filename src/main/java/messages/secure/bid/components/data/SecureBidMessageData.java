@@ -72,7 +72,8 @@ public class SecureBidMessageData {
 								int sizeOfSecureBidMessageDataPersonalSerializedCiphered,
 								int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
 								int sizeOfSecureBidMessageDataPersonalSerialized,
-								int sizeOfUserEmailSerialized, int sizeOfUserHomeAddressSerialized, 
+								int sizeOfUserEmailSerialized,
+								int sizeOfUserHomeAddressSerialized, 
 								int sizeOfUserBankAccountNIBSerialized) {
 
 		this.secureBidMessageDataSerialized = secureBidMessageDataSerialized;
@@ -258,8 +259,8 @@ public class SecureBidMessageData {
 			this.secureBidMessageDataSignature = 
 					new SecureBidMessageDataSignature(secureBidMessageDataSignatureSerialized,
 													  this.sizeOfBidSerialized,
-												      this.sizeOfBidSerializedDigitalSigned,
-												      this.sizeOfSecureBidMessageDataSignatureSerialized);
+												      this.sizeOfBidderUserClientIDSerialized,
+												      this.sizeOfBidSerializedDigitalSigned);
 			
 			this.secureBidMessageDataSignature.buildSecureBidMessageDataSignatureReceived();
 			
