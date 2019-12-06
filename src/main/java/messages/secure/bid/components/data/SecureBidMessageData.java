@@ -18,7 +18,7 @@ public class SecureBidMessageData {
 	
 	private int sizeOfBidSerialized;
 	
-	private int sizeOfBidSerializedHashedCiphered;
+	private int sizeOfBidSerializedDigitalSigned;
 	
 	private int sizeOfBidderUserClientIDSerialized;
 	
@@ -26,11 +26,13 @@ public class SecureBidMessageData {
 	
 	private SecureBidMessageDataPersonal secureBidMessageDataPersonal;
 	
-	private int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
+	private int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed;
+	
+	private int sizeOfSecureBidMessageDataPersonalSerializedCiphered;
+	
+	private int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
 	
 	private int sizeOfSecureBidMessageDataPersonalSerialized;
-	
-	private int sizeOfSecureBidMessageDataPersonalSerializedHashed;
 	
 	private int sizeOfUserEmailSerialized;
 	
@@ -51,7 +53,9 @@ public class SecureBidMessageData {
 		this.sizeOfSecureBidMessageDataSignatureSerialized = 0;
 		
 		this.secureBidMessageDataPersonal = secureBidMessageDataPersonal;
-		this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered = 0;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed = 0;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCiphered = 0;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = 0;
 		
 		this.secureBidMessageDataSerialized = null;
 		this.isSecureBidMessageDataSerialized = false;
@@ -62,11 +66,12 @@ public class SecureBidMessageData {
 	public SecureBidMessageData(byte[] secureBidMessageDataSerialized,
 								int sizeOfSecureBidMessageDataSignatureSerialized,
 								int sizeOfBidSerialized,
-								int sizeOfBidSerializedHashedCiphered,
+								int sizeOfBidSerializedDigitalSigned,
 							    int sizeOfBidderUserClientIDSerialized,
-								int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered,
+								int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,
+								int sizeOfSecureBidMessageDataPersonalSerializedCiphered,
+								int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
 								int sizeOfSecureBidMessageDataPersonalSerialized,
-								int sizeOfSecureBidMessageDataPersonalSerializedHashed,
 								int sizeOfUserEmailSerialized, int sizeOfUserHomeAddressSerialized, 
 								int sizeOfUserBankAccountNIBSerialized) {
 
@@ -76,14 +81,15 @@ public class SecureBidMessageData {
 		this.secureBidMessageDataSignature = null;
 		this.sizeOfSecureBidMessageDataSignatureSerialized = sizeOfSecureBidMessageDataSignatureSerialized;
 		this.sizeOfBidSerialized = sizeOfBidSerialized;
-		this.sizeOfBidSerializedHashedCiphered = sizeOfBidSerializedHashedCiphered;
+		this.sizeOfBidSerializedDigitalSigned = sizeOfBidSerializedDigitalSigned;
 		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
 		
 		this.secureBidMessageDataPersonal = null;
-		this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered = 
-				sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed = 
+				sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCiphered = sizeOfSecureBidMessageDataPersonalSerializedCiphered;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
 		this.sizeOfSecureBidMessageDataPersonalSerialized = sizeOfSecureBidMessageDataPersonalSerialized;
-		this.sizeOfSecureBidMessageDataPersonalSerializedHashed = sizeOfSecureBidMessageDataPersonalSerializedHashed;
 		this.sizeOfUserEmailSerialized = sizeOfUserEmailSerialized;
 		this.sizeOfUserHomeAddressSerialized = sizeOfUserEmailSerialized; 
 		this.sizeOfUserBankAccountNIBSerialized = sizeOfUserBankAccountNIBSerialized;
@@ -104,8 +110,8 @@ public class SecureBidMessageData {
 		return this.sizeOfBidSerialized;
 	}
 	
-	public int getSizeOfBidSerializedHashedCiphered() {
-		return this.sizeOfBidSerializedHashedCiphered;
+	public int getSizeOfBidSerializedDigitalSigned() {
+		return this.sizeOfBidSerializedDigitalSigned;
 	}
 	
 	public int getSizeOfBidderUserClientIDSerialized() {
@@ -120,10 +126,23 @@ public class SecureBidMessageData {
 		return this.secureBidMessageDataPersonal;
 	}
 
-	public int getSizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered() {
-		return this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
+	public int getSizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed() {
+		return this.sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed;
+	}
+	
+	public int getSizeOfSecureBidMessageDataPersonalSerializedCiphered() {
+		return this.sizeOfSecureBidMessageDataPersonalSerializedCiphered;
+	}
+	
+	public int getSizeOfSecureBidMessageDataPersonalSerializedCipheredHashed() {
+		return this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
 	}
 
+	public int getSizeOfSecureBidMessageDataPersonalSerialized() {
+		return this.sizeOfSecureBidMessageDataPersonalSerialized;
+	}
+	
+	
 	public byte[] getSecureBidMessageDataSerialized() {
 		return this.secureBidMessageDataSerialized;
 	}
@@ -152,12 +171,12 @@ public class SecureBidMessageData {
 			
 			this.secureBidMessageDataPersonal.buildSecureBidMessageDataPersonalToSend();
 			
-			byte[] secureBidMessageDataPersonalSerializedAndHashedCiphered = 
-				   this.secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerializedAndHashedCiphered();
+			byte[] secureBidMessageDataPersonalSerializedCipheredAndHashed = 
+				   this.secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerializedCipheredAndHashed();
 			
 			
 			int sizeOfSecureBidMessageDataSerialized = ( secureBidMessageDataSignatureSerialized.length +
-														 secureBidMessageDataPersonalSerializedAndHashedCiphered.length );
+														 secureBidMessageDataPersonalSerializedCipheredAndHashed.length );
 			
 			this.secureBidMessageDataSerialized = new byte[ sizeOfSecureBidMessageDataSerialized ];
 			
@@ -186,9 +205,9 @@ public class SecureBidMessageData {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(secureBidMessageDataPersonalSerializedAndHashedCiphered, 0,
+			System.arraycopy(secureBidMessageDataPersonalSerializedCipheredAndHashed, 0,
 							 this.secureBidMessageDataSerialized, serializationOffset,
-							 secureBidMessageDataPersonalSerializedAndHashedCiphered.length);
+							 secureBidMessageDataPersonalSerializedCipheredAndHashed.length);
 			
 			this.setIsSecureBidMessageDataSerialized(true);
 			
@@ -205,8 +224,8 @@ public class SecureBidMessageData {
 			byte[] secureBidMessageDataSignatureSerialized = 
 					new byte[this.sizeOfSecureBidMessageDataSignatureSerialized];
 			
-			byte[] secureBidMessageDataPersonalSerializedAndHashedCiphered = 
-					new byte[this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered];
+			byte[] secureBidMessageDataPersonalSerializedCipheredAndHashed = 
+					new byte[this.sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed];
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -233,22 +252,23 @@ public class SecureBidMessageData {
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
 			System.arraycopy(this.secureBidMessageDataSerialized, serializationOffset,
-							 secureBidMessageDataPersonalSerializedAndHashedCiphered, 0,
-							 secureBidMessageDataPersonalSerializedAndHashedCiphered.length);
+							 secureBidMessageDataPersonalSerializedCipheredAndHashed, 0,
+							 secureBidMessageDataPersonalSerializedCipheredAndHashed.length);
 			
 			this.secureBidMessageDataSignature = 
 					new SecureBidMessageDataSignature(secureBidMessageDataSignatureSerialized,
 													  this.sizeOfBidSerialized,
-												      this.sizeOfBidSerializedHashedCiphered,
-												      this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered);
+												      this.sizeOfBidSerializedDigitalSigned,
+												      this.sizeOfSecureBidMessageDataSignatureSerialized);
 			
 			this.secureBidMessageDataSignature.buildSecureBidMessageDataSignatureReceived();
 			
 			
 			this.secureBidMessageDataPersonal = 
-					new SecureBidMessageDataPersonal(secureBidMessageDataPersonalSerializedAndHashedCiphered,
-									 				 this.sizeOfSecureBidMessageDataPersonalSerialized,
-													 this.sizeOfSecureBidMessageDataPersonalSerializedHashed,
+					new SecureBidMessageDataPersonal(secureBidMessageDataPersonalSerializedCipheredAndHashed,
+									 				 this.sizeOfSecureBidMessageDataPersonalSerializedCiphered,
+													 this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
+													 this.sizeOfSecureBidMessageDataPersonalSerialized,
 													 this.sizeOfUserEmailSerialized,
 													 this.sizeOfUserHomeAddressSerialized,
 													 this.sizeOfUserBankAccountNIBSerialized);

@@ -30,29 +30,22 @@ public class SecureBidMessageComponents {
 	
 	
 	private int sizeOfSecureBidMessageDataSignatureSerialized;
-	
+	private int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed;
+	  
 	private int sizeOfBidSerialized;
-	
-	private int sizeOfBidSerializedHashedCiphered;
-	
+	private int sizeOfBidSerializedDigitalSigned;
+	  
 	private int sizeOfBidderUserClientIDSerialized;
-	
-	
-	private int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
-	
+	  
+	private int sizeOfSecureBidMessageDataPersonalSerializedCiphered;
+	private int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
 	private int sizeOfSecureBidMessageDataPersonalSerialized;
-	
-	private int sizeOfSecureBidMessageDataPersonalSerializedHashed;
-	
+	  
 	private int sizeOfUserEmailSerialized;
-	
 	private int sizeOfUserHomeAddressSerialized;
-	
 	private int sizeOfUserBankAccountNIBSerialized;
-	
-	
+	  
 	private int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
-	
 	private int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
 	
 	
@@ -75,13 +68,15 @@ public class SecureBidMessageComponents {
 	public SecureBidMessageComponents(byte[] secureBidMessageComponentsSerialized,
 									  int sizeOfSecureBidMessageDataSerialized,
 									  int sizeOfSecureBidMessageDataSignatureSerialized,
+									  int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,
 									  int sizeOfBidSerialized,
-									  int sizeOfBidSerializedHashedCiphered,
+									  int sizeOfBidSerializedDigitalSigned,
 									  int sizeOfBidderUserClientIDSerialized,
-									  int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered,
+									  int sizeOfSecureBidMessageDataPersonalSerializedCiphered,
+									  int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
 									  int sizeOfSecureBidMessageDataPersonalSerialized,
-									  int sizeOfSecureBidMessageDataPersonalSerializedHashed,
-									  int sizeOfUserEmailSerialized, int sizeOfUserHomeAddressSerialized, 
+									  int sizeOfUserEmailSerialized,
+									  int sizeOfUserHomeAddressSerialized, 
 									  int sizeOfUserBankAccountNIBSerialized,
 									  int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered,
 									  int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned) {
@@ -97,23 +92,32 @@ public class SecureBidMessageComponents {
 		
 		
 		this.sizeOfSecureBidMessageDataSerialized = sizeOfSecureBidMessageDataSerialized;
-		
+		  
 		this.sizeOfSecureBidMessageDataSignatureSerialized = sizeOfSecureBidMessageDataSignatureSerialized;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed = 
+				sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed;
+		  
 		this.sizeOfBidSerialized = sizeOfBidSerialized;
-		this.sizeOfBidSerializedHashedCiphered = sizeOfBidSerializedHashedCiphered;
+		this.sizeOfBidSerializedDigitalSigned = sizeOfBidSerializedDigitalSigned;
+		  
 		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
-		
-		this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered = 
-				sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered;
+		  
+		this.sizeOfSecureBidMessageDataPersonalSerializedCiphered =
+		     sizeOfSecureBidMessageDataPersonalSerializedCiphered;
+		this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = 
+			 sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
 		this.sizeOfSecureBidMessageDataPersonalSerialized = sizeOfSecureBidMessageDataPersonalSerialized;
-		this.sizeOfSecureBidMessageDataPersonalSerializedHashed = sizeOfSecureBidMessageDataPersonalSerializedHashed;
-		this.sizeOfUserEmailSerialized = sizeOfUserEmailSerialized;
-		this.sizeOfUserHomeAddressSerialized = sizeOfUserEmailSerialized; 
-		this.sizeOfUserBankAccountNIBSerialized = sizeOfUserBankAccountNIBSerialized;
+		
+		this.sizeOfUserEmailSerialized = 
+						sizeOfUserEmailSerialized;
+		this.sizeOfUserHomeAddressSerialized = 
+						sizeOfUserHomeAddressSerialized;
+		this.sizeOfUserBankAccountNIBSerialized =
+						sizeOfUserBankAccountNIBSerialized;
 		
 		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
 				sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
-		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned = 
+		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned =
 				sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
 		
 	}
@@ -286,11 +290,12 @@ public class SecureBidMessageComponents {
 			this.secureBidMessageData = new SecureBidMessageData(secureBidMessageDataSerialized,
 																 this.sizeOfSecureBidMessageDataSignatureSerialized,
 																 this.sizeOfBidSerialized,
-																 this.sizeOfBidSerializedHashedCiphered,
+																 this.sizeOfBidSerializedDigitalSigned,
 																 this.sizeOfBidderUserClientIDSerialized,
-																 this.sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered,
+																 this.sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,
+																 this.sizeOfSecureBidMessageDataPersonalSerializedCiphered,
+																 this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
 																 this.sizeOfSecureBidMessageDataPersonalSerialized,
-																 this.sizeOfSecureBidMessageDataPersonalSerializedHashed,
 																 this.sizeOfUserEmailSerialized,
 																 this.sizeOfUserHomeAddressSerialized,
 																 this.sizeOfUserBankAccountNIBSerialized);

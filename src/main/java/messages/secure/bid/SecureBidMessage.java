@@ -208,49 +208,58 @@ public class SecureBidMessage {
 			
 			int sizeOfSecureBidMessageDataSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataSerialized();
+			  
 			int sizeOfSecureBidMessageDataSignatureSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataSignatureSerialized();
+			int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed();
+			  
 			int sizeOfBidSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfBidSerialized();
-			int sizeOfBidSerializedHashedCiphered = 
-					this.secureBidMessageMetaHeader.getSizeOfBidSerializedHashedCiphered();
+			int sizeOfBidSerializedDigitalSigned = 
+					this.secureBidMessageMetaHeader.getSizeOfBidSerializedDigitalSigned();
+			  
 			int sizeOfBidderUserClientIDSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfBidderUserClientIDSerialized();
-			int sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered();
+			  
+			int sizeOfSecureBidMessageDataPersonalSerializedCiphered = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedCiphered();
+			int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedCipheredHashed();
 			int sizeOfSecureBidMessageDataPersonalSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerialized();
-			int sizeOfSecureBidMessageDataPersonalSerializedHashed = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedHashed();
+			  
 			int sizeOfUserEmailSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfUserEmailSerialized();
 			int sizeOfUserHomeAddressSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfUserHomeAddressSerialized();
 			int sizeOfUserBankAccountNIBSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfUserBankAccountNIBSerialized();
-
+			  
 			int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
-					this.secureBidMessageMetaHeader.getSizeOfUserBankAccountNIBSerialized();
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered();
 			int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned = 
-					this.secureBidMessageMetaHeader.getSizeOfUserBankAccountNIBSerialized();
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned();
+
 			
 			
 			this.secureBidMessageComponents = 
 					new SecureBidMessageComponents(secureBidMessageComponentsSerialized,
 												   sizeOfSecureBidMessageDataSerialized,
 												   sizeOfSecureBidMessageDataSignatureSerialized,
+												   sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,
 												   sizeOfBidSerialized,
-												   sizeOfBidSerializedHashedCiphered,
+												   sizeOfBidSerializedDigitalSigned,
 												   sizeOfBidderUserClientIDSerialized,
-												   sizeOfSecureBidMessageDataPersonalSerializedAndHashedCiphered,
+												   sizeOfSecureBidMessageDataPersonalSerializedCiphered,
+												   sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
 												   sizeOfSecureBidMessageDataPersonalSerialized,
-												   sizeOfSecureBidMessageDataPersonalSerializedHashed,
 												   sizeOfUserEmailSerialized,
-												   sizeOfUserHomeAddressSerialized,
+												   sizeOfUserHomeAddressSerialized, 
 												   sizeOfUserBankAccountNIBSerialized,
 												   sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered,
 												   sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned);
-			
+						
 			this.secureBidMessageDoSMitigation = 
 					new SecureBidMessageDoSMitigation(secureBidMessageComponentsSerialized,
 													  secureBidMessageDoSMitigationSerialized);
