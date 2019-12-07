@@ -12,6 +12,7 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Security;
 import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -21,6 +22,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -111,6 +114,12 @@ public class Client implements ClientAPI {
 			System.exit(1);
 		}
 
+		// if provider is not present, add it
+		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+		    // insert at specific position
+		    Security.addProvider(new BouncyCastleProvider());
+		}
+		
 		String url = args[0];
 		int serverPort = Integer.parseInt(args[1]);
 		String keystorePath = args[2];

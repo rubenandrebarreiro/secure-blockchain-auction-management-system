@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -73,6 +75,12 @@ public class AuctionRepositoryServer implements AuctionRepositoryAPI {
 					("Usage: java AuctionRepositoryServer <url>")
 			);
 			System.exit(1);
+		}
+		
+		// if provider is not present, add it
+		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+		    // insert at specific position
+		    Security.addProvider(new BouncyCastleProvider());
 		}
 		
 		int port = Integer.parseInt(args[0]);
