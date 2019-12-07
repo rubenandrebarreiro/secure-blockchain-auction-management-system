@@ -63,6 +63,9 @@ public class SecureBidMessageDoSMitigation {
 		this.secureBidMessageComponentsHashedForDoSMitigation = 
 				secureBidMessageComponentsHashedForDoSMitigation;
 		
+		this.secretHMACKeyForDoSMitigationInBytes = 
+				secretHMACKeyForDoSMitigationInBytes;
+		
 		this.isSecureBidMessageComponentsHashedForDoSMitigation = true;
 		
 		this.sizeOfSecureBidMessageComponentsHashedForDoSMitigation = 

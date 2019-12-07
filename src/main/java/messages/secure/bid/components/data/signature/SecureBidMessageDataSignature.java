@@ -14,6 +14,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.Collection;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -82,12 +83,12 @@ public class SecureBidMessageDataSignature {
 		this.isBidDigitalSigned = true;
 
 		this.bidSerialized = null;
-		this.isBidSerialized = false;
+		this.isBidSerialized = true;
 		this.sizeOfBidSerialized = sizeOfBidSerialized;
 		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
 		
 		this.bidSerializedDigitalSigned = null;
-		this.isBidSerializedDigitalSigned = false;
+		this.isBidSerializedDigitalSigned = true;
 		this.sizeOfBidSerializedDigitalSigned = sizeOfBidSerializedDigitalSigned;
 		this.isBidSerializedDigitalSignedVerified = false;
 		this.isBidSerializedDigitalSignedValid = false;
@@ -194,10 +195,10 @@ public class SecureBidMessageDataSignature {
 	
 	public void buildSecureBidMessageDataSignatureReceived()
 		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
-		
+				
 		boolean isPossibleToBuildSecureBidMessageSignatureReceived = 
-				( this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
-				  this.getIsBidDigitalSigned() );
+				(  this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
+				   this.getIsBidDigitalSigned() );
 		
 		if(isPossibleToBuildSecureBidMessageSignatureReceived) {
 			
@@ -295,10 +296,7 @@ public class SecureBidMessageDataSignature {
 			Signature secureBidMessageDataSignatureBidSerializedSignature = 
 					Signature.getInstance("SHA256withRSA");
 
-			Certificate certificate = null;
-			secureBidMessageDataSignatureBidSerializedSignature.initVerify(certificate);
-			
-			PublicKey userClientPublicKey = readCertificate("auctionServer").getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
+			PublicKey userClientPublicKey = readCertificate(userPeerID).getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
 
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(userClientPublicKey);
 
@@ -456,7 +454,8 @@ public class SecureBidMessageDataSignature {
 		try {
 			FileInputStream inputStream = new FileInputStream("res/certificates/" + alias + "Chain.pem");
 			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-			cert = certFactory.generateCertificate(inputStream);
+			Collection<? extends Certificate> certificates = certFactory.generateCertificates(inputStream);
+			cert = (Certificate) certificates.toArray()[certificates.size() - 1];
 			//			PublicKey pk = cert.getPublicKey();
 			//			System.out.println(user + " public key is: " + Base64.toBase64String(pk.getEncoded()));
 		} catch (Exception e) {

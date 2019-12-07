@@ -570,7 +570,7 @@ public class Client implements ClientAPI {
 			
 			secureBidMessageDataSignature.buildSecureBidMessageDataSignatureToSend();
 			bidSerializedDigitalSigned = secureBidMessageDataSignature.getBidSerializedDigitalSigned();
-			secureBidMessageDataSignatureSerialized = secureBidMessageDataSignature.getBidSerializedDigitalSigned();
+			secureBidMessageDataSignatureSerialized = secureBidMessageDataSignature.getBidDigitalSigned();
 			
 			secureBidMessageDataPersonal.buildSecureBidMessageDataPersonalToSend();
 			secureBidMessageDataPersonalSerialized = secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerialized();

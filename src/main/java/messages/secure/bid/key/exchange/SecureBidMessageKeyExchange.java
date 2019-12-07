@@ -14,6 +14,8 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.Collection;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -240,7 +242,7 @@ public class SecureBidMessageKeyExchange {
 
 	}
 		
-	public void buildSecureBidMessageDataPersonalReceived()
+	public void buildSecureBidMessageKeyExchangeReceived()
 		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		
 		boolean isPossibleToBuildSecureBidMessageKeyExchangeReceived = 
@@ -257,8 +259,8 @@ public class SecureBidMessageKeyExchange {
 				
 				this.decryptSecureBidMessageKeyExchangeSerialized();
 				
-				this.undoSecureBidMessageKeyExchangeSerializedCipheredAndSigned();
-
+				this.undoSerializationOfSecureBidMessageKeyExchange();
+				
 			}
 			
 		}
@@ -353,7 +355,7 @@ public class SecureBidMessageKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageKeyExchangeSerialized, 0, this.secretHMACKeyForDoSMitigationInBytes,
+			System.arraycopy(this.secureBidMessageKeyExchangeSerialized, serializationOffset, this.secretHMACKeyForDoSMitigationInBytes,
 					         0, this.secretHMACKeyForDoSMitigationInBytes.length);
 			
 			this.setIsSecureBidMessageKeyExchangeSerialized(false);
@@ -664,10 +666,10 @@ public class SecureBidMessageKeyExchange {
 	public void undoSecureBidMessageKeyExchangeSerializedCipheredAndSigned() {
 		
 		boolean isPossibleToUndoSecureBidMessageKeyExchangeSerializedCipheredAndSigned = 
-				( this.isSecureBidMessageKeyExchangeSerialized && 
-				  this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				  this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				  this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+				(  this.isSecureBidMessageKeyExchangeSerialized && 
+				   this.isSecureBidMessageKeyExchangeSerializedCiphered &&
+				   this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
+				   this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
 		
 		
 		if(isPossibleToUndoSecureBidMessageKeyExchangeSerializedCipheredAndSigned) {
@@ -707,7 +709,7 @@ public class SecureBidMessageKeyExchange {
 					         0, this.secureBidMessageKeyExchangeSerializedCipheredSigned.length);
 			
 			
-			this.setIsSecureBidMessageKeyExchangeSerializedCipheredSigned(false);
+			this.setIsSecureBidMessageKeyExchangeSerializedCipheredAndSigned(false);
 			
 		}
 	}
@@ -742,7 +744,8 @@ public class SecureBidMessageKeyExchange {
 		try {
 			FileInputStream inputStream = new FileInputStream("res/certificates/" + alias + "Chain.pem");
 			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-			cert = certFactory.generateCertificate(inputStream);
+			Collection<? extends Certificate> certificates = certFactory.generateCertificates(inputStream);
+			cert = (Certificate) certificates.toArray()[certificates.size() - 1];
 			//			PublicKey pk = cert.getPublicKey();
 			//			System.out.println(user + " public key is: " + Base64.toBase64String(pk.getEncoded()));
 		} catch (Exception e) {

@@ -323,7 +323,7 @@ public class SecureBidMessage {
 													userPeerID);
 		
 			try {
-				this.secureBidMessageKeyExchange.buildSecureBidMessageDataPersonalReceived();
+				this.secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeReceived();
 			} catch (InvalidKeyException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -27,6 +27,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -37,6 +40,8 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.eclipse.jetty.server.Response;
+
 import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
@@ -337,7 +342,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	@Override
 	public HttpResponse addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo)
-			throws SQLException {
+			throws SQLException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException, ClientProtocolException, IOException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to add bid to " + openedAuctionID + "!");
 
@@ -349,56 +354,40 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		
 		SecureBidMessage serializedBidInfo = new SecureBidMessage(bidInfo.getSecureBidMessageSerialized());
 		serializedBidInfo.undoSecureBidMessageSerialized();
-		
-		SecureBidMessageMetaHeader secureBidMessageMetaHeader = serializedBidInfo.getSecureBidMessageMetaHeader();
-		SecureBidMessageComponents secureBidMessageComponents = serializedBidInfo.getSecureBidMessageComponents();
-		try {
-			secureBidMessageComponents.undoSecureBidMessageComponentsSerialization();
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidAlgorithmParameterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SignatureException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		SecureBidMessageData secureBidMessageData = secureBidMessageComponents.getSecureBidMessageData();
-		SecureBidMessageDataPersonal secureBidMessageDataPersonal = secureBidMessageData.getSecureBidMessageDataPersonal();
-		SecureBidMessageDoSMitigation secureBidMessageDosMitigation = serializedBidInfo.getSecureBidMessageDoSMitigation();
-		SecureBidMessageDataSignature secureBidMessageDataSignature = secureBidMessageData.getSecureBidMessageDataSignature();
-		SecureBidMessageKeyExchange secureBidMessageKeyExchange = serializedBidInfo.getSecureBidMessageKeyExchange();
-		
-		//TODO Change generation of Bid ID!
-		Random random = new Random();
-//		Bid bid = new Bid(random.nextLong(), bidInfo.getUser().getUserPeerID(), bidInfo.getBidValue());
-//		String bidJson = gson.toJson(bid);
-//		try {
-//			postRequest.setEntity(new StringEntity(bidJson));
-//			postRequest.setHeader("Accept", "application/json");
-//			postRequest.setHeader("Content-type", "application/json");
-//			response = httpClient.execute(postRequest);
-//		} catch (UnsupportedEncodingException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (ClientProtocolException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 
+		SecureBidMessageData secureBidMessageData = null;
+		SecureBidMessageKeyExchange secureBidMessageKeyExchange = serializedBidInfo.getSecureBidMessageKeyExchange();
+		SecureBidMessageDoSMitigation secureBidMessageDosMitigation = serializedBidInfo.getSecureBidMessageDoSMitigation();
+		SecureBidMessageComponents secureBidMessageComponents = serializedBidInfo.getSecureBidMessageComponents();
+		
+		secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeReceived();
+		
+		if(secureBidMessageKeyExchange.getIsSecureBidMessageKeyExchangeSerializedCipheredSignedValid()) {
+						
+			if(secureBidMessageDosMitigation.checkIfHashOfSecureBidMessageDoSMitigationIsValid()) {
+				
+				secureBidMessageComponents.undoSecureBidMessageComponentsSerialization();
+
+				secureBidMessageData = secureBidMessageComponents.getSecureBidMessageData();
+				
+
+				SecureBidMessageDataSignature secureBidMessageDataSignature = secureBidMessageData.getSecureBidMessageDataSignature();
+				secureBidMessageDataSignature.buildSecureBidMessageDataSignatureReceived();
+				
+				SecureBidMessageDataPersonal secureBidMessageDataPersonal = secureBidMessageData.getSecureBidMessageDataPersonal();
+				secureBidMessageDataPersonal.buildSecureBidMessageDataPersonalReceived();
+				
+				
+				String bidJson = gson.toJson(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
+				System.err.println("Bid is: " + secureBidMessageData.getSecureBidMessageDataSignature().getBid());
+				postRequest.setEntity(new StringEntity(bidJson));
+				postRequest.setHeader("Accept", "application/json");
+				postRequest.setHeader("Content-type", "application/json");
+
+			}
+			
+		}
+		response = httpClient.execute(postRequest);	
 		printErrorStringWithClassName(response.getStatusLine());
 		printErrorStringWithClassName(response.getEntity());
 		return response;
