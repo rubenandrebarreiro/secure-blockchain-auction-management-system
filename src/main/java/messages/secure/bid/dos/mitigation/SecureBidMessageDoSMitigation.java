@@ -5,11 +5,14 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.encoders.Base64;
 
 import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
@@ -21,6 +24,8 @@ public class SecureBidMessageDoSMitigation {
 	private byte[] secureBidMessageComponentsSerialized;
 	
 	private byte[] secureBidMessageComponentsHashedForDoSMitigation;
+	
+	private byte[] secretHMACKeyForDoSMitigationInBytes;
 	
 	private boolean isSecureBidMessageComponentsHashedForDoSMitigation;
 	
@@ -47,7 +52,8 @@ public class SecureBidMessageDoSMitigation {
 	
 	
 	public SecureBidMessageDoSMitigation(byte[] secureBidMessageComponentsSerialized,
-									     byte[] secureBidMessageComponentsHashedForDoSMitigation) {
+									     byte[] secureBidMessageComponentsHashedForDoSMitigation,
+									     byte[] secretHMACKeyForDoSMitigationInBytes) {
 		
 		this.secureBidMessageComponents = null;
 		
@@ -138,14 +144,12 @@ public class SecureBidMessageDoSMitigation {
 			try {
 				
 				// The Initialization Vector and its Parameter's Specifications
-				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils
-						.convertStringToKey(""/*keystoreInterface.load(propertiesReader.getProperty("ip") + ":" + 
-								propertiesReader.getProperty("port") + ":" +
-								"mac")*/); // TODO Symmetric Key generated on the fly (secretHMACKeyForDoSMitigationInBytes)
-				
+				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils.createKeyForAES(256, new SecureRandom());
+				this.secretHMACKeyForDoSMitigationInBytes = Base64.decode(secretHMACKeyForDoSMitigationMACKey.getEncoded());
+				Mac mac = Mac.getInstance("HMacSHA256");
+				SecretKeySpec keySpec = new SecretKeySpec(this.secretHMACKeyForDoSMitigationInBytes, "HMacSHA256");
 				// The configuration, initialization and update of the MAC Hash process
-				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/);
-				mac.init(secretHMACKeyForDoSMitigationMACKey);
+				mac.init(keySpec);
 				mac.update(this.secureBidMessageComponentsSerialized);
 				
 				// Performs the final operation of MAC Hash process over the Secure Message serialized
@@ -181,14 +185,10 @@ public class SecureBidMessageDoSMitigation {
 			try {
 			
 				// The Initialization Vector and its Parameter's Specifications
-				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils
-						.convertStringToKey(""/*keystoreInterface.load(propertiesReader.getProperty("ip") + ":" + 
-								propertiesReader.getProperty("port") + ":" +
-								"mac")*/);
-				
+				Mac mac = Mac.getInstance("HMacSHA256");
+				SecretKeySpec keySpec = new SecretKeySpec(this.secretHMACKeyForDoSMitigationInBytes, "HMacSHA256");
 				// The configuration, initialization and update of the MAC Hash process
-				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/); //TODO Symmetric Key contained in the Envelope (secretSymmetricKeyForDataPersonalInBytes)
-				mac.init(secretHMACKeyForDoSMitigationMACKey);
+				mac.init(keySpec);
 				mac.update(secureBidMessageComponentsSerializedToCompare);
 				
 				// Performs the final operation of MAC Hash process over the Secure Message serialized

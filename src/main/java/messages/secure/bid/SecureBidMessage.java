@@ -280,9 +280,22 @@ public class SecureBidMessage {
 													sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
 													sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned);
 		
+			try {
+				this.secureBidMessageKeyExchange.buildSecureBidMessageDataPersonalReceived();
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SignatureException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			this.secureBidMessageComponents = 
 					new SecureBidMessageComponents(secureBidMessageComponentsSerialized,
+												   this.secureBidMessageKeyExchange.getSecretSymmetricKeyForDataPersonalInBytes(),
 												   sizeOfSecureBidMessageDataSerialized,
 												   sizeOfSecureBidMessageDataSignatureSerialized,
 												   sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,
@@ -298,7 +311,8 @@ public class SecureBidMessage {
 						
 			this.secureBidMessageDoSMitigation = 
 					new SecureBidMessageDoSMitigation(secureBidMessageComponentsSerialized,
-													  secureBidMessageDoSMitigationSerialized);
+													  secureBidMessageDoSMitigationSerialized,
+													  this.secureBidMessageKeyExchange.getSecretHMACKeyForDoSMitigationInBytes());
 			
 			
 			

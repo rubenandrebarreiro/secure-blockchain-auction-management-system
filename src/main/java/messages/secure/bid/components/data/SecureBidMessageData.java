@@ -14,6 +14,8 @@ public class SecureBidMessageData {
 
 	private SecureBidMessageDataSignature secureBidMessageDataSignature;
 	
+	private byte[] secretSymmetricKeyForDataPersonalInBytes;
+	
 	private int sizeOfSecureBidMessageDataSignatureSerialized;
 	
 	private int sizeOfBidSerialized;
@@ -64,6 +66,7 @@ public class SecureBidMessageData {
 	
 	
 	public SecureBidMessageData(byte[] secureBidMessageDataSerialized,
+							    byte[] secretSymmetricKeyForDataPersonalInBytes,
 								int sizeOfSecureBidMessageDataSignatureSerialized,
 								int sizeOfBidSerialized,
 								int sizeOfBidSerializedDigitalSigned,
@@ -77,6 +80,7 @@ public class SecureBidMessageData {
 								int sizeOfUserBankAccountNIBSerialized) {
 
 		this.secureBidMessageDataSerialized = secureBidMessageDataSerialized;
+		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
 		this.isSecureBidMessageDataSerialized = true;
 		
 		this.secureBidMessageDataSignature = null;
@@ -267,6 +271,7 @@ public class SecureBidMessageData {
 			
 			this.secureBidMessageDataPersonal = 
 					new SecureBidMessageDataPersonal(secureBidMessageDataPersonalSerializedCipheredAndHashed,
+													 this.secretSymmetricKeyForDataPersonalInBytes,
 									 				 this.sizeOfSecureBidMessageDataPersonalSerializedCiphered,
 													 this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
 													 this.sizeOfSecureBidMessageDataPersonalSerialized,

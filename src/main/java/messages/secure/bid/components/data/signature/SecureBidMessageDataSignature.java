@@ -285,7 +285,7 @@ public class SecureBidMessageDataSignature {
 			Certificate certificate = null;
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(certificate);
 			
-			PublicKey userClientPublicKey = readCertificate("UserID").getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
+			PublicKey userClientPublicKey = readCertificate("auctionServer").getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
 
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(userClientPublicKey);
 
