@@ -29,7 +29,6 @@ import main.java.resources.user.UserAuctionInfo;
 import main.java.resources.user.UserBidInfo;
 import main.java.sys.SSLSocketAuctionOperation;
 import main.java.sys.SSLSocketMessage;
-import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
 public class Client implements ClientAPI {
@@ -72,7 +71,6 @@ public class Client implements ClientAPI {
 
 	private static final String USER_DATABASE_JDBC_PATH = "jdbc:sqlite:res/database/client/users.db";
 	private static final String USER_TLS_CONFIGURATION_PATH = "res/configurations/client-tls-configuration.conf";
-	private static final String USER_STORES_CONFIGURATION_PATH = "res/configurations/client-keystore-configuration.conf";
 
 	private User currentUser;
 
@@ -126,17 +124,14 @@ public class Client implements ClientAPI {
 			String truststorePath, String truststorePassword) {
 
 		AuctionServerTLSConfigurationReader tlsConfigurationReader = null;
-//		AuctionServerKeyStoreConfigurationReader storesConfigurationReader = null;
 		try {
 			tlsConfigurationReader = new AuctionServerTLSConfigurationReader(USER_TLS_CONFIGURATION_PATH);
-//			storesConfigurationReader = new AuctionServerKeyStoreConfigurationReader(USER_STORES_CONFIGURATION_PATH);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		//SSL Connection
-
 		try {
 			System.setProperty("javax.net.ssl.keyStore", keystorePath);
 			System.setProperty("javax.net.ssl.keyStorePassword",keystorePassword);
