@@ -84,6 +84,10 @@ public class SecureBidMessageDoSMitigation {
 		return this.secureBidMessageComponentsHashedForDoSMitigation;
 	}
 	
+	public byte[] getSecretHMACKeyForDoSMitigationInBytes() {
+		return this.secretHMACKeyForDoSMitigationInBytes;
+	}
+	
 	public boolean getIsSecureBidMessageComponentsHashedForDoSMitigation() {
 		return this.isSecureBidMessageComponentsHashedForDoSMitigation;
 	}

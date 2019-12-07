@@ -14,8 +14,6 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -62,10 +60,11 @@ public class SecureBidMessageKeyExchange {
 	
 	private boolean isSecureBidMessageKeyExchangeSerializedCipheredAndSigned;
 	
-	
+	private String userPeerID;
 	
 	public SecureBidMessageKeyExchange(byte[] secretSymmetricKeyForDataPersonalInBytes,
-									   byte[] secretHMACKeyForDoSMitigationInBytes) {
+									   byte[] secretHMACKeyForDoSMitigationInBytes,
+									   String userPeerID) {
 			
 		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
 		this.secretHMACKeyForDoSMitigationInBytes = secretHMACKeyForDoSMitigationInBytes;
@@ -84,12 +83,15 @@ public class SecureBidMessageKeyExchange {
 		this.secureBidMessageKeyExchangeSerializedCipheredAndSigned = null;
 		this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned = false;
 		
+		this.userPeerID = userPeerID;
+		
 	}
 	
 	
 	public SecureBidMessageKeyExchange(byte[] secureBidMessageKeyExchangeSerializedCipheredAndSigned,
 									   int sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
-									   int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned) {
+									   int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
+									   String userPeerID) {
 		
 		this.secureBidMessageKeyExchangeSerializedCipheredAndSigned = 
 				secureBidMessageKeyExchangeSerializedCipheredAndSigned;
@@ -111,6 +113,7 @@ public class SecureBidMessageKeyExchange {
 		this.secretSymmetricKeyForDataPersonalInBytes = null;
 		this.secretHMACKeyForDoSMitigationInBytes = null;
 		
+		this.userPeerID = userPeerID;
 	}
 	
 		
@@ -610,7 +613,7 @@ public class SecureBidMessageKeyExchange {
 			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
 					  Signature.getInstance("SHA256withDSA");
 			
-			PrivateKey userClientPrivateKey = readKeysFromKeystore("UserID").getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
+			PrivateKey userClientPrivateKey = readKeysFromKeystore(userPeerID).getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
 			
 			secureBidMessageKeyExchangeSerializedCipheredSignature.initSign(userClientPrivateKey);
 			
@@ -644,7 +647,7 @@ public class SecureBidMessageKeyExchange {
 			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
 					  Signature.getInstance("SHA256withDSA");
 			
-			PublicKey userClientPublicKey = readCertificate("UserID").getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
+			PublicKey userClientPublicKey = readCertificate(userPeerID).getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
 			
 			secureBidMessageKeyExchangeSerializedCipheredSignature.initVerify(userClientPublicKey);
 			

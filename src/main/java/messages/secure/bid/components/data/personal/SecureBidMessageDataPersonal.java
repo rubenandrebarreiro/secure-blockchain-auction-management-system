@@ -219,6 +219,10 @@ public class SecureBidMessageDataPersonal {
 		return this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
 	}
 	
+	public byte[] getSecretSymmetricKeyForDataPersonalInBytes() {
+		return secretSymmetricKeyForDataPersonalInBytes;
+	}
+	
 	public boolean getIsSecureBidMessageDataPersonalSerializedCipheredHashedVerified() {
 		return this.isSecureBidMessageDataPersonalSerializedCipheredHashedVerified;
 	}

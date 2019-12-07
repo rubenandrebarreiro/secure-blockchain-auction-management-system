@@ -44,9 +44,11 @@ public class SecureBidMessageComponents {
 	private int sizeOfUserHomeAddressSerialized;
 	private int sizeOfUserBankAccountNIBSerialized;
 	
+	private String userPeerID;
 	
 	public SecureBidMessageComponents(SecureCommonHeader secureCommonHeader,
-								      SecureBidMessageData secureBidMessageData) {
+								      SecureBidMessageData secureBidMessageData,
+								      String userPeerID) {
 		
 		this.secureCommonHeader = secureCommonHeader;
 		
@@ -55,6 +57,8 @@ public class SecureBidMessageComponents {
 		
 		this.secureBidMessageComponentsSerialized = null;
 		this.isSecureBidMessageComponentsSerialized = false;
+		
+		this.userPeerID = userPeerID;
 		
 	}
 	
@@ -71,7 +75,8 @@ public class SecureBidMessageComponents {
 									  int sizeOfSecureBidMessageDataPersonalSerialized,
 									  int sizeOfUserEmailSerialized,
 									  int sizeOfUserHomeAddressSerialized, 
-									  int sizeOfUserBankAccountNIBSerialized) {
+									  int sizeOfUserBankAccountNIBSerialized,
+									  String userPeerID) {
 
 		this.secureBidMessageComponentsSerialized = secureBidMessageComponentsSerialized;
 		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
@@ -105,6 +110,8 @@ public class SecureBidMessageComponents {
 						sizeOfUserHomeAddressSerialized;
 		this.sizeOfUserBankAccountNIBSerialized =
 						sizeOfUserBankAccountNIBSerialized;
+		
+		this.userPeerID = userPeerID;
 		
 	}
 	
@@ -266,7 +273,8 @@ public class SecureBidMessageComponents {
 																 this.sizeOfSecureBidMessageDataPersonalSerialized,
 																 this.sizeOfUserEmailSerialized,
 																 this.sizeOfUserHomeAddressSerialized,
-																 this.sizeOfUserBankAccountNIBSerialized);
+																 this.sizeOfUserBankAccountNIBSerialized,
+																 this.userPeerID);
 			
 			this.secureBidMessageData.undoSecureBidMessageDataSerialization();
 			

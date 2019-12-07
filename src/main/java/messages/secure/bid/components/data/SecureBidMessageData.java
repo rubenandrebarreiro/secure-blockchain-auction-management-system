@@ -47,9 +47,11 @@ public class SecureBidMessageData {
 	
 	private boolean isSecureBidMessageDataSerialized;
 	
+	private String userPeerID;
 	
 	public SecureBidMessageData(SecureBidMessageDataSignature secureBidMessageDataSignature,
-								SecureBidMessageDataPersonal secureBidMessageDataPersonal) {
+								SecureBidMessageDataPersonal secureBidMessageDataPersonal,
+								String userPeerID) {
 		
 		this.secureBidMessageDataSignature = secureBidMessageDataSignature;
 		this.sizeOfSecureBidMessageDataSignatureSerialized = 0;
@@ -62,6 +64,7 @@ public class SecureBidMessageData {
 		this.secureBidMessageDataSerialized = null;
 		this.isSecureBidMessageDataSerialized = false;
 		
+		this.userPeerID = userPeerID;
 	}
 	
 	
@@ -77,7 +80,8 @@ public class SecureBidMessageData {
 								int sizeOfSecureBidMessageDataPersonalSerialized,
 								int sizeOfUserEmailSerialized,
 								int sizeOfUserHomeAddressSerialized, 
-								int sizeOfUserBankAccountNIBSerialized) {
+								int sizeOfUserBankAccountNIBSerialized,
+								String userPeerID) {
 
 		this.secureBidMessageDataSerialized = secureBidMessageDataSerialized;
 		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
@@ -99,6 +103,7 @@ public class SecureBidMessageData {
 		this.sizeOfUserHomeAddressSerialized = sizeOfUserEmailSerialized; 
 		this.sizeOfUserBankAccountNIBSerialized = sizeOfUserBankAccountNIBSerialized;
 		
+		this.userPeerID = userPeerID;
 	}
 	
 	
@@ -264,7 +269,8 @@ public class SecureBidMessageData {
 					new SecureBidMessageDataSignature(secureBidMessageDataSignatureSerialized,
 													  this.sizeOfBidSerialized,
 												      this.sizeOfBidderUserClientIDSerialized,
-												      this.sizeOfBidSerializedDigitalSigned);
+												      this.sizeOfBidSerializedDigitalSigned,
+												      userPeerID);
 			
 			this.secureBidMessageDataSignature.buildSecureBidMessageDataSignatureReceived();
 			

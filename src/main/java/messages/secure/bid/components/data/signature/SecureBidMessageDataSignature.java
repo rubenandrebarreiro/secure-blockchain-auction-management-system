@@ -49,8 +49,9 @@ public class SecureBidMessageDataSignature {
 
 	private boolean isBidDigitalSigned;
 
+	private String userPeerID;
 
-	public SecureBidMessageDataSignature(Bid bid) {
+	public SecureBidMessageDataSignature(Bid bid, String userPeerID) {
 
 		this.bid = bid;
 
@@ -68,12 +69,14 @@ public class SecureBidMessageDataSignature {
 		this.bidDigitalSigned = null;
 		this.isBidDigitalSigned = false;
 
+		this.userPeerID = userPeerID;
 	}
 
 	public SecureBidMessageDataSignature(byte[] bidDigitalSigned,
 										 int sizeOfBidSerialized,
 										 int sizeOfBidderUserClientIDSerialized,
-										 int sizeOfBidSerializedDigitalSigned) {
+										 int sizeOfBidSerializedDigitalSigned,
+										 String userPeerID) {
 
 		this.bidDigitalSigned = bidDigitalSigned;
 		this.isBidDigitalSigned = true;
@@ -91,6 +94,7 @@ public class SecureBidMessageDataSignature {
 
 		this.bid = null;
 
+		this.userPeerID = userPeerID;
 	}
 
 	
@@ -255,7 +259,7 @@ public class SecureBidMessageDataSignature {
 			Signature secureBidMessageDataSignatureBidSerialized = 
 					  Signature.getInstance("SHA256withDSA");
 			
-			PrivateKey userClientPrivateKey = readKeysFromKeystore("UserID").getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
+			PrivateKey userClientPrivateKey = readKeysFromKeystore(userPeerID).getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
 			
 			secureBidMessageDataSignatureBidSerialized.initSign(userClientPrivateKey);
 			

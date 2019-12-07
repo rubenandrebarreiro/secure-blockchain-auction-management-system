@@ -310,7 +310,8 @@ public class SecureBidMessage {
 			this.secureBidMessageKeyExchange = 
 					new SecureBidMessageKeyExchange(secureBidMessageKeyExchangeSerialized,
 													sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
-													sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned);
+													sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
+													userPeerID);
 		
 			try {
 				this.secureBidMessageKeyExchange.buildSecureBidMessageDataPersonalReceived();
@@ -339,7 +340,8 @@ public class SecureBidMessage {
 												   sizeOfSecureBidMessageDataPersonalSerialized,
 												   sizeOfUserEmailSerialized,
 												   sizeOfUserHomeAddressSerialized, 
-												   sizeOfUserBankAccountNIBSerialized);
+												   sizeOfUserBankAccountNIBSerialized,
+												   this.userPeerID);
 						
 			this.secureBidMessageDoSMitigation = 
 					new SecureBidMessageDoSMitigation(secureBidMessageComponentsSerialized,
