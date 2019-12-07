@@ -141,7 +141,7 @@ public class SecureBidMessageDoSMitigation {
 				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils
 						.convertStringToKey(""/*keystoreInterface.load(propertiesReader.getProperty("ip") + ":" + 
 								propertiesReader.getProperty("port") + ":" +
-								"mac")*/); //TODO
+								"mac")*/); // TODO Symmetric Key generated on the fly (secretHMACKeyForDoSMitigationInBytes)
 				
 				// The configuration, initialization and update of the MAC Hash process
 				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/);
@@ -187,7 +187,7 @@ public class SecureBidMessageDoSMitigation {
 								"mac")*/);
 				
 				// The configuration, initialization and update of the MAC Hash process
-				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/); //TODO
+				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/); //TODO Symmetric Key contained in the Envelope (secretSymmetricKeyForDataPersonalInBytes)
 				mac.init(secretHMACKeyForDoSMitigationMACKey);
 				mac.update(secureBidMessageComponentsSerializedToCompare);
 				

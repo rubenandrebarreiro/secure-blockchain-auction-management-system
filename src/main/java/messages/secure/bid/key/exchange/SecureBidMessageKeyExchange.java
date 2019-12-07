@@ -366,7 +366,7 @@ public class SecureBidMessageKeyExchange {
 		
 		if(isPossibleToEncryptSecureBidMessageKeyExchangeSerialized) {
 			
-			byte[] secretKeyBytes = null;
+			byte[] secretKeyBytes = null;  //TODO Public Key of the Server
 			
 			try {
 				
@@ -473,7 +473,7 @@ public class SecureBidMessageKeyExchange {
 		
 		if(isPossibleToDecryptSecureBidMessageKeyExchangeSerializedCiphered) {
 			
-			byte[] secretKeyBytes = null;
+			byte[] secretKeyBytes = null; //TODO Private Key of the Server
 			
 			try {
 				
@@ -601,7 +601,7 @@ public class SecureBidMessageKeyExchange {
 			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
 					  Signature.getInstance("SHA256withDSA");
 			
-			PrivateKey userClientPrivateKey = null; //TODO
+			PrivateKey userClientPrivateKey = null; //TODO Private Key to Sign contained in the KeyStore of the User
 			
 			secureBidMessageKeyExchangeSerializedCipheredSignature.initSign(userClientPrivateKey);
 			
@@ -635,7 +635,7 @@ public class SecureBidMessageKeyExchange {
 			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
 					  Signature.getInstance("SHA256withDSA");
 			
-			PublicKey userClientPublicKey = null; //TODO
+			PublicKey userClientPublicKey = null; //TODO Public Key or Certificate of the User contained in the Server 
 			
 			secureBidMessageKeyExchangeSerializedCipheredSignature.initVerify(userClientPublicKey);
 			

@@ -443,9 +443,7 @@ public class SecureBidMessageDataPersonal {
 
 		if(isPossibleToEncryptSecureBidMessageDataPersonalSerialized) {
 
-			// TODO - to complete
-
-			byte[] secretKeyBytes = null;
+			byte[] secretKeyBytes = null; // TODO Symmetric Key generated on the fly with KeyGen (secretHMACKeyForDoSMitigationInBytes)
 
 			try {
 
@@ -554,7 +552,7 @@ public class SecureBidMessageDataPersonal {
 
 		if(isPossibleToDecryptSecureBidMessageDataPersonalSerializedCiphered) {
 			
-			byte[] secretKeyBytes = null;
+			byte[] secretKeyBytes = null; // TODO Symmetric Key contained in the Envelope (secretHMACKeyForDoSMitigationInBytes)
 			
 			try {
 				

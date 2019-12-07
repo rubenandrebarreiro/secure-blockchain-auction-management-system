@@ -250,7 +250,7 @@ public class SecureBidMessageDataSignature {
 			Signature secureBidMessageDataSignatureBidSerialized = 
 					  Signature.getInstance("SHA256withDSA");
 			
-			PrivateKey userClientPrivateKey = null; //TODO
+			PrivateKey userClientPrivateKey = null; //TODO Private Key to Sign contained in the KeyStore of the User
 			
 			secureBidMessageDataSignatureBidSerialized.initSign(userClientPrivateKey);
 			
@@ -280,7 +280,7 @@ public class SecureBidMessageDataSignature {
 			Certificate certificate = null;
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(certificate);
 			
-			PublicKey userClientPublicKey = null; //TODO
+			PublicKey userClientPublicKey = null; //TODO Public Key or Certificate of the User contained in the Server 
 
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(userClientPublicKey);
 
