@@ -35,6 +35,7 @@ import org.apache.http.util.EntityUtils;
 import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
+import main.java.messages.secure.bid.SecureBidMessage;
 import main.java.resources.auction.Auction;
 import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
@@ -332,26 +333,27 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		url = removeSpaceFromURL(url);
 		HttpPost postRequest = new HttpPost(url);
 		HttpResponse response = null;
-		UserBidInfo bidInfo = gson.fromJson(userBidInfo, UserBidInfo.class);
+		SecureBidMessage bidInfo = gson.fromJson(userBidInfo, SecureBidMessage.class);
+		
 		//TODO Change generation of Bid ID!
 		Random random = new Random();
-		Bid bid = new Bid(random.nextLong(), bidInfo.getUser().getUserPeerID(), bidInfo.getBidValue());
-		String bidJson = gson.toJson(bid);
-		try {
-			postRequest.setEntity(new StringEntity(bidJson));
-			postRequest.setHeader("Accept", "application/json");
-			postRequest.setHeader("Content-type", "application/json");
-			response = httpClient.execute(postRequest);
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		Bid bid = new Bid(random.nextLong(), bidInfo.getUser().getUserPeerID(), bidInfo.getBidValue());
+//		String bidJson = gson.toJson(bid);
+//		try {
+//			postRequest.setEntity(new StringEntity(bidJson));
+//			postRequest.setHeader("Accept", "application/json");
+//			postRequest.setHeader("Content-type", "application/json");
+//			response = httpClient.execute(postRequest);
+//		} catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ClientProtocolException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 		printErrorStringWithClassName(response.getStatusLine());
 		printErrorStringWithClassName(response.getEntity());
