@@ -1,7 +1,11 @@
 package main.java.messages.secure.bid.components.data.signature;
 
+import java.io.FileInputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -9,6 +13,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -250,7 +255,7 @@ public class SecureBidMessageDataSignature {
 			Signature secureBidMessageDataSignatureBidSerialized = 
 					  Signature.getInstance("SHA256withDSA");
 			
-			PrivateKey userClientPrivateKey = null; //TODO Private Key to Sign contained in the KeyStore of the User
+			PrivateKey userClientPrivateKey = readKeysFromKeystore("UserID").getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
 			
 			secureBidMessageDataSignatureBidSerialized.initSign(userClientPrivateKey);
 			
@@ -280,7 +285,7 @@ public class SecureBidMessageDataSignature {
 			Certificate certificate = null;
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(certificate);
 			
-			PublicKey userClientPublicKey = null; //TODO Public Key or Certificate of the User contained in the Server 
+			PublicKey userClientPublicKey = readCertificate("UserID").getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
 
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(userClientPublicKey);
 
@@ -406,6 +411,47 @@ public class SecureBidMessageDataSignature {
 			this.setIsBidDigitalSigned(false);
 			
 		}
+	}
+
+	private KeyPair readKeysFromKeystore(String alias) {
+		KeyPair kp = null;
+		try {
+			FileInputStream inputStream = new FileInputStream("res/keystores/" + alias + "Keystore.jks");
+			KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+			char[] password = (alias + "1920").toCharArray();
+			keystore.load(inputStream, password);
+			Key key = keystore.getKey(alias, password);
+			if(key instanceof PrivateKey) {
+				Certificate cert = keystore.getCertificateChain(alias)[0];
+				PublicKey publicKey = cert.getPublicKey();
+				kp = new KeyPair(publicKey, (PrivateKey)key);
+			}
+			//            String publicKeyString = Base64.toBase64String(kp.getPublic().getEncoded());
+			//            String privateKeyString = Base64.toBase64String(kp.getPrivate().getEncoded());
+			//            System.out.println("Alias " + alias + " public string is: " + publicKeyString);
+			//            System.out.println("Alias " + alias + " private string is: " + privateKeyString);
+		} catch (Exception e) {
+			e.getCause();
+			e.getMessage();
+			e.printStackTrace();
+		}
+		return kp;
+	}
+
+	private Certificate readCertificate(String alias) {
+		Certificate cert = null;
+		try {
+			FileInputStream inputStream = new FileInputStream("res/certificates/" + alias + "Chain.pem");
+			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+			cert = certFactory.generateCertificate(inputStream);
+			//			PublicKey pk = cert.getPublicKey();
+			//			System.out.println(user + " public key is: " + Base64.toBase64String(pk.getEncoded()));
+		} catch (Exception e) {
+			e.getCause();
+			e.getMessage();
+			e.printStackTrace();
+		}
+		return cert;
 	}
 	
 }
