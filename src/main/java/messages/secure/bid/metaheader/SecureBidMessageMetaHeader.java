@@ -4,6 +4,9 @@ import main.java.common.utils.CommonUtils;
 
 public class SecureBidMessageMetaHeader {
 	
+	private int sizeOfSecureBidMessageKeyExchangeSerializedCiphered;
+	private int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned;
+	
 	private int sizeOfSecureBidMessageDataSerialized;
 	private int sizeOfSecureBidMessageDoSMitigationSerialized;
 	  
@@ -22,9 +25,6 @@ public class SecureBidMessageMetaHeader {
 	private int sizeOfUserEmailSerialized;
 	private int sizeOfUserHomeAddressSerialized;
 	private int sizeOfUserBankAccountNIBSerialized;
-	  
-	private int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
-	private int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
 	
 	
 	private byte[] secureBidMessageMetaHeaderSerialized;
@@ -33,7 +33,10 @@ public class SecureBidMessageMetaHeader {
 
 	
 	
-	public SecureBidMessageMetaHeader(int sizeOfSecureBidMessageDataSerialized,
+	public SecureBidMessageMetaHeader(int sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
+			  						  int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
+			  						  
+			  						  int sizeOfSecureBidMessageDataSerialized,
 									  int sizeOfSecureBidMessageDoSMitigationSerialized,
 									  
 									  int sizeOfSecureBidMessageDataSignatureSerialized,
@@ -50,10 +53,12 @@ public class SecureBidMessageMetaHeader {
 									  
 									  int sizeOfUserEmailSerialized,
 									  int sizeOfUserHomeAddressSerialized,
-									  int sizeOfUserBankAccountNIBSerialized,
-									  
-									  int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered,
-									  int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned) {
+									  int sizeOfUserBankAccountNIBSerialized) {
+		
+		this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 
+				sizeOfSecureBidMessageKeyExchangeSerializedCiphered;
+		this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned =
+				sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned;
 		
 		this.sizeOfSecureBidMessageDataSerialized = sizeOfSecureBidMessageDataSerialized;
 		this.sizeOfSecureBidMessageDoSMitigationSerialized = sizeOfSecureBidMessageDoSMitigationSerialized;
@@ -80,11 +85,6 @@ public class SecureBidMessageMetaHeader {
 		this.sizeOfUserBankAccountNIBSerialized =
 						sizeOfUserBankAccountNIBSerialized;
 		
-		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
-				sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
-		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned =
-				sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
-		
 		this.secureBidMessageMetaHeaderSerialized = null;
 		this.isSecureBidMessageMetaHeaderSerialized = false;
 		
@@ -94,9 +94,6 @@ public class SecureBidMessageMetaHeader {
 
 		this.secureBidMessageMetaHeaderSerialized = secureBidMessageMetaHeaderSerialized;
 		this.isSecureBidMessageMetaHeaderSerialized = true;
-		
-		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 0;
-		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned = 0;
 		
 		this.sizeOfUserEmailSerialized = 0;
 		this.sizeOfUserHomeAddressSerialized = 0;
@@ -117,6 +114,34 @@ public class SecureBidMessageMetaHeader {
 		this.sizeOfSecureBidMessageDataSerialized = 0;
 		this.sizeOfSecureBidMessageDoSMitigationSerialized = 0;
 		
+		this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 0;
+		this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned = 0;
+		
+	}
+
+	  
+	public int getSizeOfSecureBidMessageKeyExchangeSerializedCiphered() {
+		return this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered;
+	}
+	
+	public void setSizeOfSecureBidMessageKeyExchangeSerializedCiphered
+	      (int sizeOfSecureBidMessageKeyExchangeSerializedCiphered) {
+	
+		this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 
+				sizeOfSecureBidMessageKeyExchangeSerializedCiphered;
+	
+	}
+	
+	public int getSizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned() {
+		return this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned;
+	}
+	
+	public void setSizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned
+	      (int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned) {
+	
+		this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned = 
+				sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned;
+	
 	}
 	
 	public int getSizeOfSecureBidMessageDataSerialized() {
@@ -240,30 +265,7 @@ public class SecureBidMessageMetaHeader {
 	public void setSizeOfUserBankAccountNIBSerialized(int sizeOfUserBankAccountNIBSerialized) {
 		this.sizeOfUserBankAccountNIBSerialized = sizeOfUserBankAccountNIBSerialized;
 	}
-	  
-	public int getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered() {
-		return this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
-	}
 	
-	public void setSizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered
-	      (int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered) {
-	
-		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
-				sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered;
-	
-	}
-	
-	public int getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned() {
-		return this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
-	}
-	
-	public void setSizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned
-	      (int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned) {
-	
-		this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned = 
-				sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned;
-	
-	}
 	
 	public byte[] getSecureBidMessageMetaHeaderSerialized() {
 		return this.secureBidMessageMetaHeaderSerialized;
@@ -290,7 +292,12 @@ public class SecureBidMessageMetaHeader {
 
 			byte[] outsideSeparator = new byte[] { ( (byte) 0x00 ), ( (byte) 0x00 ) };
 			byte[] insideSeparator = new byte[] { ( (byte) 0x00 ) };
-
+			
+			
+			byte[] sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes = 
+					CommonUtils.fromIntToByteArray(this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered);
+			byte[] sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes = 
+					CommonUtils.fromIntToByteArray(this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned);
 			
 			byte[] sizeOfSecureBidMessageDataSerializedInBytes = 
 					CommonUtils.fromIntToByteArray(this.sizeOfSecureBidMessageDataSerialized);
@@ -327,12 +334,6 @@ public class SecureBidMessageMetaHeader {
 					CommonUtils.fromIntToByteArray(this.sizeOfUserBankAccountNIBSerialized);
 
 			
-			byte[] sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredInBytes = 
-					CommonUtils.fromIntToByteArray(this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered);
-			byte[] sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedInBytes = 
-					CommonUtils.fromIntToByteArray(this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned);
-
-			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
 			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
@@ -350,7 +351,37 @@ public class SecureBidMessageMetaHeader {
 			// the position corresponding to the length of the current Bid's Serialization
 			System.arraycopy(outsideSeparator, 0, this.secureBidMessageMetaHeaderSerialized, serializationOffset, outsideSeparator.length);
 			serializationOffset += outsideSeparator.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes.length);
+			serializationOffset += sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes.length;
 
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(insideSeparator, 0, this.secureBidMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
+			serializationOffset += insideSeparator.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes.length);
+			serializationOffset += sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(insideSeparator, 0, this.secureBidMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
+			serializationOffset += insideSeparator.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -543,36 +574,6 @@ public class SecureBidMessageMetaHeader {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(insideSeparator, 0, this.secureBidMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
-			serializationOffset += insideSeparator.length;
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
-					serializationOffset, sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredInBytes.length);
-			serializationOffset += sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredInBytes.length;
-
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(insideSeparator, 0, this.secureBidMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
-			serializationOffset += insideSeparator.length;
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
-					serializationOffset, sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedInBytes.length);
-			serializationOffset += sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedInBytes.length;
-
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
 			System.arraycopy(outsideSeparator, 0, this.secureBidMessageMetaHeaderSerialized, serializationOffset, outsideSeparator.length);
 
 
@@ -587,6 +588,9 @@ public class SecureBidMessageMetaHeader {
 		
 		if(this.getIsSecureBidMessageMetaHeaderSerialized()) {
 		
+			byte[] sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			byte[] sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			
 			byte[] sizeOfSecureBidMessageDataSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfSecureBidMessageDoSMitigationSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 
@@ -611,11 +615,7 @@ public class SecureBidMessageMetaHeader {
 			byte[] sizeOfUserHomeAddressSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfUserBankAccountNIBSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 
-			
-			byte[] sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
-			byte[] sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
-
-			
+						
 			byte[] outsideSeparator = new byte[] { ( (byte) 0x00 ), ( (byte) 0x00 ) };
 			byte[] insideSeparator = new byte[] { ( (byte) 0x00 ) };
 			
@@ -631,6 +631,26 @@ public class SecureBidMessageMetaHeader {
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			serializationOffset += insideSeparator.length;
+			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset,
+					sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes,
+					0, sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes.length);
+			serializationOffset += sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes.length;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			serializationOffset += insideSeparator.length;
+			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset,
+					sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes,
+					0, sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes.length);
+			serializationOffset += sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -759,28 +779,13 @@ public class SecureBidMessageMetaHeader {
 			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset,
 					sizeOfUserBankAccountNIBSerializedInBytes,
 					0, sizeOfUserBankAccountNIBSerializedInBytes.length);
-			serializationOffset += sizeOfUserBankAccountNIBSerializedInBytes.length;
-
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			serializationOffset += insideSeparator.length;
-			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredInBytes,
-					0, sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredInBytes.length);
-			serializationOffset += sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredInBytes.length;
-
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			serializationOffset += insideSeparator.length;
-			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedInBytes,
-					0, sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedInBytes.length);
-			serializationOffset += sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedInBytes.length;
+			serializationOffset += sizeOfUserBankAccountNIBSerializedInBytes.length;			
 			
+			
+			this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 
+					CommonUtils.fromByteArrayToInt(sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes);
+			this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned = 
+					CommonUtils.fromByteArrayToInt(sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes);
 			
 			this.sizeOfSecureBidMessageDataSerialized = 
 					CommonUtils.fromByteArrayToInt(sizeOfSecureBidMessageDataSerializedInBytes);
@@ -810,11 +815,6 @@ public class SecureBidMessageMetaHeader {
 					CommonUtils.fromByteArrayToInt(sizeOfUserHomeAddressSerializedInBytes);
 			this.sizeOfUserBankAccountNIBSerialized = 
 					CommonUtils.fromByteArrayToInt(sizeOfUserBankAccountNIBSerializedInBytes);
-			
-			this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
-					CommonUtils.fromByteArrayToInt(sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredInBytes);
-			this.sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned = 
-					CommonUtils.fromByteArrayToInt(sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSignedInBytes);
 			
 			
 			this.setIsSecureBidMessageMetaHeaderSerialized(false);

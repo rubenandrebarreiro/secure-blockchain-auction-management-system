@@ -4,17 +4,21 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 
 import javax.crypto.NoSuchPaddingException;
 
 import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
+import main.java.messages.secure.bid.key.exchange.SecureBidMessageKeyExchange;
 import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
 
 public class SecureBidMessage {
 	
 	private SecureBidMessageMetaHeader secureBidMessageMetaHeader;
+	
+	private SecureBidMessageKeyExchange secureBidMessageKeyExchange;
 	
 	private SecureBidMessageComponents secureBidMessageComponents;
 	
@@ -26,10 +30,12 @@ public class SecureBidMessage {
 	
 	
 	public SecureBidMessage(SecureBidMessageMetaHeader secureBidMessageMetaHeader,
+							SecureBidMessageKeyExchange secureBidMessageKeyExchange,
 							SecureBidMessageComponents secureBidMessageComponents,
 							SecureBidMessageDoSMitigation secureBidMessageDoSMitigation) {
 		
 		this.secureBidMessageMetaHeader = secureBidMessageMetaHeader;
+		this.secureBidMessageKeyExchange = secureBidMessageKeyExchange;
 		this.secureBidMessageComponents = secureBidMessageComponents;
 		this.secureBidMessageDoSMitigation = secureBidMessageDoSMitigation;
 		
@@ -44,6 +50,7 @@ public class SecureBidMessage {
 		this.isSecureBidMessageSerialized = true;
 		
 		this.secureBidMessageMetaHeader = null;
+		this.secureBidMessageKeyExchange = null;
 		this.secureBidMessageComponents = null;
 		this.secureBidMessageDoSMitigation = null;
 		
@@ -52,6 +59,10 @@ public class SecureBidMessage {
 	
 	public SecureBidMessageMetaHeader getSecureBidMessageMetaHeader() {
 		return this.secureBidMessageMetaHeader;
+	}
+	
+	public SecureBidMessageKeyExchange getSecureBidMessageKeyExchange() {
+		return this.secureBidMessageKeyExchange;
 	}
 	
 	public SecureBidMessageComponents getSecureBidMessageComponents() {
@@ -76,7 +87,7 @@ public class SecureBidMessage {
 	
 	
 	public void doSecureBidMessageSerialized()
-		   throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
+		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException,
 		          NoSuchPaddingException, InvalidAlgorithmParameterException {
 		
 		if(!this.isSecureBidMessageSerialized) {
@@ -84,6 +95,10 @@ public class SecureBidMessage {
 			this.secureBidMessageMetaHeader.doSecureBidMessageMetaHeaderSerialization();
 			byte[] secureBidMessageMetaHeaderSerialized = 
 					this.secureBidMessageMetaHeader.getSecureBidMessageMetaHeaderSerialized();
+			
+			this.secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeToSend();
+			byte[] secureBidMessageKeyExchangeSerializedCipheredSigned = 
+					this.secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCipheredSigned();
 			
 			this.secureBidMessageComponents.doSecureBidMessageComponentsSerialization();
 			byte[] secureBidMessageComponentsSerialized = 
@@ -94,6 +109,7 @@ public class SecureBidMessage {
 					this.secureBidMessageDoSMitigation.getSecureBidMessageComponentsHashedForDoSMitigation();
 			
 			int sizeOfSecureBidMessageSerialized = (secureBidMessageMetaHeaderSerialized.length +
+												    secureBidMessageKeyExchangeSerializedCipheredSigned.length +
 													secureBidMessageComponentsSerialized.length +
 													secureBidMessageDoSMitigationSerialized.length);
 
@@ -173,6 +189,14 @@ public class SecureBidMessage {
 			serializationOffset += secureBidMessageMetaHeaderSerialized.length;
 			
 			this.secureBidMessageMetaHeader = new SecureBidMessageMetaHeader(secureBidMessageMetaHeaderSerialized);
+			this.secureBidMessageMetaHeader.undoSecureBidMessageMetaHeaderSerialization();
+			
+			
+			int sizeOfSecureBidMessageKeyExchangeSerialized = 
+					( this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeSerializedCiphered() + 
+					  this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned() );
+			
+			byte[] secureBidMessageKeyExchangeSerialized = new byte[ sizeOfSecureBidMessageKeyExchangeSerialized ];
 			
 			
 			int sizeOfSecureBidMessageComponentsSerialized = 
@@ -193,6 +217,15 @@ public class SecureBidMessage {
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
 			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
+					secureBidMessageKeyExchangeSerialized,
+							 0, secureBidMessageKeyExchangeSerialized.length);
+			serializationOffset += secureBidMessageKeyExchangeSerialized.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
 							 secureBidMessageComponentsSerialized,
 							 0, secureBidMessageComponentsSerialized.length);
 			serializationOffset += secureBidMessageComponentsSerialized.length;
@@ -204,6 +237,12 @@ public class SecureBidMessage {
 			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
 							 secureBidMessageDoSMitigationSerialized,
 							 0, secureBidMessageDoSMitigationSerialized.length);
+			
+			
+			int sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeSerializedCiphered();
+			int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned();
 			
 			
 			int sizeOfSecureBidMessageDataSerialized = 
@@ -235,13 +274,12 @@ public class SecureBidMessage {
 					this.secureBidMessageMetaHeader.getSizeOfUserHomeAddressSerialized();
 			int sizeOfUserBankAccountNIBSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfUserBankAccountNIBSerialized();
-			  
-			int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered();
-			int sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned();
-
 			
+			this.secureBidMessageKeyExchange = 
+					new SecureBidMessageKeyExchange(secureBidMessageKeyExchangeSerialized,
+													sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
+													sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned);
+		
 			
 			this.secureBidMessageComponents = 
 					new SecureBidMessageComponents(secureBidMessageComponentsSerialized,
@@ -256,9 +294,7 @@ public class SecureBidMessage {
 												   sizeOfSecureBidMessageDataPersonalSerialized,
 												   sizeOfUserEmailSerialized,
 												   sizeOfUserHomeAddressSerialized, 
-												   sizeOfUserBankAccountNIBSerialized,
-												   sizeOfSecureBidMessageKeyExchangeAgreementSerializedCiphered,
-												   sizeOfSecureBidMessageKeyExchangeAgreementSerializedCipheredSigned);
+												   sizeOfUserBankAccountNIBSerialized);
 						
 			this.secureBidMessageDoSMitigation = 
 					new SecureBidMessageDoSMitigation(secureBidMessageComponentsSerialized,
