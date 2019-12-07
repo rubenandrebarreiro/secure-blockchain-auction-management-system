@@ -1,22 +1,26 @@
 package main.java.messages.secure.bid.key.exchange;
 
-import java.security.InvalidAlgorithmParameterException;
+import java.io.FileInputStream;
 import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.util.Collection;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
 import main.java.common.utils.CommonUtils;
 
 public class SecureBidMessageKeyExchange {
@@ -53,10 +57,11 @@ public class SecureBidMessageKeyExchange {
 	
 	private boolean isSecureBidMessageKeyExchangeSerializedCipheredAndSigned;
 	
-	
+	private String userPeerID;
 	
 	public SecureBidMessageKeyExchange(byte[] secretSymmetricKeyForDataPersonalInBytes,
-									   byte[] secretHMACKeyForDoSMitigationInBytes) {
+									   byte[] secretHMACKeyForDoSMitigationInBytes,
+									   String userPeerID) {
 			
 		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
 		this.secretHMACKeyForDoSMitigationInBytes = secretHMACKeyForDoSMitigationInBytes;
@@ -75,12 +80,15 @@ public class SecureBidMessageKeyExchange {
 		this.secureBidMessageKeyExchangeSerializedCipheredAndSigned = null;
 		this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned = false;
 		
+		this.userPeerID = userPeerID;
+		
 	}
 	
 	
 	public SecureBidMessageKeyExchange(byte[] secureBidMessageKeyExchangeSerializedCipheredAndSigned,
 									   int sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
-									   int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned) {
+									   int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
+									   String userPeerID) {
 		
 		this.secureBidMessageKeyExchangeSerializedCipheredAndSigned = 
 				secureBidMessageKeyExchangeSerializedCipheredAndSigned;
@@ -102,6 +110,7 @@ public class SecureBidMessageKeyExchange {
 		this.secretSymmetricKeyForDataPersonalInBytes = null;
 		this.secretHMACKeyForDoSMitigationInBytes = null;
 		
+		this.userPeerID = userPeerID;
 	}
 	
 		
@@ -233,7 +242,7 @@ public class SecureBidMessageKeyExchange {
 
 	}
 		
-	public void buildSecureBidMessageDataPersonalReceived()
+	public void buildSecureBidMessageKeyExchangeReceived()
 		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		
 		boolean isPossibleToBuildSecureBidMessageKeyExchangeReceived = 
@@ -250,8 +259,8 @@ public class SecureBidMessageKeyExchange {
 				
 				this.decryptSecureBidMessageKeyExchangeSerialized();
 				
-				this.undoSecureBidMessageKeyExchangeSerializedCipheredAndSigned();
-
+				this.undoSerializationOfSecureBidMessageKeyExchange();
+				
 			}
 			
 		}
@@ -346,7 +355,7 @@ public class SecureBidMessageKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageKeyExchangeSerialized, 0, this.secretHMACKeyForDoSMitigationInBytes,
+			System.arraycopy(this.secureBidMessageKeyExchangeSerialized, serializationOffset, this.secretHMACKeyForDoSMitigationInBytes,
 					         0, this.secretHMACKeyForDoSMitigationInBytes.length);
 			
 			this.setIsSecureBidMessageKeyExchangeSerialized(false);
@@ -366,19 +375,13 @@ public class SecureBidMessageKeyExchange {
 		
 		if(isPossibleToEncryptSecureBidMessageKeyExchangeSerialized) {
 			
-			byte[] secretKeyBytes = null;  //TODO Public Key of the Server
+			Key secretKeyBytes = readKeysFromKeystore("auctionServer").getPublic();  //TODO Public Key of the Server
 			
 			try {
 				
-				String symmetricEncryptionAlgorithm = "AES";
-				String symmetricEncryptionMode = "CBC";
+				String symmetricEncryptionAlgorithm = "RSA";
+				String symmetricEncryptionMode = "None";
 		 	    String symmetricEncryptionPadding = "NoPadding";
-				
-				
-				// Set the Secret Key and its specifications,
-		 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
-				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
-				
 				
 				String provider = "BC";
 				Cipher secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher = 
@@ -386,40 +389,15 @@ public class SecureBidMessageKeyExchange {
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								           provider );
 				
-				byte[] initialisationVectorBytes = null;
-				
-				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
+				secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
+					.init(Cipher.ENCRYPT_MODE, secretKeyBytes, new SecureRandom());
 
-					// Algorithms that don't need IV (Initialisation Vector): ECB
-					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureBidMessageKeyExchange.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
-					initialisationVectorBytes = 
-							CommonUtils.generateIV(secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher);
-					
-					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageKeyExchange.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
-					
-					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
-					secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
-						.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
-					
-				}
-				else {
-					
-					// Algorithms that need IV (Initialisation Vector)
-					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
-					
-					secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
-						.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
-					
-				}
 				
 				this.secureBidMessageKeyExchangeSerializedCiphered = 
 						secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
 						.doFinal(this.secureBidMessageKeyExchangeSerialized);
 				
+				System.err.println("Ciphered data size: " + this.secureBidMessageKeyExchangeSerializedCiphered.length);
 				
 				this.setIsSecureBidMessageKeyExchangeSerializedCiphered(true);		
 				
@@ -428,11 +406,6 @@ public class SecureBidMessageKeyExchange {
 				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
 				System.err.println("- Cryptographic Algorithm not found!!!");
 				noSuchAlgorithmException.printStackTrace();
-			}
-			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
-				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
-				invalidAlgorithmParameterException.printStackTrace();
 			}
 			catch (NoSuchProviderException noSuchProviderException) {
 				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
@@ -473,19 +446,13 @@ public class SecureBidMessageKeyExchange {
 		
 		if(isPossibleToDecryptSecureBidMessageKeyExchangeSerializedCiphered) {
 			
-			byte[] secretKeyBytes = null; //TODO Private Key of the Server
+			Key secretKeyBytes = readKeysFromKeystore("auctionServer").getPrivate(); //TODO Private Key of the Server
 			
 			try {
 				
-				String symmetricEncryptionAlgorithm = "AES";
-				String symmetricEncryptionMode = "CBC";
+				String symmetricEncryptionAlgorithm = "RSA";
+				String symmetricEncryptionMode = "None";
 		 	    String symmetricEncryptionPadding = "NoPadding";
-				
-				
-				// Set the Secret Key and its specifications,
-		 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
-				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
-				
 				
 				String provider = "BC";
 				Cipher secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher = 
@@ -493,32 +460,9 @@ public class SecureBidMessageKeyExchange {
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								           provider);
 				
-				byte[] initialisationVectorBytes = null;
 			
-				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
-					
-					// Algorithms that don't need IV (Initialisation Vector): ECB
-					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
-					
-					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
-					
-					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
-					secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
-						.init(Cipher.DECRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
-				}
-				else {
-					
-					// Algorithms that need IV (Initialisation Vector)
-					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
-					
-					secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
-						.init(Cipher.DECRYPT_MODE, secretKeySpecifications);
-					
-				}
+				secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
+					.init(Cipher.DECRYPT_MODE, secretKeyBytes);
 				
 				this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 
 						this.secureBidMessageKeyExchangeSerializedCiphered.length;
@@ -546,11 +490,6 @@ public class SecureBidMessageKeyExchange {
 				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
 				System.err.println("- Cryptographic Algorithm not found!!!");
 				noSuchAlgorithmException.printStackTrace();
-			}
-			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
-				invalidAlgorithmParameterException.printStackTrace();
 			}
 			catch (NoSuchProviderException noSuchProviderException) {
 				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
@@ -599,9 +538,9 @@ public class SecureBidMessageKeyExchange {
 		if(isPossibleToSignSecureBidMessageKeyExchangeSerializedCiphered) {
 			
 			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
-					  Signature.getInstance("SHA256withDSA");
+					  Signature.getInstance("SHA256withRSA");
 			
-			PrivateKey userClientPrivateKey = null; //TODO Private Key to Sign contained in the KeyStore of the User
+			PrivateKey userClientPrivateKey = readKeysFromKeystore(userPeerID).getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
 			
 			secureBidMessageKeyExchangeSerializedCipheredSignature.initSign(userClientPrivateKey);
 			
@@ -633,9 +572,9 @@ public class SecureBidMessageKeyExchange {
 		if(isPossibleToVerifySecureBidMessageKeyExchangeSerializedCipheredSigned) {
 			
 			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
-					  Signature.getInstance("SHA256withDSA");
+					  Signature.getInstance("SHA256withRSA");
 			
-			PublicKey userClientPublicKey = null; //TODO Public Key or Certificate of the User contained in the Server 
+			PublicKey userClientPublicKey = readCertificate(userPeerID).getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
 			
 			secureBidMessageKeyExchangeSerializedCipheredSignature.initVerify(userClientPublicKey);
 			
@@ -727,10 +666,10 @@ public class SecureBidMessageKeyExchange {
 	public void undoSecureBidMessageKeyExchangeSerializedCipheredAndSigned() {
 		
 		boolean isPossibleToUndoSecureBidMessageKeyExchangeSerializedCipheredAndSigned = 
-				( this.isSecureBidMessageKeyExchangeSerialized && 
-				  this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				  this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				  this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+				(  this.isSecureBidMessageKeyExchangeSerialized && 
+				   this.isSecureBidMessageKeyExchangeSerializedCiphered &&
+				   this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
+				   this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
 		
 		
 		if(isPossibleToUndoSecureBidMessageKeyExchangeSerializedCipheredAndSigned) {
@@ -770,8 +709,51 @@ public class SecureBidMessageKeyExchange {
 					         0, this.secureBidMessageKeyExchangeSerializedCipheredSigned.length);
 			
 			
-			this.setIsSecureBidMessageKeyExchangeSerializedCipheredSigned(false);
+			this.setIsSecureBidMessageKeyExchangeSerializedCipheredAndSigned(false);
 			
 		}
 	}
+	
+	private KeyPair readKeysFromKeystore(String alias) {
+		KeyPair kp = null;
+		try {
+			FileInputStream inputStream = new FileInputStream("res/keystores/" + alias + "Keystore.jks");
+			KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+			char[] password = (alias + "1920").toCharArray();
+			keystore.load(inputStream, password);
+			Key key = keystore.getKey(alias, password);
+			if(key instanceof PrivateKey) {
+				Certificate cert = keystore.getCertificateChain(alias)[0];
+				PublicKey publicKey = cert.getPublicKey();
+				kp = new KeyPair(publicKey, (PrivateKey)key);
+			}
+			//            String publicKeyString = Base64.toBase64String(kp.getPublic().getEncoded());
+			//            String privateKeyString = Base64.toBase64String(kp.getPrivate().getEncoded());
+			//            System.out.println("Alias " + alias + " public string is: " + publicKeyString);
+			//            System.out.println("Alias " + alias + " private string is: " + privateKeyString);
+		} catch (Exception e) {
+			e.getCause();
+			e.getMessage();
+			e.printStackTrace();
+		}
+		return kp;
+	}
+
+	private Certificate readCertificate(String alias) {
+		Certificate cert = null;
+		try {
+			FileInputStream inputStream = new FileInputStream("res/certificates/" + alias + "Chain.pem");
+			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+			Collection<? extends Certificate> certificates = certFactory.generateCertificates(inputStream);
+			cert = (Certificate) certificates.toArray()[certificates.size() - 1];
+			//			PublicKey pk = cert.getPublicKey();
+			//			System.out.println(user + " public key is: " + Base64.toBase64String(pk.getEncoded()));
+		} catch (Exception e) {
+			e.getCause();
+			e.getMessage();
+			e.printStackTrace();
+		}
+		return cert;
+	}
+	
 }

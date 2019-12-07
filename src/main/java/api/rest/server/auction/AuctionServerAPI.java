@@ -2,8 +2,14 @@ package main.java.api.rest.server.auction;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.sql.SQLException;
 
+import javax.crypto.NoSuchPaddingException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
@@ -30,7 +36,7 @@ public interface AuctionServerAPI {
 	@Produces(MediaType.APPLICATION_JSON)
     public HttpResponse addBidToOpenedProductAuction
     	 (@PathParam("auction-id") String openedAuctionID, String userBidInfo)
-    	   throws SQLException;
+    	   throws SQLException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException, ClientProtocolException, IOException;
 	
 	@GET
 	@Path("/all")

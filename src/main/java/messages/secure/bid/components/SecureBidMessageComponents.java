@@ -4,6 +4,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -22,6 +23,8 @@ public class SecureBidMessageComponents {
 	
 	
 	private byte[] secureBidMessageComponentsSerialized;
+	
+	private byte[] secretSymmetricKeyForDataPersonalInBytes;
 	
 	private boolean isSecureBidMessageComponentsSerialized;
 	
@@ -42,9 +45,12 @@ public class SecureBidMessageComponents {
 	private int sizeOfUserHomeAddressSerialized;
 	private int sizeOfUserBankAccountNIBSerialized;
 	
+	private String userPeerID;
 	
 	public SecureBidMessageComponents(SecureCommonHeader secureCommonHeader,
-								      SecureBidMessageData secureBidMessageData) {
+								      SecureBidMessageData secureBidMessageData,
+								      byte[] secretSymmetricKeyForDataPersonalInBytes,
+								      String userPeerID) {
 		
 		this.secureCommonHeader = secureCommonHeader;
 		
@@ -54,9 +60,14 @@ public class SecureBidMessageComponents {
 		this.secureBidMessageComponentsSerialized = null;
 		this.isSecureBidMessageComponentsSerialized = false;
 		
+		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
+		
+		this.userPeerID = userPeerID;
+		
 	}
 	
 	public SecureBidMessageComponents(byte[] secureBidMessageComponentsSerialized,
+									  byte[] secretSymmetricKeyForDataPersonalInBytes,
 									  int sizeOfSecureBidMessageDataSerialized,
 									  int sizeOfSecureBidMessageDataSignatureSerialized,
 									  int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,
@@ -68,9 +79,11 @@ public class SecureBidMessageComponents {
 									  int sizeOfSecureBidMessageDataPersonalSerialized,
 									  int sizeOfUserEmailSerialized,
 									  int sizeOfUserHomeAddressSerialized, 
-									  int sizeOfUserBankAccountNIBSerialized) {
+									  int sizeOfUserBankAccountNIBSerialized,
+									  String userPeerID) {
 
 		this.secureBidMessageComponentsSerialized = secureBidMessageComponentsSerialized;
+		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
 		this.isSecureBidMessageComponentsSerialized = true;
 		
 		this.secureCommonHeader = null;
@@ -101,6 +114,8 @@ public class SecureBidMessageComponents {
 						sizeOfUserHomeAddressSerialized;
 		this.sizeOfUserBankAccountNIBSerialized =
 						sizeOfUserBankAccountNIBSerialized;
+		
+		this.userPeerID = userPeerID;
 		
 	}
 	
@@ -133,7 +148,7 @@ public class SecureBidMessageComponents {
 	
 	public void doSecureBidMessageComponentsSerialization()
 		   throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
-		          NoSuchPaddingException, InvalidAlgorithmParameterException {
+		          NoSuchPaddingException, InvalidAlgorithmParameterException, SignatureException {
 		
 		if(!this.isSecureBidMessageComponentsSerialized) {
 			
@@ -195,16 +210,13 @@ public class SecureBidMessageComponents {
 	
 	public void undoSecureBidMessageComponentsSerialization()
 		   throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
-		          NoSuchPaddingException, InvalidAlgorithmParameterException {
+		          NoSuchPaddingException, InvalidAlgorithmParameterException, SignatureException {
 		
 		if(this.isSecureBidMessageComponentsSerialized) {
 			
 			byte[] secureCommonHeaderSerialized = new byte[CommonUtils.COMMON_HEADER_LENGTH];
 			
-			byte[] secureBidMessageDataSerialized = new byte[this.sizeOfSecureBidMessageDataSerialized];
-			
-			byte[] secureBidMessageKeyExchangeSerialized = new byte[ 3 * CommonUtils.LENGTH_256_BITS_IN_BYTES ];
-			
+			byte[] secureBidMessageDataSerialized = new byte[this.sizeOfSecureBidMessageDataSerialized];			
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -221,8 +233,8 @@ public class SecureBidMessageComponents {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageComponentsSerialized, 0,
-							 secureCommonHeaderSerialized, serializationOffset,
+			System.arraycopy(this.secureBidMessageComponentsSerialized, serializationOffset,
+							 secureCommonHeaderSerialized, 0,
 					         secureCommonHeaderSerialized.length);
 			serializationOffset += secureCommonHeaderSerialized.length;
 
@@ -230,27 +242,17 @@ public class SecureBidMessageComponents {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageComponentsSerialized, 0,
-							 secureBidMessageDataSerialized, serializationOffset,
+			System.arraycopy(this.secureBidMessageComponentsSerialized, serializationOffset,
+							 secureBidMessageDataSerialized, 0,
 							 secureBidMessageDataSerialized.length);
 			serializationOffset += secureBidMessageDataSerialized.length;
-
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageComponentsSerialized, 0,
-							 secureBidMessageKeyExchangeSerialized, serializationOffset,
-							 secureBidMessageKeyExchangeSerialized.length);
-			serializationOffset += secureBidMessageKeyExchangeSerialized.length;
-			
-			
 			
 			this.secureCommonHeader = new SecureCommonHeader(secureCommonHeaderSerialized);
 			this.secureCommonHeader.undoSecureCommonHeaderSerialization();
 			
 			
 			this.secureBidMessageData = new SecureBidMessageData(secureBidMessageDataSerialized,
+																 this.secretSymmetricKeyForDataPersonalInBytes,
 																 this.sizeOfSecureBidMessageDataSignatureSerialized,
 																 this.sizeOfBidSerialized,
 																 this.sizeOfBidSerializedDigitalSigned,
@@ -261,7 +263,8 @@ public class SecureBidMessageComponents {
 																 this.sizeOfSecureBidMessageDataPersonalSerialized,
 																 this.sizeOfUserEmailSerialized,
 																 this.sizeOfUserHomeAddressSerialized,
-																 this.sizeOfUserBankAccountNIBSerialized);
+																 this.sizeOfUserBankAccountNIBSerialized,
+																 this.userPeerID);
 			
 			this.secureBidMessageData.undoSecureBidMessageDataSerialization();
 			

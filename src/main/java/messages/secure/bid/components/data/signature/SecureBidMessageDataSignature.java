@@ -1,7 +1,11 @@
 package main.java.messages.secure.bid.components.data.signature;
 
+import java.io.FileInputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -9,6 +13,8 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.util.Collection;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -44,8 +50,9 @@ public class SecureBidMessageDataSignature {
 
 	private boolean isBidDigitalSigned;
 
+	private String userPeerID;
 
-	public SecureBidMessageDataSignature(Bid bid) {
+	public SecureBidMessageDataSignature(Bid bid, String userPeerID) {
 
 		this.bid = bid;
 
@@ -63,29 +70,32 @@ public class SecureBidMessageDataSignature {
 		this.bidDigitalSigned = null;
 		this.isBidDigitalSigned = false;
 
+		this.userPeerID = userPeerID;
 	}
 
 	public SecureBidMessageDataSignature(byte[] bidDigitalSigned,
 										 int sizeOfBidSerialized,
 										 int sizeOfBidderUserClientIDSerialized,
-										 int sizeOfBidSerializedDigitalSigned) {
+										 int sizeOfBidSerializedDigitalSigned,
+										 String userPeerID) {
 
 		this.bidDigitalSigned = bidDigitalSigned;
 		this.isBidDigitalSigned = true;
 
 		this.bidSerialized = null;
-		this.isBidSerialized = false;
+		this.isBidSerialized = true;
 		this.sizeOfBidSerialized = sizeOfBidSerialized;
 		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
 		
 		this.bidSerializedDigitalSigned = null;
-		this.isBidSerializedDigitalSigned = false;
+		this.isBidSerializedDigitalSigned = true;
 		this.sizeOfBidSerializedDigitalSigned = sizeOfBidSerializedDigitalSigned;
 		this.isBidSerializedDigitalSignedVerified = false;
 		this.isBidSerializedDigitalSignedValid = false;
 
 		this.bid = null;
 
+		this.userPeerID = userPeerID;
 	}
 
 	
@@ -165,31 +175,40 @@ public class SecureBidMessageDataSignature {
 	
 	
 	public void buildSecureBidMessageDataSignatureToSend()
-		   throws NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException,
-		          NoSuchPaddingException, InvalidAlgorithmParameterException {
+		   throws InvalidKeyException, SignatureException, NoSuchAlgorithmException {
 
 		boolean isPossibleToBuildSecureBidMessageSignatureToSend = 
 				( !this.getIsBidSerialized() && !this.getIsBidSerializedDigitalSigned() && 
 				  !this.getIsBidDigitalSigned() );	
 
 		if(isPossibleToBuildSecureBidMessageSignatureToSend) {
-
+			
 			this.doSerializationOfBid();
-
+			
+			this.signSecureBidMessageBidSerialized();
+			
+			this.doSecureBidMessageDataSignatureBidSerializedAndSigned();
 						
 		}
 
 	}
 	
-	public void buildSecureBidMessageDataSignatureReceived() throws NoSuchAlgorithmException {
-		
+	public void buildSecureBidMessageDataSignatureReceived()
+		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+				
 		boolean isPossibleToBuildSecureBidMessageSignatureReceived = 
-				( this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
-				  this.getIsBidDigitalSigned() );
+				(  this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
+				   this.getIsBidDigitalSigned() );
 		
 		if(isPossibleToBuildSecureBidMessageSignatureReceived) {
 			
+			this.undoSecureBidMessageDataSignatureBidSerializedAndSigned();
 			
+			if(this.checkIfSecureBidMessageDataSignatureBidSerializedSignedIsValid()) {
+				
+				this.undoSerializationOfBid();
+				
+			}
 			
 		}
 	}
@@ -248,9 +267,9 @@ public class SecureBidMessageDataSignature {
 		if(isPossibleToSignBidSerialized) {
 
 			Signature secureBidMessageDataSignatureBidSerialized = 
-					  Signature.getInstance("SHA256withDSA");
+					  Signature.getInstance("SHA256withRSA");
 			
-			PrivateKey userClientPrivateKey = null; //TODO Private Key to Sign contained in the KeyStore of the User
+			PrivateKey userClientPrivateKey = readKeysFromKeystore(userPeerID).getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
 			
 			secureBidMessageDataSignatureBidSerialized.initSign(userClientPrivateKey);
 			
@@ -275,12 +294,9 @@ public class SecureBidMessageDataSignature {
 		if(isPossibleToVerifySecureBidMessageDataSignatureBidSerializedDigitalSigned) {
 
 			Signature secureBidMessageDataSignatureBidSerializedSignature = 
-					Signature.getInstance("SHA256withDSA");
+					Signature.getInstance("SHA256withRSA");
 
-			Certificate certificate = null;
-			secureBidMessageDataSignatureBidSerializedSignature.initVerify(certificate);
-			
-			PublicKey userClientPublicKey = null; //TODO Public Key or Certificate of the User contained in the Server 
+			PublicKey userClientPublicKey = readCertificate(userPeerID).getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
 
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(userClientPublicKey);
 
@@ -363,7 +379,7 @@ public class SecureBidMessageDataSignature {
 		
 	}
 	
-	public void undoSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned() {
+	public void undoSecureBidMessageDataSignatureBidSerializedAndSigned() {
 		
 		boolean isPossibleToUndoSecureBidMessageDataSignatureBidSerializedAndSigned = 
 				(  this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
@@ -406,6 +422,48 @@ public class SecureBidMessageDataSignature {
 			this.setIsBidDigitalSigned(false);
 			
 		}
+	}
+
+	private KeyPair readKeysFromKeystore(String alias) {
+		KeyPair kp = null;
+		try {
+			FileInputStream inputStream = new FileInputStream("res/keystores/" + alias + "Keystore.jks");
+			KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+			char[] password = (alias + "1920").toCharArray();
+			keystore.load(inputStream, password);
+			Key key = keystore.getKey(alias, password);
+			if(key instanceof PrivateKey) {
+				Certificate cert = keystore.getCertificateChain(alias)[0];
+				PublicKey publicKey = cert.getPublicKey();
+				kp = new KeyPair(publicKey, (PrivateKey)key);
+			}
+			//            String publicKeyString = Base64.toBase64String(kp.getPublic().getEncoded());
+			//            String privateKeyString = Base64.toBase64String(kp.getPrivate().getEncoded());
+			//            System.out.println("Alias " + alias + " public string is: " + publicKeyString);
+			//            System.out.println("Alias " + alias + " private string is: " + privateKeyString);
+		} catch (Exception e) {
+			e.getCause();
+			e.getMessage();
+			e.printStackTrace();
+		}
+		return kp;
+	}
+
+	private Certificate readCertificate(String alias) {
+		Certificate cert = null;
+		try {
+			FileInputStream inputStream = new FileInputStream("res/certificates/" + alias + "Chain.pem");
+			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+			Collection<? extends Certificate> certificates = certFactory.generateCertificates(inputStream);
+			cert = (Certificate) certificates.toArray()[certificates.size() - 1];
+			//			PublicKey pk = cert.getPublicKey();
+			//			System.out.println(user + " public key is: " + Base64.toBase64String(pk.getEncoded()));
+		} catch (Exception e) {
+			e.getCause();
+			e.getMessage();
+			e.printStackTrace();
+		}
+		return cert;
 	}
 	
 }

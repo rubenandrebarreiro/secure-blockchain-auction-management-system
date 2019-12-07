@@ -5,6 +5,7 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -15,7 +16,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.util.Arrays;
-
 import main.java.common.utils.CommonUtils;
 
 public class SecureBidMessageDataPersonal {
@@ -42,13 +42,14 @@ public class SecureBidMessageDataPersonal {
 	private int sizeOfSecureBidMessageDataPersonalSerialized;
 	
 	
+	private byte[] secretSymmetricKeyForDataPersonalInBytes;
+	
+	
 	private byte[] secureBidMessageDataPersonalSerializedCiphered;
 
 	private boolean isSecureBidMessageDataPersonalSerializedCiphered;
 	
 	private int sizeOfSecureBidMessageDataPersonalSerializedCiphered;
-	
-	
 	
 	
 	private byte[] secureBidMessageDataPersonalSerializedCipheredHashed;
@@ -102,6 +103,7 @@ public class SecureBidMessageDataPersonal {
 
 
 	public SecureBidMessageDataPersonal(byte[] secureBidMessageDataPersonalSerializedCipheredAndHashed,
+										byte[] secretSymmetricKeyForDataPersonalInBytes,
 										int sizeOfSecureBidMessageDataPersonalSerializedCiphered,
 										int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
 										int sizeOfSecureBidMessageDataPersonalSerialized,
@@ -112,6 +114,8 @@ public class SecureBidMessageDataPersonal {
 		this.secureBidMessageDataPersonalSerializedCipheredAndHashed = 
 				secureBidMessageDataPersonalSerializedCipheredAndHashed;
 		this.isSecureBidMessageDataPersonalSerializedCipheredAndHashed = true;
+		
+		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
 		
 		this.secureBidMessageDataPersonalSerializedCiphered = null;
 		this.isSecureBidMessageDataPersonalSerializedCiphered = true;
@@ -211,6 +215,10 @@ public class SecureBidMessageDataPersonal {
 	
 	public int getSizeOfSecureBidMessageDataPersonalSerializedCipheredHashed() {
 		return this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
+	}
+	
+	public byte[] getSecretSymmetricKeyForDataPersonalInBytes() {
+		return secretSymmetricKeyForDataPersonalInBytes;
 	}
 	
 	public boolean getIsSecureBidMessageDataPersonalSerializedCipheredHashedVerified() {
@@ -443,18 +451,27 @@ public class SecureBidMessageDataPersonal {
 
 		if(isPossibleToEncryptSecureBidMessageDataPersonalSerialized) {
 
-			byte[] secretKeyBytes = null; // TODO Symmetric Key generated on the fly with KeyGen (secretHMACKeyForDoSMitigationInBytes)
+			try {
+				byte[] key = CommonUtils.createKeyForAES(256, new SecureRandom()).getEncoded();
+				this.secretSymmetricKeyForDataPersonalInBytes = key;
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchProviderException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} // TODO Symmetric Key generated on the fly with KeyGen (secretHMACKeyForDoSMitigationInBytes)
 
 			try {
 
 				String symmetricEncryptionAlgorithm = "AES";
 				String symmetricEncryptionMode = "CBC";
-				String symmetricEncryptionPadding = "NoPadding";
+				String symmetricEncryptionPadding = "PKCS7Padding";
 
 
 				// Set the Secret Key and its specifications,
 				// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
-				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
+				SecretKeySpec secretKeySpecifications = new SecretKeySpec(this.secretSymmetricKeyForDataPersonalInBytes, symmetricEncryptionAlgorithm);
 
 
 				String provider = "BC";
@@ -552,7 +569,7 @@ public class SecureBidMessageDataPersonal {
 
 		if(isPossibleToDecryptSecureBidMessageDataPersonalSerializedCiphered) {
 			
-			byte[] secretKeyBytes = null; // TODO Symmetric Key contained in the Envelope (secretHMACKeyForDoSMitigationInBytes)
+			byte[] secretKeyBytes = this.secretSymmetricKeyForDataPersonalInBytes; // TODO Symmetric Key contained in the Envelope (secretHMACKeyForDoSMitigationInBytes)
 			
 			try {
 				
@@ -836,5 +853,5 @@ public class SecureBidMessageDataPersonal {
 			
 		}
 		
-	}	
+	}		
 }

@@ -4,6 +4,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -13,6 +14,8 @@ import main.java.messages.secure.bid.components.data.signature.SecureBidMessageD
 public class SecureBidMessageData {
 
 	private SecureBidMessageDataSignature secureBidMessageDataSignature;
+	
+	private byte[] secretSymmetricKeyForDataPersonalInBytes;
 	
 	private int sizeOfSecureBidMessageDataSignatureSerialized;
 	
@@ -45,9 +48,11 @@ public class SecureBidMessageData {
 	
 	private boolean isSecureBidMessageDataSerialized;
 	
+	private String userPeerID;
 	
 	public SecureBidMessageData(SecureBidMessageDataSignature secureBidMessageDataSignature,
-								SecureBidMessageDataPersonal secureBidMessageDataPersonal) {
+								SecureBidMessageDataPersonal secureBidMessageDataPersonal,
+								String userPeerID) {
 		
 		this.secureBidMessageDataSignature = secureBidMessageDataSignature;
 		this.sizeOfSecureBidMessageDataSignatureSerialized = 0;
@@ -60,10 +65,12 @@ public class SecureBidMessageData {
 		this.secureBidMessageDataSerialized = null;
 		this.isSecureBidMessageDataSerialized = false;
 		
+		this.userPeerID = userPeerID;
 	}
 	
 	
 	public SecureBidMessageData(byte[] secureBidMessageDataSerialized,
+							    byte[] secretSymmetricKeyForDataPersonalInBytes,
 								int sizeOfSecureBidMessageDataSignatureSerialized,
 								int sizeOfBidSerialized,
 								int sizeOfBidSerializedDigitalSigned,
@@ -74,9 +81,11 @@ public class SecureBidMessageData {
 								int sizeOfSecureBidMessageDataPersonalSerialized,
 								int sizeOfUserEmailSerialized,
 								int sizeOfUserHomeAddressSerialized, 
-								int sizeOfUserBankAccountNIBSerialized) {
+								int sizeOfUserBankAccountNIBSerialized,
+								String userPeerID) {
 
 		this.secureBidMessageDataSerialized = secureBidMessageDataSerialized;
+		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
 		this.isSecureBidMessageDataSerialized = true;
 		
 		this.secureBidMessageDataSignature = null;
@@ -95,6 +104,7 @@ public class SecureBidMessageData {
 		this.sizeOfUserHomeAddressSerialized = sizeOfUserEmailSerialized; 
 		this.sizeOfUserBankAccountNIBSerialized = sizeOfUserBankAccountNIBSerialized;
 		
+		this.userPeerID = userPeerID;
 	}
 	
 	
@@ -161,7 +171,7 @@ public class SecureBidMessageData {
 	
 	public void doSecureBidMessageDataSerialization()
 			throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
-			NoSuchPaddingException, InvalidAlgorithmParameterException {
+			NoSuchPaddingException, InvalidAlgorithmParameterException, SignatureException {
 	
 		if(!this.isSecureBidMessageDataSerialized) {
 			
@@ -218,7 +228,7 @@ public class SecureBidMessageData {
 	
 	public void undoSecureBidMessageDataSerialization()
 		   throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
-		          NoSuchPaddingException, InvalidAlgorithmParameterException {
+		          NoSuchPaddingException, InvalidAlgorithmParameterException, SignatureException {
 		
 		if(this.isSecureBidMessageDataSerialized) {
 			
@@ -260,13 +270,15 @@ public class SecureBidMessageData {
 					new SecureBidMessageDataSignature(secureBidMessageDataSignatureSerialized,
 													  this.sizeOfBidSerialized,
 												      this.sizeOfBidderUserClientIDSerialized,
-												      this.sizeOfBidSerializedDigitalSigned);
+												      this.sizeOfBidSerializedDigitalSigned,
+												      userPeerID);
 			
 			this.secureBidMessageDataSignature.buildSecureBidMessageDataSignatureReceived();
 			
 			
 			this.secureBidMessageDataPersonal = 
 					new SecureBidMessageDataPersonal(secureBidMessageDataPersonalSerializedCipheredAndHashed,
+													 this.secretSymmetricKeyForDataPersonalInBytes,
 									 				 this.sizeOfSecureBidMessageDataPersonalSerializedCiphered,
 													 this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
 													 this.sizeOfSecureBidMessageDataPersonalSerialized,

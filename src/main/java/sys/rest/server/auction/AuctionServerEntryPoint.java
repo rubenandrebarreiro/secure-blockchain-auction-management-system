@@ -7,6 +7,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
@@ -21,13 +23,17 @@ public class AuctionServerEntryPoint extends Thread{
 	private static final String AUCTION_SERVER_TLS_CONFIGURATION_PATH = "res/configurations/auction-server-tls-configuration.conf";
 	private static final String AUCTION_SERVER_STORES_CONFIGURATION_PATH = "res/configurations/auction-server-keystore-configuration.conf";
 	
-	private static final String TLS_CONF_CLIENT_ONLY = "CLIENT-ONLY";
-	private static final String TLS_CONF_SERVER_ONLY = "SERVER-ONLY";
-	private static final String TLS_CONF_MUTUAL = "MUTUAL";
+	public static final String TLS_CONF_CLIENT_ONLY = "CLIENT-ONLY";
+	public static final String TLS_CONF_SERVER_ONLY = "SERVER-ONLY";
+	public static final String TLS_CONF_MUTUAL = "MUTUAL";
 	
-	SSLServerSocketFactory serverSocketFactory;
-	SSLServerSocket serverSocket;
-	SSLSocket responseSocket;
+	private SSLServerSocketFactory serverSocketFactory;
+	private SSLServerSocket serverSocket;
+	private SSLSocket responseSocket;
+	
+	
+	private Map<String, String> connectedClientsMap;
+	
 	
 	public static void main(String[] args) throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
 		new AuctionServerEntryPoint();
@@ -59,22 +65,38 @@ public class AuctionServerEntryPoint extends Thread{
 //		ks = KeyStore.getInstance("JKS");		
 //		sslContext.init(null, null, null);
 		SSLContext sslContext = SSLContext.getDefault();
-		SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
+		serverSocketFactory = sslContext.getServerSocketFactory();
 		serverSocket = (SSLServerSocket)serverSocketFactory.createServerSocket(8443);
 		serverSocket.setEnabledCipherSuites(tlsConfigurationReader.getAvailableTLSCiphersuites());
 		serverSocket.setEnabledProtocols(tlsConfigurationReader.getAvailableTLSVersions());
 		String[] mutualAuth = tlsConfigurationReader.getAvailableTLSAuthenticationModes();
 		// TODO Change this maybe!
-		if(mutualAuth[0].equals(TLS_CONF_MUTUAL))
+		if(mutualAuth[0].equals(TLS_CONF_CLIENT_ONLY)) {
+			printErrorStringWithClassName("Not supported");
+			System.exit(1);
+		}
+		else if(mutualAuth[0].equals(TLS_CONF_MUTUAL))
 			serverSocket.setNeedClientAuth(true);
+		else serverSocket.setNeedClientAuth(false);
+		
+		connectedClientsMap = new ConcurrentHashMap<>();
 		
 		while(true) {
-			responseSocket = (SSLSocket) serverSocket.accept();
-			responseSocket.startHandshake();
-
-			Thread t = new AuctionServer(serverSocket, responseSocket);
-			t.start();
+			try {
+				responseSocket = (SSLSocket) serverSocket.accept();
+				responseSocket.startHandshake();
+				connectedClientsMap.put(responseSocket.getRemoteSocketAddress().toString(),"Client IP:port");
+				Thread t = new AuctionServer(serverSocket, responseSocket, connectedClientsMap, mutualAuth[0]);
+				t.start();
+			} catch (Exception e) {
+				printErrorStringWithClassName(e.getMessage());
+			}
 		}
+	}
+	
+	private void printErrorStringWithClassName(Object message) {
+		System.err.println("[" + this.getClass().getCanonicalName() + "] " + 
+				"Message: " + message);
 	}
 	
 }

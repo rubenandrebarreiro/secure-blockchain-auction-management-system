@@ -373,6 +373,13 @@ public class SecureBidMessageMetaHeader {
 			System.arraycopy(sizeOfUserPeerIDSerializedInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
 					serializationOffset, sizeOfUserPeerIDSerializedInBytes.length);
 			serializationOffset += sizeOfUserPeerIDSerializedInBytes.length;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(insideSeparator, 0, this.secureBidMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
+			serializationOffset += insideSeparator.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,

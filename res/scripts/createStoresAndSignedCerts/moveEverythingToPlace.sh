@@ -1,16 +1,16 @@
 #!/bin/bash
-declare -a toDo=("keystores"
-                 "cruststores"
-                 "certificates")
 
-#keystores
+# Move keystores
 mv **/*Keystore.jks ../../keystores
 
-#truststores
+# Move truststores
 mv **/*Truststore.jks ../../truststores
 
-#certificates
-mv **/*.pem ../../certificates
+# Move chain certificates
+mv **/*Chain.pem ../../certificates
 
-#remove all folders
+# Remove non-chain certificates
+rm **/*.pem
+
+# Remove all folders
 find . -type d -exec rm -rf {} +

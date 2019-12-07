@@ -108,8 +108,8 @@ public class SecureBidMessage {
 			byte[] userPeerIDSerialized = CommonUtils.fromStringToByteArray(userPeerID);
 			
 			this.secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeToSend();
-			byte[] secureBidMessageKeyExchangeSerializedCipheredSigned = 
-					this.secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCipheredSigned();
+			byte[] secureBidMessageKeyExchangeSerializedCipheredAndSigned = 
+					this.secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCipheredAndSigned();
 			
 			this.secureBidMessageComponents.doSecureBidMessageComponentsSerialization();
 			byte[] secureBidMessageComponentsSerialized = 
@@ -120,7 +120,8 @@ public class SecureBidMessage {
 					this.secureBidMessageDoSMitigation.getSecureBidMessageComponentsHashedForDoSMitigation();
 			
 			int sizeOfSecureBidMessageSerialized = (secureBidMessageMetaHeaderSerialized.length +
-												    secureBidMessageKeyExchangeSerializedCipheredSigned.length +
+													userPeerIDSerialized.length +
+												    secureBidMessageKeyExchangeSerializedCipheredAndSigned.length +
 													secureBidMessageComponentsSerialized.length +
 													secureBidMessageDoSMitigationSerialized.length);
 
@@ -152,6 +153,14 @@ public class SecureBidMessage {
 			System.arraycopy(userPeerIDSerialized, 0, this.secureBidMessageSerialized,
 							 serializationOffset, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(secureBidMessageKeyExchangeSerializedCipheredAndSigned, 0, this.secureBidMessageSerialized,
+							 serializationOffset, secureBidMessageKeyExchangeSerializedCipheredAndSigned.length);
+			serializationOffset += secureBidMessageKeyExchangeSerializedCipheredAndSigned.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -182,8 +191,8 @@ public class SecureBidMessage {
 			
 			
 			int sizeOfSecureBidMessageMetaHeaderSerialized = ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-															   ( 12 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-															   ( 13 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+															   ( 15 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+															   ( 16 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 			
 			byte[] secureBidMessageMetaHeaderSerialized = new byte[ sizeOfSecureBidMessageMetaHeaderSerialized ];
 			
@@ -310,11 +319,25 @@ public class SecureBidMessage {
 			this.secureBidMessageKeyExchange = 
 					new SecureBidMessageKeyExchange(secureBidMessageKeyExchangeSerialized,
 													sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
-													sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned);
+													sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
+													userPeerID);
 		
+			try {
+				this.secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeReceived();
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SignatureException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			this.secureBidMessageComponents = 
 					new SecureBidMessageComponents(secureBidMessageComponentsSerialized,
+												   this.secureBidMessageKeyExchange.getSecretSymmetricKeyForDataPersonalInBytes(),
 												   sizeOfSecureBidMessageDataSerialized,
 												   sizeOfSecureBidMessageDataSignatureSerialized,
 												   sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,
@@ -326,11 +349,13 @@ public class SecureBidMessage {
 												   sizeOfSecureBidMessageDataPersonalSerialized,
 												   sizeOfUserEmailSerialized,
 												   sizeOfUserHomeAddressSerialized, 
-												   sizeOfUserBankAccountNIBSerialized);
+												   sizeOfUserBankAccountNIBSerialized,
+												   this.userPeerID);
 						
 			this.secureBidMessageDoSMitigation = 
 					new SecureBidMessageDoSMitigation(secureBidMessageComponentsSerialized,
-													  secureBidMessageDoSMitigationSerialized);
+													  secureBidMessageDoSMitigationSerialized,
+													  this.secureBidMessageKeyExchange.getSecretHMACKeyForDoSMitigationInBytes());
 			
 			
 			
