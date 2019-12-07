@@ -4,6 +4,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -170,7 +171,7 @@ public class SecureBidMessageData {
 	
 	public void doSecureBidMessageDataSerialization()
 			throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
-			NoSuchPaddingException, InvalidAlgorithmParameterException {
+			NoSuchPaddingException, InvalidAlgorithmParameterException, SignatureException {
 	
 		if(!this.isSecureBidMessageDataSerialized) {
 			
@@ -227,7 +228,7 @@ public class SecureBidMessageData {
 	
 	public void undoSecureBidMessageDataSerialization()
 		   throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
-		          NoSuchPaddingException, InvalidAlgorithmParameterException {
+		          NoSuchPaddingException, InvalidAlgorithmParameterException, SignatureException {
 		
 		if(this.isSecureBidMessageDataSerialized) {
 			

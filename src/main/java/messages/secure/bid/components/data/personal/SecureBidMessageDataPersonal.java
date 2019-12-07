@@ -16,8 +16,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.util.Arrays;
-import org.bouncycastle.util.encoders.Base64;
-
 import main.java.common.utils.CommonUtils;
 
 public class SecureBidMessageDataPersonal {
@@ -453,9 +451,9 @@ public class SecureBidMessageDataPersonal {
 
 		if(isPossibleToEncryptSecureBidMessageDataPersonalSerialized) {
 
-			byte[] secretKeyBytes = null;
 			try {
-				secretKeyBytes = Base64.decode(CommonUtils.createKeyForAES(256, new SecureRandom()).getEncoded());
+				byte[] key = CommonUtils.createKeyForAES(256, new SecureRandom()).getEncoded();
+				this.secretSymmetricKeyForDataPersonalInBytes = key;
 			} catch (NoSuchAlgorithmException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -468,12 +466,12 @@ public class SecureBidMessageDataPersonal {
 
 				String symmetricEncryptionAlgorithm = "AES";
 				String symmetricEncryptionMode = "CBC";
-				String symmetricEncryptionPadding = "NoPadding";
+				String symmetricEncryptionPadding = "PKCS7Padding";
 
 
 				// Set the Secret Key and its specifications,
 				// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
-				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
+				SecretKeySpec secretKeySpecifications = new SecretKeySpec(this.secretSymmetricKeyForDataPersonalInBytes, symmetricEncryptionAlgorithm);
 
 
 				String provider = "BC";

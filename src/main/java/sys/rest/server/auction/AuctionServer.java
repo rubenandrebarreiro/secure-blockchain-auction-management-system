@@ -9,16 +9,21 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Principal;
+import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Random;
 
+import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
@@ -36,6 +41,13 @@ import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
 import main.java.messages.secure.bid.SecureBidMessage;
+import main.java.messages.secure.bid.components.SecureBidMessageComponents;
+import main.java.messages.secure.bid.components.data.SecureBidMessageData;
+import main.java.messages.secure.bid.components.data.personal.SecureBidMessageDataPersonal;
+import main.java.messages.secure.bid.components.data.signature.SecureBidMessageDataSignature;
+import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
+import main.java.messages.secure.bid.key.exchange.SecureBidMessageKeyExchange;
+import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
 import main.java.resources.auction.Auction;
 import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
@@ -334,6 +346,38 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		HttpPost postRequest = new HttpPost(url);
 		HttpResponse response = null;
 		SecureBidMessage bidInfo = gson.fromJson(userBidInfo, SecureBidMessage.class);
+		
+		SecureBidMessage serializedBidInfo = new SecureBidMessage(bidInfo.getSecureBidMessageSerialized());
+		serializedBidInfo.undoSecureBidMessageSerialized();
+		
+		SecureBidMessageMetaHeader secureBidMessageMetaHeader = serializedBidInfo.getSecureBidMessageMetaHeader();
+		SecureBidMessageComponents secureBidMessageComponents = serializedBidInfo.getSecureBidMessageComponents();
+		try {
+			secureBidMessageComponents.undoSecureBidMessageComponentsSerialization();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidAlgorithmParameterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SignatureException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		SecureBidMessageData secureBidMessageData = secureBidMessageComponents.getSecureBidMessageData();
+		SecureBidMessageDataPersonal secureBidMessageDataPersonal = secureBidMessageData.getSecureBidMessageDataPersonal();
+		SecureBidMessageDoSMitigation secureBidMessageDosMitigation = serializedBidInfo.getSecureBidMessageDoSMitigation();
+		SecureBidMessageDataSignature secureBidMessageDataSignature = secureBidMessageData.getSecureBidMessageDataSignature();
+		SecureBidMessageKeyExchange secureBidMessageKeyExchange = serializedBidInfo.getSecureBidMessageKeyExchange();
 		
 		//TODO Change generation of Bid ID!
 		Random random = new Random();

@@ -6,6 +6,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.SignatureException;
 
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
@@ -135,7 +136,7 @@ public class SecureBidMessageDoSMitigation {
 	
 	public void doHashOfSecureBidMessageDoSMitigation()
 		   throws NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, 
-		          NoSuchPaddingException, InvalidAlgorithmParameterException {
+		          NoSuchPaddingException, InvalidAlgorithmParameterException, SignatureException {
 		
 		if(!this.isSecureBidMessageComponentsHashedForDoSMitigation) {
 			
@@ -149,7 +150,7 @@ public class SecureBidMessageDoSMitigation {
 				
 				// The Initialization Vector and its Parameter's Specifications
 				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils.createKeyForAES(256, new SecureRandom());
-				this.secretHMACKeyForDoSMitigationInBytes = Base64.decode(secretHMACKeyForDoSMitigationMACKey.getEncoded());
+				this.secretHMACKeyForDoSMitigationInBytes = secretHMACKeyForDoSMitigationMACKey.getEncoded();
 				Mac mac = Mac.getInstance("HMacSHA256");
 				SecretKeySpec keySpec = new SecretKeySpec(this.secretHMACKeyForDoSMitigationInBytes, "HMacSHA256");
 				// The configuration, initialization and update of the MAC Hash process

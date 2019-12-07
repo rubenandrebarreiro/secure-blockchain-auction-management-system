@@ -1,7 +1,6 @@
 package main.java.messages.secure.bid.key.exchange;
 
 import java.io.FileInputStream;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -10,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
@@ -19,11 +19,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.bouncycastle.util.encoders.Base64;
-
 import main.java.common.utils.CommonUtils;
 
 public class SecureBidMessageKeyExchange {
@@ -378,19 +373,13 @@ public class SecureBidMessageKeyExchange {
 		
 		if(isPossibleToEncryptSecureBidMessageKeyExchangeSerialized) {
 			
-			byte[] secretKeyBytes = Base64.decode(readKeysFromKeystore("auctionServer").getPublic().getEncoded());  //TODO Public Key of the Server
+			Key secretKeyBytes = readKeysFromKeystore("auctionServer").getPublic();  //TODO Public Key of the Server
 			
 			try {
 				
-				String symmetricEncryptionAlgorithm = "AES";
-				String symmetricEncryptionMode = "CBC";
+				String symmetricEncryptionAlgorithm = "RSA";
+				String symmetricEncryptionMode = "None";
 		 	    String symmetricEncryptionPadding = "NoPadding";
-				
-				
-				// Set the Secret Key and its specifications,
-		 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
-				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
-				
 				
 				String provider = "BC";
 				Cipher secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher = 
@@ -398,40 +387,15 @@ public class SecureBidMessageKeyExchange {
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								           provider );
 				
-				byte[] initialisationVectorBytes = null;
-				
-				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
+				secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
+					.init(Cipher.ENCRYPT_MODE, secretKeyBytes, new SecureRandom());
 
-					// Algorithms that don't need IV (Initialisation Vector): ECB
-					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureBidMessageKeyExchange.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
-					initialisationVectorBytes = 
-							CommonUtils.generateIV(secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher);
-					
-					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageKeyExchange.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
-					
-					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
-					secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
-						.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
-					
-				}
-				else {
-					
-					// Algorithms that need IV (Initialisation Vector)
-					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
-					
-					secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
-						.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
-					
-				}
 				
 				this.secureBidMessageKeyExchangeSerializedCiphered = 
 						secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
 						.doFinal(this.secureBidMessageKeyExchangeSerialized);
 				
+				System.err.println("Ciphered data size: " + this.secureBidMessageKeyExchangeSerializedCiphered.length);
 				
 				this.setIsSecureBidMessageKeyExchangeSerializedCiphered(true);		
 				
@@ -440,11 +404,6 @@ public class SecureBidMessageKeyExchange {
 				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
 				System.err.println("- Cryptographic Algorithm not found!!!");
 				noSuchAlgorithmException.printStackTrace();
-			}
-			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
-				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
-				invalidAlgorithmParameterException.printStackTrace();
 			}
 			catch (NoSuchProviderException noSuchProviderException) {
 				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
@@ -485,19 +444,13 @@ public class SecureBidMessageKeyExchange {
 		
 		if(isPossibleToDecryptSecureBidMessageKeyExchangeSerializedCiphered) {
 			
-			byte[] secretKeyBytes = Base64.decode(readKeysFromKeystore("auctionServer").getPrivate().getEncoded()); //TODO Private Key of the Server
+			Key secretKeyBytes = readKeysFromKeystore("auctionServer").getPrivate(); //TODO Private Key of the Server
 			
 			try {
 				
-				String symmetricEncryptionAlgorithm = "AES";
-				String symmetricEncryptionMode = "CBC";
+				String symmetricEncryptionAlgorithm = "RSA";
+				String symmetricEncryptionMode = "None";
 		 	    String symmetricEncryptionPadding = "NoPadding";
-				
-				
-				// Set the Secret Key and its specifications,
-		 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
-				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
-				
 				
 				String provider = "BC";
 				Cipher secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher = 
@@ -505,32 +458,9 @@ public class SecureBidMessageKeyExchange {
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								           provider);
 				
-				byte[] initialisationVectorBytes = null;
 			
-				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
-					
-					// Algorithms that don't need IV (Initialisation Vector): ECB
-					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
-					
-					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
-					
-					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
-					secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
-						.init(Cipher.DECRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
-				}
-				else {
-					
-					// Algorithms that need IV (Initialisation Vector)
-					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageSignatureProposal.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
-					
-					secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
-						.init(Cipher.DECRYPT_MODE, secretKeySpecifications);
-					
-				}
+				secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
+					.init(Cipher.DECRYPT_MODE, secretKeyBytes);
 				
 				this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 
 						this.secureBidMessageKeyExchangeSerializedCiphered.length;
@@ -558,11 +488,6 @@ public class SecureBidMessageKeyExchange {
 				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
 				System.err.println("- Cryptographic Algorithm not found!!!");
 				noSuchAlgorithmException.printStackTrace();
-			}
-			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
-				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
-				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
-				invalidAlgorithmParameterException.printStackTrace();
 			}
 			catch (NoSuchProviderException noSuchProviderException) {
 				System.err.println("Error occurred during the Symmetric Encryption over the Secure Bid Message's Signature Proposal:");
@@ -611,7 +536,7 @@ public class SecureBidMessageKeyExchange {
 		if(isPossibleToSignSecureBidMessageKeyExchangeSerializedCiphered) {
 			
 			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
-					  Signature.getInstance("SHA256withDSA");
+					  Signature.getInstance("SHA256withRSA");
 			
 			PrivateKey userClientPrivateKey = readKeysFromKeystore(userPeerID).getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
 			
@@ -645,7 +570,7 @@ public class SecureBidMessageKeyExchange {
 		if(isPossibleToVerifySecureBidMessageKeyExchangeSerializedCipheredSigned) {
 			
 			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
-					  Signature.getInstance("SHA256withDSA");
+					  Signature.getInstance("SHA256withRSA");
 			
 			PublicKey userClientPublicKey = readCertificate(userPeerID).getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
 			

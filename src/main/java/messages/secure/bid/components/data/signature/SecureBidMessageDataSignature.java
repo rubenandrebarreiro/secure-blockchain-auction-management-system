@@ -174,23 +174,26 @@ public class SecureBidMessageDataSignature {
 	
 	
 	public void buildSecureBidMessageDataSignatureToSend()
-		   throws NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException,
-		          NoSuchPaddingException, InvalidAlgorithmParameterException {
+		   throws InvalidKeyException, SignatureException, NoSuchAlgorithmException {
 
 		boolean isPossibleToBuildSecureBidMessageSignatureToSend = 
 				( !this.getIsBidSerialized() && !this.getIsBidSerializedDigitalSigned() && 
 				  !this.getIsBidDigitalSigned() );	
 
 		if(isPossibleToBuildSecureBidMessageSignatureToSend) {
-
+			
 			this.doSerializationOfBid();
-
+			
+			this.signSecureBidMessageBidSerialized();
+			
+			this.doSecureBidMessageDataSignatureBidSerializedAndSigned();
 						
 		}
 
 	}
 	
-	public void buildSecureBidMessageDataSignatureReceived() throws NoSuchAlgorithmException {
+	public void buildSecureBidMessageDataSignatureReceived()
+		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		
 		boolean isPossibleToBuildSecureBidMessageSignatureReceived = 
 				( this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 
@@ -198,7 +201,13 @@ public class SecureBidMessageDataSignature {
 		
 		if(isPossibleToBuildSecureBidMessageSignatureReceived) {
 			
+			this.undoSecureBidMessageDataSignatureBidSerializedAndSigned();
 			
+			if(this.checkIfSecureBidMessageDataSignatureBidSerializedSignedIsValid()) {
+				
+				this.undoSerializationOfBid();
+				
+			}
 			
 		}
 	}
@@ -257,7 +266,7 @@ public class SecureBidMessageDataSignature {
 		if(isPossibleToSignBidSerialized) {
 
 			Signature secureBidMessageDataSignatureBidSerialized = 
-					  Signature.getInstance("SHA256withDSA");
+					  Signature.getInstance("SHA256withRSA");
 			
 			PrivateKey userClientPrivateKey = readKeysFromKeystore(userPeerID).getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
 			
@@ -284,7 +293,7 @@ public class SecureBidMessageDataSignature {
 		if(isPossibleToVerifySecureBidMessageDataSignatureBidSerializedDigitalSigned) {
 
 			Signature secureBidMessageDataSignatureBidSerializedSignature = 
-					Signature.getInstance("SHA256withDSA");
+					Signature.getInstance("SHA256withRSA");
 
 			Certificate certificate = null;
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(certificate);
@@ -372,7 +381,7 @@ public class SecureBidMessageDataSignature {
 		
 	}
 	
-	public void undoSecureBidMessageKeyExchangeAgreementSerializedCipheredAndSigned() {
+	public void undoSecureBidMessageDataSignatureBidSerializedAndSigned() {
 		
 		boolean isPossibleToUndoSecureBidMessageDataSignatureBidSerializedAndSigned = 
 				(  this.getIsBidSerialized() && this.getIsBidSerializedDigitalSigned() && 

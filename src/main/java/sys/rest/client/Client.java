@@ -158,7 +158,7 @@ public class Client implements ClientAPI {
 			System.setProperty("javax.net.ssl.trustStore", truststorePath);
 			System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
-			System.setProperty("javax.net.debug", "SSL,handshake");
+//			System.setProperty("javax.net.debug", "SSL,handshake");
 
 			SSLContext sslContext = SSLContext.getDefault();
 
@@ -546,19 +546,12 @@ public class Client implements ClientAPI {
 				MessageType.MESSAGE_TYPE_1.getMessageType(),
 				System.currentTimeMillis());
 		
-		SecureBidMessageComponents secureBidMessageComponents = new SecureBidMessageComponents(
-				secureCommonHeader,
-				secureBidMessageData,
-				currentUser.getUserPeerID());
+		SecureBidMessageComponents secureBidMessageComponents = null;
 		
-		SecureBidMessageDoSMitigation secureBidMessageDoSMitigation = new SecureBidMessageDoSMitigation(
-				secureBidMessageComponents);
-		
-		SecureBidMessageKeyExchange secureBidMessageKeyExchange = new SecureBidMessageKeyExchange(
-				secureBidMessageDataPersonal.getSecretSymmetricKeyForDataPersonalInBytes(),
-				secureBidMessageDoSMitigation.getSecretHMACKeyForDoSMitigationInBytes(),
-				currentUser.getUserPeerID());
+		SecureBidMessageDoSMitigation secureBidMessageDoSMitigation = null;
 
+		SecureBidMessageKeyExchange secureBidMessageKeyExchange = null;
+		
 		byte[] secureBidMessageKeyExchangeSerializedCiphered = null;
 		byte[] secureBidMessageKeyExchangeSerializedCipheredSigned = null;
 		byte[] secureBidMessageDataSerialized = null;
@@ -568,32 +561,55 @@ public class Client implements ClientAPI {
 		byte[] bidSerialized = null;
 		byte[] bidSerializedDigitalSigned = null;
 		byte[] secureBidMessageDataPersonalSerialized = null;
+		byte[] secureBidMessageDataPersonalSerializedCiphered = null;
+		byte[] secureBidMessageDataPersonalSerializedCipheredHashed = null;
 		
 		try {
-			secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeToSend();
-			secureBidMessageKeyExchangeSerializedCiphered = secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCiphered();
-			secureBidMessageKeyExchangeSerializedCipheredSigned = secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCipheredSigned();
-
-			secureBidMessageData.doSecureBidMessageDataSerialization();
-			secureBidMessageDataSerialized = secureBidMessageData.getSecureBidMessageDataSerialized();
-			
-			secureBidMessageDoSMitigation.doHashOfSecureBidMessageDoSMitigation();
-			secureBidMessageDoSMitigationSerialized = secureBidMessageDoSMitigation.getSecretHMACKeyForDoSMitigationInBytes();
-			
-			secureBidMessageDataSignature.buildSecureBidMessageDataSignatureToSend();
-			secureBidMessageDataSignatureSerialized = secureBidMessageDataSignature.getBidSerializedDigitalSigned();
-			
-			secureBidMessageDataPersonal.buildSecureBidMessageDataPersonalToSend();
-			secureBidMessageDataPersonalSerializedCipheredAndHashed = secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerializedCipheredAndHashed();
-			
 			bid.doSerialization();
 			bidSerialized = bid.getBidSerializedBytes();
 			
 			secureBidMessageDataSignature.buildSecureBidMessageDataSignatureToSend();
 			bidSerializedDigitalSigned = secureBidMessageDataSignature.getBidSerializedDigitalSigned();
+			secureBidMessageDataSignatureSerialized = secureBidMessageDataSignature.getBidSerializedDigitalSigned();
+			
+			secureBidMessageDataPersonal.buildSecureBidMessageDataPersonalToSend();
+			secureBidMessageDataPersonalSerialized = secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerialized();
+			secureBidMessageDataPersonalSerializedCipheredAndHashed = secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerializedCipheredAndHashed();
+			
 			
 			secureBidMessageData.doSecureBidMessageDataSerialization();
-			secureBidMessageDataPersonalSerialized = secureBidMessageData.getSecureBidMessageDataSerialized();
+			secureBidMessageDataSerialized = secureBidMessageData.getSecureBidMessageDataSerialized();
+			
+			secureCommonHeader.doSecureCommonHeaderSerialization();
+			
+
+			// Needs to be here
+			secureBidMessageComponents = new SecureBidMessageComponents(
+					secureCommonHeader,
+					secureBidMessageData,
+					secureBidMessageDataPersonal.getSecretSymmetricKeyForDataPersonalInBytes(),
+					currentUser.getUserPeerID());
+			
+			secureBidMessageDoSMitigation = new SecureBidMessageDoSMitigation(
+					secureBidMessageComponents);
+			
+			secureBidMessageComponents.doSecureBidMessageComponentsSerialization();
+			
+			secureBidMessageDoSMitigation.doHashOfSecureBidMessageDoSMitigation();
+			secureBidMessageDoSMitigationSerialized = secureBidMessageDoSMitigation.getSecretHMACKeyForDoSMitigationInBytes();
+						
+			secureBidMessageKeyExchange = new SecureBidMessageKeyExchange(
+					secureBidMessageDataPersonal.getSecretSymmetricKeyForDataPersonalInBytes(),
+					secureBidMessageDoSMitigation.getSecretHMACKeyForDoSMitigationInBytes(),
+					currentUser.getUserPeerID());
+			
+
+			secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeToSend();
+			secureBidMessageKeyExchangeSerializedCiphered = secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCiphered();
+			secureBidMessageKeyExchangeSerializedCipheredSigned = secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCipheredSigned();
+
+			secureBidMessageDataPersonalSerializedCiphered = secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerializedCiphered();
+			secureBidMessageDataPersonalSerializedCipheredHashed = secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerializedCipheredHashed();	
 			
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
@@ -615,9 +631,7 @@ public class Client implements ClientAPI {
 			e.printStackTrace();
 		}
 
-		byte[] secureBidMessageDataPersonalSerializedCiphered = secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerializedCiphered();
-		byte[] secureBidMessageDataPersonalSerializedCipheredHashed = secureBidMessageDataPersonal.getSecureBidMessageDataPersonalSerializedCipheredHashed();	
-		
+
 		SecureBidMessageMetaHeader secureBidMessageMetaHeader = new SecureBidMessageMetaHeader(
 				currentUser.getUserPeerID().getBytes("UTF-8").length,
 				secureBidMessageKeyExchangeSerializedCiphered.length,
@@ -636,12 +650,37 @@ public class Client implements ClientAPI {
 				currentUser.getUserHomeAddress().getBytes("UTF-8").length,
 				currentUser.getUserBankAccountNIB().getBytes("UTF-8").length);
 		
+		secureBidMessageMetaHeader.doSecureBidMessageMetaHeaderSerialization();
+		
 		SecureBidMessage bidMessage = new SecureBidMessage(
 				secureBidMessageMetaHeader,
 				currentUser.getUserPeerID(),
 				secureBidMessageKeyExchange,
 				secureBidMessageComponents,
 				secureBidMessageDoSMitigation);
+		
+		try {
+			bidMessage.doSecureBidMessageSerialized();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SignatureException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidAlgorithmParameterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		UserBidInfo bidInfo = new UserBidInfo(currentUser, Double.parseDouble(bidAmount));
 		String bidInfoSerialiazed = gson.toJson(bidMessage);
