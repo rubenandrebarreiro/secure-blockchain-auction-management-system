@@ -2,14 +2,16 @@ package main.java.messages.secure.bid.dos.mitigation;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.util.Arrays;
 
+import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 
 public class SecureBidMessageDoSMitigation {
@@ -131,12 +133,36 @@ public class SecureBidMessageDoSMitigation {
 			this.secureBidMessageComponentsSerialized = 
 					this.secureBidMessageComponents.getSecureBidMessageComponentsSerialized();
 			
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			this.secureBidMessageComponentsHashedForDoSMitigation = 
-					messageDigest.digest(secureBidMessageComponentsSerialized);
+			// Starts the MAC Hash process over the Secure Message serialized (applying the HMAC or CMAC operation),
+			// before the sending of the final concatenation of it with Secure Message serialized
+			try {
+				
+				// The Initialization Vector and its Parameter's Specifications
+				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils
+						.convertStringToKey(""/*keystoreInterface.load(propertiesReader.getProperty("ip") + ":" + 
+								propertiesReader.getProperty("port") + ":" +
+								"mac")*/); //TODO
+				
+				// The configuration, initialization and update of the MAC Hash process
+				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/);
+				mac.init(secretHMACKeyForDoSMitigationMACKey);
+				mac.update(this.secureBidMessageComponentsSerialized);
+				
+				// Performs the final operation of MAC Hash process over the Secure Message serialized
+				// (applying the HMAC or CMAC operation)
+				this.secureBidMessageComponentsHashedForDoSMitigation = mac.doFinal();
+			}
+			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("- Cryptographic Algorithm not found!!!");
+				noSuchAlgorithmException.printStackTrace();
+			}
+			catch (InvalidKeyException invalidKeyException) {
+				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("- Invalid Secret Key!!!");
+				invalidKeyException.printStackTrace();
+			}
 			
-			this.sizeOfSecureBidMessageComponentsHashedForDoSMitigation = 
-					this.secureBidMessageComponentsHashedForDoSMitigation.length;
 			
 			this.setIsSecureBidMessageComponentsHashedForDoSMitigation(true);
 			
@@ -148,14 +174,48 @@ public class SecureBidMessageDoSMitigation {
 		
 		if(this.isSecureBidMessageComponentsHashedForDoSMitigation) {
 			
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			byte[] bidSerializedHashedToCompare = messageDigest.digest(this.secureBidMessageComponentsSerialized);
+			byte[] secureBidMessageComponentsSerializedToCompare = this.secureBidMessageComponentsSerialized;
+			
+			// Starts the MAC Hash process over the Secure Message serialized received (applying the HMAC or CMAC operation),
+			// comparing it with Secure Message serialized hashed received (the MAC Hash process related to the Fast Secure Message Check)
+			try {
+			
+				// The Initialization Vector and its Parameter's Specifications
+				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils
+						.convertStringToKey(""/*keystoreInterface.load(propertiesReader.getProperty("ip") + ":" + 
+								propertiesReader.getProperty("port") + ":" +
+								"mac")*/);
+				
+				// The configuration, initialization and update of the MAC Hash process
+				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/); //TODO
+				mac.init(secretHMACKeyForDoSMitigationMACKey);
+				mac.update(secureBidMessageComponentsSerializedToCompare);
+				
+				// Performs the final operation of MAC Hash process over the Secure Message serialized
+				// (applying the HMAC or CMAC operation)
+				secureBidMessageComponentsSerializedToCompare = mac.doFinal();
+			}
+			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("- Cryptographic Algorithm not found!!!");
+				noSuchAlgorithmException.printStackTrace();
+			}
+			catch (InvalidKeyException invalidKeyException) {
+				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("- Invalid Secret Key!!!");
+				invalidKeyException.printStackTrace();
+			}
 			
 			this.isSecureBidMessageComponentsHashedForDoSMitigationValid = 
-								Arrays.areEqual(this.secureBidMessageComponentsHashedForDoSMitigation, 
-								 			    bidSerializedHashedToCompare) ? 
-												true : false;
+									  Arrays.areEqual(this.getSecureBidMessageComponentsHashedForDoSMitigation(), 
+											  		  secureBidMessageComponentsSerializedToCompare) ? 
+															  true : false;
 			
+			if(!this.isSecureBidMessageComponentsHashedForDoSMitigationValid) {
+				System.err.println("The Fast Secure Message Check it's not valid:");
+				System.err.println("- The Secure Message will be ignored!!!");
+			}
+
 			
 			this.setIsSecureBidMessageComponentsHashedForDoSMitigationVerified(true);
 			this.setIsSecureBidMessageComponentsHashedForDoSMitigation(false);

@@ -2,14 +2,13 @@ package main.java.messages.secure.bid.components.data.personal;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
@@ -110,7 +109,8 @@ public class SecureBidMessageDataPersonal {
 										int sizeOfUserHomeAddressSerialized,
 										int sizeOfUserBankAccountNIBSerialized) {
 		
-		this.secureBidMessageDataPersonalSerializedCipheredAndHashed = secureBidMessageDataPersonalSerializedCipheredAndHashed;
+		this.secureBidMessageDataPersonalSerializedCipheredAndHashed = 
+				secureBidMessageDataPersonalSerializedCipheredAndHashed;
 		this.isSecureBidMessageDataPersonalSerializedCipheredAndHashed = true;
 		
 		this.secureBidMessageDataPersonalSerializedCiphered = null;
@@ -676,35 +676,12 @@ public class SecureBidMessageDataPersonal {
 
 		if(isPossibleToHashOfSecureBidMessageDataPersonalSerializedCiphered) {
 
-			// Starts the MAC Hash process over the Secure Message serialized (applying the HMAC or CMAC operation),
-			// before the sending of the final concatenation of it with Secure Message serialized
-			try {
-				
-				// The Initialization Vector and its Parameter's Specifications
-				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils
-						.convertStringToKey(""/*keystoreInterface.load(propertiesReader.getProperty("ip") + ":" + 
-								propertiesReader.getProperty("port") + ":" +
-								"mac")*/); //TODO
-				
-				// The configuration, initialization and update of the MAC Hash process
-				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/);
-				mac.init(secretHMACKeyForDoSMitigationMACKey);
-				mac.update(this.secureBidMessageDataPersonalSerializedCiphered);
-				
-				// Performs the final operation of MAC Hash process over the Secure Message serialized
-				// (applying the HMAC or CMAC operation)
-				this.secureBidMessageDataPersonalSerializedCipheredHashed = mac.doFinal();
-			}
-			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
-				System.err.println("- Cryptographic Algorithm not found!!!");
-				noSuchAlgorithmException.printStackTrace();
-			}
-			catch (InvalidKeyException invalidKeyException) {
-				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
-				System.err.println("- Invalid Secret Key!!!");
-				invalidKeyException.printStackTrace();
-			}
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			this.secureBidMessageDataPersonalSerializedCipheredHashed = 
+					messageDigest.digest(secureBidMessageDataPersonalSerializedCiphered);
+			
+			this.sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = 
+					this.secureBidMessageDataPersonalSerializedCipheredHashed.length;
 			
 			
 			this.setIsSecureBidMessageDataPersonalSerializedCipheredHashed(true);
@@ -713,7 +690,8 @@ public class SecureBidMessageDataPersonal {
 
 	}
 
-	public boolean checkIfHashOfSecureBidMessageDataPersonalSerializedCipheredIsValid() throws NoSuchAlgorithmException {
+	public boolean checkIfHashOfSecureBidMessageDataPersonalSerializedCipheredIsValid()
+		   throws NoSuchAlgorithmException {
 
 		boolean isPossibleToCheckHashOfSecureBidMessageDataPersonalSerializedCiphered = 
 				(  this.getIsSecureBidMessageDataPersonalSerialized() && 
@@ -723,47 +701,14 @@ public class SecureBidMessageDataPersonal {
 
 		if(isPossibleToCheckHashOfSecureBidMessageDataPersonalSerializedCiphered) {
 			
-			byte[] secureBidMessageDataPersonalSerializedHashedToCompare = this.secureBidMessageDataPersonalSerializedCiphered;
-			
-			// Starts the MAC Hash process over the Secure Message serialized received (applying the HMAC or CMAC operation),
-			// comparing it with Secure Message serialized hashed received (the MAC Hash process related to the Fast Secure Message Check)
-			try {
-			
-				// The Initialization Vector and its Parameter's Specifications
-				Key secretHMACKeyForDoSMitigationMACKey = CommonUtils
-						.convertStringToKey(""/*keystoreInterface.load(propertiesReader.getProperty("ip") + ":" + 
-								propertiesReader.getProperty("port") + ":" +
-								"mac")*/);
-				
-				// The configuration, initialization and update of the MAC Hash process
-				Mac mac = Mac.getInstance(""/*this.propertiesReader.getProperty("mac")*/); //TODO
-				mac.init(secretHMACKeyForDoSMitigationMACKey);
-				mac.update(secureBidMessageDataPersonalSerializedHashedToCompare);
-				
-				// Performs the final operation of MAC Hash process over the Secure Message serialized
-				// (applying the HMAC or CMAC operation)
-				secureBidMessageDataPersonalSerializedHashedToCompare = mac.doFinal();
-			}
-			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
-				System.err.println("- Cryptographic Algorithm not found!!!");
-				noSuchAlgorithmException.printStackTrace();
-			}
-			catch (InvalidKeyException invalidKeyException) {
-				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
-				System.err.println("- Invalid Secret Key!!!");
-				invalidKeyException.printStackTrace();
-			}
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			byte[] secureBidMessageDataPersonalSerializedHashedToCompare = 
+					messageDigest.digest(this.secureBidMessageDataPersonalSerializedCiphered);
 			
 			this.isSecureBidMessageDataPersonalSerializedCipheredHashedValid = 
-									  Arrays.areEqual(this.secureBidMessageDataPersonalSerializedCipheredHashed, 
-											  		  secureBidMessageDataPersonalSerializedHashedToCompare) ? 
-															  true : false;
-			
-			if(!this.isSecureBidMessageDataPersonalSerializedCipheredHashedValid) {
-				System.err.println("The Fast Secure Message Check it's not valid:");
-				System.err.println("- The Secure Message will be ignored!!!");
-			}
+								Arrays.areEqual(this.secureBidMessageDataPersonalSerializedCipheredHashed, 
+										        secureBidMessageDataPersonalSerializedHashedToCompare) ? 
+												true : false;
 			
 			this.setIsSecureBidMessageDataPersonalSerializedCipheredHashedVerified(true);
 			this.setIsSecureBidMessageDataPersonalSerializedCipheredHashed(false);

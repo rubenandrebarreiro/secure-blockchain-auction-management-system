@@ -8,6 +8,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.cert.Certificate;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -276,6 +277,9 @@ public class SecureBidMessageDataSignature {
 			Signature secureBidMessageDataSignatureBidSerializedSignature = 
 					Signature.getInstance("SHA256withDSA");
 
+			Certificate certificate = null;
+			secureBidMessageDataSignatureBidSerializedSignature.initVerify(certificate);
+			
 			PublicKey userClientPublicKey = null; //TODO
 
 			secureBidMessageDataSignatureBidSerializedSignature.initVerify(userClientPublicKey);
