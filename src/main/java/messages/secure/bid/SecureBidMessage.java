@@ -11,8 +11,8 @@ import javax.crypto.NoSuchPaddingException;
 import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
-import main.java.messages.secure.bid.key.exchange.SecureBidMessageKeyExchange;
 import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
+import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 
 public class SecureBidMessage {
 	
@@ -20,7 +20,7 @@ public class SecureBidMessage {
 	
 	private String userPeerID;
 	
-	private SecureBidMessageKeyExchange secureBidMessageKeyExchange;
+	private SecureCommonKeyExchange secureBidMessageKeyExchange;
 	
 	private SecureBidMessageComponents secureBidMessageComponents;
 	
@@ -33,7 +33,7 @@ public class SecureBidMessage {
 	
 	public SecureBidMessage(SecureBidMessageMetaHeader secureBidMessageMetaHeader,
 							String userPeerID,
-							SecureBidMessageKeyExchange secureBidMessageKeyExchange,
+							SecureCommonKeyExchange secureBidMessageKeyExchange,
 							SecureBidMessageComponents secureBidMessageComponents,
 							SecureBidMessageDoSMitigation secureBidMessageDoSMitigation) {
 		
@@ -70,7 +70,7 @@ public class SecureBidMessage {
 		return this.userPeerID;
 	}
 	
-	public SecureBidMessageKeyExchange getSecureBidMessageKeyExchange() {
+	public SecureCommonKeyExchange getSecureBidMessageKeyExchange() {
 		return this.secureBidMessageKeyExchange;
 	}
 	
@@ -317,10 +317,10 @@ public class SecureBidMessage {
 			this.userPeerID = CommonUtils.fromByteArrayToString(userPeerIDSerialized);
 			
 			this.secureBidMessageKeyExchange = 
-					new SecureBidMessageKeyExchange(secureBidMessageKeyExchangeSerialized,
-													sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
-													sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
-													userPeerID);
+					new SecureCommonKeyExchange(secureBidMessageKeyExchangeSerialized,
+												sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
+												sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
+												userPeerID);
 		
 			try {
 				this.secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeReceived();
@@ -337,7 +337,7 @@ public class SecureBidMessage {
 			
 			this.secureBidMessageComponents = 
 					new SecureBidMessageComponents(secureBidMessageComponentsSerialized,
-												   this.secureBidMessageKeyExchange.getSecretSymmetricKeyForDataPersonalInBytes(),
+												   this.secureBidMessageKeyExchange.getSecretSymmetricKeyInBytes(),
 												   sizeOfSecureBidMessageDataSerialized,
 												   sizeOfSecureBidMessageDataSignatureSerialized,
 												   sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,

@@ -40,9 +40,9 @@ import main.java.messages.secure.bid.components.data.SecureBidMessageData;
 import main.java.messages.secure.bid.components.data.personal.SecureBidMessageDataPersonal;
 import main.java.messages.secure.bid.components.data.signature.SecureBidMessageDataSignature;
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
-import main.java.messages.secure.bid.key.exchange.SecureBidMessageKeyExchange;
 import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
 import main.java.messages.secure.common.header.SecureCommonHeader;
+import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
@@ -550,7 +550,7 @@ public class Client implements ClientAPI {
 		
 		SecureBidMessageDoSMitigation secureBidMessageDoSMitigation = null;
 
-		SecureBidMessageKeyExchange secureBidMessageKeyExchange = null;
+		SecureCommonKeyExchange secureBidMessageKeyExchange = null;
 		
 		byte[] secureBidMessageKeyExchangeSerializedCiphered = null;
 		byte[] secureBidMessageKeyExchangeSerializedCipheredSigned = null;
@@ -598,7 +598,7 @@ public class Client implements ClientAPI {
 			secureBidMessageDoSMitigation.doHashOfSecureBidMessageDoSMitigation();
 			secureBidMessageDoSMitigationSerialized = secureBidMessageDoSMitigation.getSecretHMACKeyForDoSMitigationInBytes();
 						
-			secureBidMessageKeyExchange = new SecureBidMessageKeyExchange(
+			secureBidMessageKeyExchange = new SecureCommonKeyExchange(
 					secureBidMessageDataPersonal.getSecretSymmetricKeyForDataPersonalInBytes(),
 					secureBidMessageDoSMitigation.getSecretHMACKeyForDoSMitigationInBytes(),
 					currentUser.getUserPeerID());
@@ -682,7 +682,7 @@ public class Client implements ClientAPI {
 		}
 		
 		
-		UserBidInfo bidInfo = new UserBidInfo(currentUser, Double.parseDouble(bidAmount));
+		UserBidInfo bidInfo = new UserBidInfo(currentUser, Double.parseDouble(bidAmount)); // TODO delete
 		String bidInfoSerialiazed = gson.toJson(bidMessage);
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);

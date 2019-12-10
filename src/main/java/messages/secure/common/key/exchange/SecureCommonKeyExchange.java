@@ -1,4 +1,4 @@
-package main.java.messages.secure.bid.key.exchange;
+package main.java.messages.secure.common.key.exchange;
 
 import java.io.FileInputStream;
 import java.security.InvalidKeyException;
@@ -23,9 +23,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.ShortBufferException;
 import main.java.common.utils.CommonUtils;
 
-public class SecureBidMessageKeyExchange {
+public class SecureCommonKeyExchange {
 		
-	private byte[] secretSymmetricKeyForDataPersonalInBytes;
+	private byte[] secretSymmetricKeyInBytes;
 	
 	private byte[] secretHMACKeyForDoSMitigationInBytes;
 	
@@ -59,11 +59,11 @@ public class SecureBidMessageKeyExchange {
 	
 	private String userPeerID;
 	
-	public SecureBidMessageKeyExchange(byte[] secretSymmetricKeyForDataPersonalInBytes,
+	public SecureCommonKeyExchange(byte[] secretSymmetricKeyInBytes,
 									   byte[] secretHMACKeyForDoSMitigationInBytes,
 									   String userPeerID) {
 			
-		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
+		this.secretSymmetricKeyInBytes = secretSymmetricKeyInBytes;
 		this.secretHMACKeyForDoSMitigationInBytes = secretHMACKeyForDoSMitigationInBytes;
 		
 		this.secureBidMessageKeyExchangeSerialized = null;
@@ -85,10 +85,10 @@ public class SecureBidMessageKeyExchange {
 	}
 	
 	
-	public SecureBidMessageKeyExchange(byte[] secureBidMessageKeyExchangeSerializedCipheredAndSigned,
-									   int sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
-									   int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
-									   String userPeerID) {
+	public SecureCommonKeyExchange(byte[] secureBidMessageKeyExchangeSerializedCipheredAndSigned,
+								   int sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
+								   int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
+								   String userPeerID) {
 		
 		this.secureBidMessageKeyExchangeSerializedCipheredAndSigned = 
 				secureBidMessageKeyExchangeSerializedCipheredAndSigned;
@@ -107,15 +107,15 @@ public class SecureBidMessageKeyExchange {
 		this.secureBidMessageKeyExchangeSerialized = null;
 		this.isSecureBidMessageKeyExchangeSerialized = true;
 		
-		this.secretSymmetricKeyForDataPersonalInBytes = null;
+		this.secretSymmetricKeyInBytes = null;
 		this.secretHMACKeyForDoSMitigationInBytes = null;
 		
 		this.userPeerID = userPeerID;
 	}
 	
 		
-	public byte[] getSecretSymmetricKeyForDataPersonalInBytes() {
-		return this.secretSymmetricKeyForDataPersonalInBytes;
+	public byte[] getSecretSymmetricKeyInBytes() {
+		return this.secretSymmetricKeyInBytes;
 	}
 	
 	public byte[] getSecretHMACKeyForDoSMitigationInBytes() {
@@ -278,7 +278,7 @@ public class SecureBidMessageKeyExchange {
 		if(isPossibleToDoSerializationOfSecureBidMessageKeyExchange) {
 			
 			int sizeOfSecureKeyExchangeSerialized = 
-					( this.secretSymmetricKeyForDataPersonalInBytes.length +
+					( this.secretSymmetricKeyInBytes.length +
 					  this.secretHMACKeyForDoSMitigationInBytes.length);
 			
 			this.secureBidMessageKeyExchangeSerialized = 
@@ -299,9 +299,9 @@ public class SecureBidMessageKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secretSymmetricKeyForDataPersonalInBytes, 0, this.secureBidMessageKeyExchangeSerialized,
-							 serializationOffset, this.secretSymmetricKeyForDataPersonalInBytes.length);
-			serializationOffset += this.secretSymmetricKeyForDataPersonalInBytes.length;
+			System.arraycopy(this.secretSymmetricKeyInBytes, 0, this.secureBidMessageKeyExchangeSerialized,
+							 serializationOffset, this.secretSymmetricKeyInBytes.length);
+			serializationOffset += this.secretSymmetricKeyInBytes.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -328,7 +328,7 @@ public class SecureBidMessageKeyExchange {
 		
 		if(isPossibleToUndoSerializationOfSecureBidMessageKeyExchange) {
 			
-			this.secretSymmetricKeyForDataPersonalInBytes = new byte[CommonUtils.LENGTH_256_BITS_IN_BYTES];
+			this.secretSymmetricKeyInBytes = new byte[CommonUtils.LENGTH_256_BITS_IN_BYTES];
 			this.secretHMACKeyForDoSMitigationInBytes = new byte[CommonUtils.LENGTH_256_BITS_IN_BYTES];
 			
 			// Operations to Fill a Byte Array, with the following parameters:
@@ -347,9 +347,9 @@ public class SecureBidMessageKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageKeyExchangeSerialized, serializationOffset, this.secretSymmetricKeyForDataPersonalInBytes,
-							 0, this.secretSymmetricKeyForDataPersonalInBytes.length);
-			serializationOffset += this.secretSymmetricKeyForDataPersonalInBytes.length;
+			System.arraycopy(this.secureBidMessageKeyExchangeSerialized, serializationOffset, this.secretSymmetricKeyInBytes,
+							 0, this.secretSymmetricKeyInBytes.length);
+			serializationOffset += this.secretSymmetricKeyInBytes.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,

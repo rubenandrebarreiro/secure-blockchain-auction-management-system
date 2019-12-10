@@ -27,8 +27,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
@@ -40,7 +38,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.eclipse.jetty.server.Response;
 
 import com.google.gson.Gson;
 
@@ -51,13 +48,10 @@ import main.java.messages.secure.bid.components.data.SecureBidMessageData;
 import main.java.messages.secure.bid.components.data.personal.SecureBidMessageDataPersonal;
 import main.java.messages.secure.bid.components.data.signature.SecureBidMessageDataSignature;
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
-import main.java.messages.secure.bid.key.exchange.SecureBidMessageKeyExchange;
-import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
+import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.resources.auction.Auction;
-import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
-import main.java.resources.user.UserBidInfo;
 import main.java.sys.SSLSocketMessage;
 
 public class AuctionServer extends Thread implements AuctionServerAPI{
@@ -356,7 +350,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		serializedBidInfo.undoSecureBidMessageSerialized();
 
 		SecureBidMessageData secureBidMessageData = null;
-		SecureBidMessageKeyExchange secureBidMessageKeyExchange = serializedBidInfo.getSecureBidMessageKeyExchange();
+		SecureCommonKeyExchange secureBidMessageKeyExchange = serializedBidInfo.getSecureBidMessageKeyExchange();
 		SecureBidMessageDoSMitigation secureBidMessageDosMitigation = serializedBidInfo.getSecureBidMessageDoSMitigation();
 		SecureBidMessageComponents secureBidMessageComponents = serializedBidInfo.getSecureBidMessageComponents();
 		

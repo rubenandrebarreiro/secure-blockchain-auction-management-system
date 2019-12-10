@@ -1,13 +1,11 @@
 package main.java.messages.secure.bid.components.data.signature;
 
 import java.io.FileInputStream;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -15,8 +13,6 @@ import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.Collection;
-
-import javax.crypto.NoSuchPaddingException;
 
 import main.java.resources.bid.Bid;
 
