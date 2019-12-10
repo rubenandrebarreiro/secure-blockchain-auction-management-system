@@ -45,7 +45,7 @@ import main.java.api.rest.server.auction.AuctionServerAPI;
 import main.java.messages.secure.bid.SecureBidMessage;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.components.data.SecureBidMessageData;
-import main.java.messages.secure.bid.components.data.personal.SecureBidMessageDataPersonal;
+import main.java.messages.secure.bid.components.data.confidential.SecureBidMessageDataConfidential;
 import main.java.messages.secure.bid.components.data.signature.SecureBidMessageDataSignature;
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
@@ -368,8 +368,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				SecureBidMessageDataSignature secureBidMessageDataSignature = secureBidMessageData.getSecureBidMessageDataSignature();
 				secureBidMessageDataSignature.buildSecureBidMessageDataSignatureReceived();
 				
-				SecureBidMessageDataPersonal secureBidMessageDataPersonal = secureBidMessageData.getSecureBidMessageDataPersonal();
-				secureBidMessageDataPersonal.buildSecureBidMessageDataPersonalReceived();
+				SecureBidMessageDataConfidential secureBidMessageDataConfidential = secureBidMessageData.getSecureBidMessageDataConfidential();
+				secureBidMessageDataConfidential.buildSecureBidMessageDataConfidentialReceived();
 				
 				
 				String bidJson = gson.toJson(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
