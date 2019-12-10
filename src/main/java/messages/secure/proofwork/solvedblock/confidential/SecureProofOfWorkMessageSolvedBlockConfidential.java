@@ -1,5 +1,20 @@
 package main.java.messages.secure.proofwork.solvedblock.confidential;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import main.java.common.utils.CommonUtils;
 import main.java.resources.block.Block;
 
 public class SecureProofOfWorkMessageSolvedBlockConfidential {
@@ -26,6 +41,9 @@ public class SecureProofOfWorkMessageSolvedBlockConfidential {
 	private int sizeOfBlockSerializedAndSolvedHashed;
 	
 	private boolean isBlockSerializedAndSolvedHashed;
+	
+	
+	private byte[] secretSymmetricKeyForSolvedBlockConfidentialInBytes;
 	
 	
 	private byte[] blockSerializedAndSolvedHashedCiphered;
@@ -204,9 +222,6 @@ public class SecureProofOfWorkMessageSolvedBlockConfidential {
 		
 	}
 	
-	
-	
-	
 	public void doBlockSerializedAndSolvedHashed() {
 		
 		boolean isPossibleToDoBlockSerializedAndSolvedHashed = 
@@ -228,25 +243,25 @@ public class SecureProofOfWorkMessageSolvedBlockConfidential {
 			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
 			// 3) dest - The destination of the array to be copied
 			// 4) destPos - The position of the array where will be placed the new copy,
-			//              representing the first element where new data will be placed
-			// 5) length - The length of the data to be copied from the source array to the destination array
+			//              representing the first element where new SolvedBlock will be placed
+			// 5) length - The length of the SolvedBlock to be copied from the source array to the destination array
 	
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 			
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(this.blockSerialized, 0,
 							 this.blockSerializedAndSolvedHashed,
 							 serializationOffset, this.blockSerialized.length);
 			serializationOffset += this.blockSerialized.length;
 			
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(this.blockSolvedHashed, 0,
 					         this.blockSerializedAndSolvedHashed,
 					         serializationOffset, this.blockSerialized.length);
@@ -279,24 +294,24 @@ public class SecureProofOfWorkMessageSolvedBlockConfidential {
 			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
 			// 3) dest - The destination of the array to be copied
 			// 4) destPos - The position of the array where will be placed the new copy,
-			//              representing the first element where new data will be placed
-			// 5) length - The length of the data to be copied from the source array to the destination array
+			//              representing the first element where new SolvedBlock will be placed
+			// 5) length - The length of the SolvedBlock to be copied from the source array to the destination array
 	
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 			
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(this.blockSerializedAndSolvedHashed, serializationOffset,
 							 this.blockSerialized, 0, this.blockSerialized.length);
 			serializationOffset += this.blockSerialized.length;
 			
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(this.blockSerializedAndSolvedHashed, serializationOffset,
 					         this.blockSolvedHashed, 0, this.blockSerialized.length);
 			
@@ -306,8 +321,6 @@ public class SecureProofOfWorkMessageSolvedBlockConfidential {
 		}
 		
 	}
-	
-
 	
 	
 	public void encryptBlockSerializedAndSolvedHashed() {
@@ -320,11 +333,109 @@ public class SecureProofOfWorkMessageSolvedBlockConfidential {
 		
 		if(isPossibleToEncryptSerializedAndSolvedHashed) {
 			
-			
-			
-			
-			this.setIsBlockSerializedAndSolvedHashedCiphered(true);
-			
+			try {
+				byte[] key = CommonUtils.createKeyForAES(256, new SecureRandom()).getEncoded();
+				this.secretSymmetricKeyForSolvedBlockConfidentialInBytes = key;
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchProviderException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} // TODO Symmetric Key generated on the fly with KeyGen (secretHMACKeyForDoSMitigationInBytes)
+
+			try {
+
+				String symmetricEncryptionAlgorithm = "AES";
+				String symmetricEncryptionMode = "CBC";
+				String symmetricEncryptionPadding = "PKCS7Padding";
+
+
+				// Set the Secret Key and its specifications,
+				// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
+				SecretKeySpec secretKeySpecifications = new SecretKeySpec(this.secretSymmetricKeyForSolvedBlockConfidentialInBytes, symmetricEncryptionAlgorithm);
+
+
+				String provider = "BC";
+				Cipher secureProofOfWorkMessageSolvedBlockConfidentialSerializedSymmetricEncryptionCipher = 
+						Cipher.getInstance(String.format("%s/%s/%s",
+								symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
+								provider );
+
+				byte[] initialisationVectorBytes = null;
+
+				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
+
+					// Algorithms that don't need IV (Initialisation Vector): ECB
+					// The parameter specifications for the IV (Initialisation Vector)	
+					System.out.println("[SecureProofOfWorkMessageSolvedBlockConfidential.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
+					initialisationVectorBytes = 
+							CommonUtils.generateIV(secureProofOfWorkMessageSolvedBlockConfidentialSerializedSymmetricEncryptionCipher);
+
+					// Showing the randomly defined IV (Initialisation Vector)
+					System.out.println("[SecureProofOfWorkMessageSolvedBlockConfidential.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
+							+ CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
+
+					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
+					
+					secureProofOfWorkMessageSolvedBlockConfidentialSerializedSymmetricEncryptionCipher
+							.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
+
+				}
+				else {
+
+					// Algorithms that need IV (Initialisation Vector)
+					// The parameter specifications for the IV (Initialisation Vector)
+					System.out.println("[SecureProofOfWorkMessageSolvedBlockConfidential.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
+
+					secureProofOfWorkMessageSolvedBlockConfidentialSerializedSymmetricEncryptionCipher
+					.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
+
+				}
+
+				this.blockSerializedAndSolvedHashedCiphered = 
+						secureProofOfWorkMessageSolvedBlockConfidentialSerializedSymmetricEncryptionCipher
+						.doFinal(this.blockSerializedAndSolvedHashed);
+
+
+				this.setIsBlockSerializedAndSolvedHashedCiphered(true);		
+
+			}
+			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Cryptographic Algorithm not found!!!");
+				noSuchAlgorithmException.printStackTrace();
+			}
+			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
+				invalidAlgorithmParameterException.printStackTrace();
+			}
+			catch (NoSuchProviderException noSuchProviderException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Cryptograhic Provider not found!!!");
+				noSuchProviderException.printStackTrace();
+			}
+			catch (NoSuchPaddingException noSuchPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Padding Method not found!!!");
+				noSuchPaddingException.printStackTrace();
+			}
+			catch (BadPaddingException badPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Bad/Wrong Padding Method in use!!!");
+				badPaddingException.printStackTrace();
+			}
+			catch (InvalidKeyException invalidKeyException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Invalid Cryptographic Algorithm's Secret Key!!!");
+				invalidKeyException.printStackTrace();
+			}
+			catch (IllegalBlockSizeException illegalBlockSizeException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Illegal Cryptographic Algorithm's Block Size!!!");
+				illegalBlockSizeException.printStackTrace();
+			}	
 		}
 		
 	}
@@ -339,11 +450,114 @@ public class SecureProofOfWorkMessageSolvedBlockConfidential {
 		
 		if(isPossibleToDecryptSerializedAndSolvedHashed) {
 			
+			byte[] secretKeyBytes = this.secretSymmetricKeyForSolvedBlockConfidentialInBytes; // TODO Symmetric Key contained in the Envelope (secretHMACKeyForDoSMitigationInBytes)
 			
+			try {
+				
+				String symmetricEncryptionAlgorithm = "AES";
+				String symmetricEncryptionMode = "CBC";
+		 	    String symmetricEncryptionPadding = "NoPadding";
+				
+				
+				// Set the Secret Key and its specifications,
+		 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
+				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
+				
+				
+				String provider = "BC";
+				Cipher secureProofOfWorkMessageSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher = 
+						Cipher.getInstance(String.format("%s/%s/%s",
+										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
+								           provider );
+				
+				byte[] initialisationVectorBytes = null;
 			
-			
-			this.setIsBlockSerializedAndSolvedHashedCiphered(false);
-			
+				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
+					
+					// Algorithms that don't need IV (Initialisation Vector): ECB
+					// The parameter specifications for the IV (Initialisation Vector)	
+					System.out.println("[SecureProofOfWorkMessageSolvedBlockConfidential.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
+					
+					// Showing the randomly defined IV (Initialisation Vector)
+					System.out.println("[SecureProofOfWorkMessageSolvedBlockConfidential.DECRYPT] - IV (Initialisation Vector) is:\n- " 
+									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
+					
+					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
+					secureProofOfWorkMessageSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+						.init(Cipher.DECRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
+				}
+				else {
+					
+					// Algorithms that need IV (Initialisation Vector)
+					// The parameter specifications for the IV (Initialisation Vector)
+					System.out.println("[SecureProofOfWorkMessageSolvedBlockConfidential.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
+					
+					secureProofOfWorkMessageSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+						.init(Cipher.DECRYPT_MODE, secretKeySpecifications);
+					
+				}
+				
+				this.sizeOfBlockSerializedAndSolvedHashedCiphered = 
+						this.blockSerializedAndSolvedHashedCiphered.length;
+				
+			  	// The Plain Text of the bytes of the SolvedBlock input received through the communication channel
+			  	this.blockSerializedAndSolvedHashed = 
+			  			new byte[ secureProofOfWorkMessageSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+			  	                  .getOutputSize(this.sizeOfBlockSerializedAndSolvedHashedCiphered) ];
+			    
+			  	this.sizeOfBlockSerializedAndSolvedHashed = secureProofOfWorkMessageSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+										  								    .update(this.blockSerializedAndSolvedHashedCiphered, 
+										  									   	    0, this.sizeOfBlockSerializedAndSolvedHashedCiphered,
+										  										    this.blockSerializedAndSolvedHashed, 0);
+			  	
+			  	secureProofOfWorkMessageSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+			  									   .doFinal(this.blockSerializedAndSolvedHashed,
+			  											    this.sizeOfBlockSerializedAndSolvedHashed);
+			    
+			  	
+				this.setIsBlockSerializedAndSolvedHashedCiphered(false);		
+				
+			}
+			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Cryptographic Algorithm not found!!!");
+				noSuchAlgorithmException.printStackTrace();
+			}
+			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
+				invalidAlgorithmParameterException.printStackTrace();
+			}
+			catch (NoSuchProviderException noSuchProviderException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Cryptograhic Provider not found!!!");
+				noSuchProviderException.printStackTrace();
+			}
+			catch (NoSuchPaddingException noSuchPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Padding Method not found!!!");
+				noSuchPaddingException.printStackTrace();
+			}
+			catch (BadPaddingException badPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Bad/Wrong Padding Method in use!!!");
+				badPaddingException.printStackTrace();
+			}
+			catch (InvalidKeyException invalidKeyException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Invalid Cryptographic Algorithm's Secret Key!!!");
+				invalidKeyException.printStackTrace();
+			}
+			catch (IllegalBlockSizeException illegalBlockSizeException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Illegal Cryptographic Algorithm's Block Size!!!");
+				illegalBlockSizeException.printStackTrace();
+			}
+			catch (ShortBufferException shortBufferException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- The Buffer in use, during the Deciphering process it's not correct!!!");
+				shortBufferException.printStackTrace();
+			}
 		}
 		
 	}

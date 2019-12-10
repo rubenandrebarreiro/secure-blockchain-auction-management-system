@@ -622,11 +622,11 @@ public class SecureBidMessageDataConfidential {
 			  	// The Plain Text of the bytes of the data input received through the communication channel
 			  	this.secureBidMessageDataConfidentialSerialized = 
 			  			new byte[ secureBidMessageDataConfidentialSerializedAndHashedSymmetricEncryptionDecipher
-			  	                  .getOutputSize(sizeOfSecureBidMessageDataConfidentialSerializedCiphered) ];
+			  	                  .getOutputSize(this.sizeOfSecureBidMessageDataConfidentialSerializedCiphered) ];
 			    
 			  	this.sizeOfSecureBidMessageDataConfidentialSerialized = secureBidMessageDataConfidentialSerializedAndHashedSymmetricEncryptionDecipher
 										  								    .update(this.secureBidMessageDataConfidentialSerializedCiphered, 
-										  									   	    0, sizeOfSecureBidMessageDataConfidentialSerializedCiphered,
+										  									   	    0, this.sizeOfSecureBidMessageDataConfidentialSerializedCiphered,
 										  										    this.secureBidMessageDataConfidentialSerialized, 0);
 			  	
 			  	secureBidMessageDataConfidentialSerializedAndHashedSymmetricEncryptionDecipher
