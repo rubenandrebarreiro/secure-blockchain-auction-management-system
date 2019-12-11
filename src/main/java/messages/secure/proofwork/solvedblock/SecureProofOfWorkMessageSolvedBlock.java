@@ -130,7 +130,7 @@ public class SecureProofOfWorkMessageSolvedBlock {
 	}
 	
 
-	public byte[] secureProofOfWorkMessageSolvedBlockSerialized() {
+	public byte[] getSecureProofOfWorkMessageSolvedBlockSerialized() {
 		return this.secureProofOfWorkMessageSolvedBlockSerialized;
 	}
 	
@@ -148,7 +148,7 @@ public class SecureProofOfWorkMessageSolvedBlock {
 	
 	
 	
-	public void buildSecureProofOfWorkMessageSolvedBlockToSend() {
+	public void doSecureProofOfWorkMessageSolvedBlockSerialization() {
 		
 		if(!this.isSecureProofOfWorkMessageSolvedBlockSerialized) {
 			
@@ -191,11 +191,11 @@ public class SecureProofOfWorkMessageSolvedBlock {
 			
 			this.setIsSecureProofOfWorkMessageSolvedBlockSerialized(true);
 			
-		}
-		
+		}	
 	}
 	
-	public void buildSecureProofOfWorkMessageSolvedBlockReceived() {
+	
+	public void undoSecureProofOfWorkMessageSolvedBlockSerialization() {
 		
 		if(this.isSecureProofOfWorkMessageSolvedBlockSerialized) {
 			
@@ -240,6 +240,5 @@ public class SecureProofOfWorkMessageSolvedBlock {
 		}
 		
 	}
-	
-	
+		
 }
