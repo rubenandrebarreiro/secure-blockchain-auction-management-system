@@ -47,7 +47,50 @@ public class Block {
 	private boolean isBlockMined;
 	
 	
-	public Block() {
+	public Block(int blockID, byte[] previousBlockHashed, Bid[] bidsOfCurrentBlockToTryToMine, byte strategyForCryptoPuzzle) {
+		
+		this.blockID = blockID;
+		
+		
+		this.previousBlockHashed = previousBlockHashed;
+		
+		this.bidsOfCurrentBlockToTryToMine = bidsOfCurrentBlockToTryToMine;
+		this.bidsOfCurrentBlockToTryToMineSerialized = null;
+		this.sizeOfBidsOfCurrentBlockToTryToMineSerialized = 0;
+		this.areBidsOfCurrentBlockToTryToMineSerialized = false;
+		
+		this.strategyForCryptoPuzzle = strategyForCryptoPuzzle;
+		
+		
+		
+		switch(this.strategyForCryptoPuzzle) {
+		
+			case 1:
+				this.nonce = 0;
+				break;
+			
+			case 2:
+				this.secureRandom = new SecureRandom();
+				this.nonce = this.secureRandom.nextInt();
+				break;
+			
+			case 3:
+				this.nonce = this.secureRandom.nextInt();
+				break;
+			
+			default:
+				break;
+			
+		}
+		
+		this.blockSerialized = null;
+		this.sizeOfBlockSerialized = 0;
+		this.isBlockSerialized = false;
+		
+		this.blockSerializedHashed = null;
+		this.isBlockSerializedHashed = false;
+		
+		this.isBlockMined = false;
 		
 	}
 	
@@ -134,7 +177,7 @@ public class Block {
 		this.setIsBlockSerialized(false);
 		this.setIsBlockSerializedHashed(false);
 		
-		switch(this.getStrategyForCryptoPuzzle()) {
+		switch(this.strategyForCryptoPuzzle) {
 			
 			case 1:
 				this.nonce++;
@@ -322,10 +365,10 @@ public class Block {
 			
 			byte[] challengeTarget = new byte[difficulty]; 
 			
-			while(!Arrays.copyOfRange(this.blockSerializedHashed, 0, difficulty).equals(challengeTarget)) {
+			while( !Arrays.copyOfRange(this.blockSerializedHashed, 0, difficulty).equals(challengeTarget) ) {
 			
 				this.startProcessToTryToSolveBlockHashChallenge();
-			
+				
 			}
 			
 			this.setIsBlockMined(true);	
