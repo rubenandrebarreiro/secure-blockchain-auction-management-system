@@ -185,7 +185,7 @@ public class SecureBidMessageDoSMitigation {
 		
 		if(this.isSecureBidMessageComponentsHashedForDoSMitigation) {
 			
-			byte[] secureBidMessageComponentsSerializedToCompare = this.secureBidMessageComponentsSerialized;
+			byte[] secureBidMessageComponentsSerializedHashedToCompare = this.secureBidMessageComponentsSerialized;
 			
 			// Starts the MAC Hash process over the Secure Message serialized received (applying the HMAC or CMAC operation),
 			// comparing it with Secure Message serialized hashed received (the MAC Hash process related to the Fast Secure Message Check)
@@ -196,11 +196,11 @@ public class SecureBidMessageDoSMitigation {
 				SecretKeySpec keySpec = new SecretKeySpec(this.secretHMACKeyForDoSMitigationInBytes, "HMacSHA256");
 				// The configuration, initialization and update of the MAC Hash process
 				mac.init(keySpec);
-				mac.update(secureBidMessageComponentsSerializedToCompare);
+				mac.update(secureBidMessageComponentsSerializedHashedToCompare);
 				
 				// Performs the final operation of MAC Hash process over the Secure Message serialized
 				// (applying the HMAC or CMAC operation)
-				secureBidMessageComponentsSerializedToCompare = mac.doFinal();
+				secureBidMessageComponentsSerializedHashedToCompare = mac.doFinal();
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
 				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
@@ -215,7 +215,7 @@ public class SecureBidMessageDoSMitigation {
 			
 			this.isSecureBidMessageComponentsHashedForDoSMitigationValid = 
 									  Arrays.areEqual(this.getSecureBidMessageComponentsHashedForDoSMitigation(), 
-											  		  secureBidMessageComponentsSerializedToCompare) ? 
+											  		  secureBidMessageComponentsSerializedHashedToCompare) ? 
 															  true : false;
 			
 			if(!this.isSecureBidMessageComponentsHashedForDoSMitigationValid) {

@@ -107,9 +107,9 @@ public class SecureBidMessage {
 			
 			byte[] userPeerIDSerialized = CommonUtils.fromStringToByteArray(userPeerID);
 			
-			this.secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeToSend();
+			this.secureBidMessageKeyExchange.buildSecureCommonKeyExchangeToSend();
 			byte[] secureBidMessageKeyExchangeSerializedCipheredAndSigned = 
-					this.secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCipheredAndSigned();
+					this.secureBidMessageKeyExchange.getSecureCommonKeyExchangeSerializedCipheredAndSigned();
 			
 			this.secureBidMessageComponents.doSecureBidMessageComponentsSerialization();
 			byte[] secureBidMessageComponentsSerialized = 
@@ -289,8 +289,8 @@ public class SecureBidMessage {
 			  
 			int sizeOfSecureBidMessageDataSignatureSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataSignatureSerialized();
-			int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed();
+			int sizeOfSecureBidMessageDataConfidentialSerializedCipheredAndHashed = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataConfidentialSerializedCipheredAndHashed();
 			  
 			int sizeOfBidSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfBidSerialized();
@@ -300,12 +300,12 @@ public class SecureBidMessage {
 			int sizeOfBidderUserClientIDSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfBidderUserClientIDSerialized();
 			  
-			int sizeOfSecureBidMessageDataPersonalSerializedCiphered = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedCiphered();
-			int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedCipheredHashed();
-			int sizeOfSecureBidMessageDataPersonalSerialized = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerialized();
+			int sizeOfSecureBidMessageDataConfidentialSerializedCiphered = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataConfidentialSerializedCiphered();
+			int sizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed();
+			int sizeOfSecureBidMessageDataConfidentialSerialized = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataConfidentialSerialized();
 			  
 			int sizeOfUserEmailSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfUserEmailSerialized();
@@ -323,7 +323,7 @@ public class SecureBidMessage {
 												userPeerID);
 		
 			try {
-				this.secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeReceived();
+				this.secureBidMessageKeyExchange.buildSecureCommonKeyExchangeReceived();
 			} catch (InvalidKeyException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -340,13 +340,13 @@ public class SecureBidMessage {
 												   this.secureBidMessageKeyExchange.getSecretSymmetricKeyInBytes(),
 												   sizeOfSecureBidMessageDataSerialized,
 												   sizeOfSecureBidMessageDataSignatureSerialized,
-												   sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,
+												   sizeOfSecureBidMessageDataConfidentialSerializedCipheredAndHashed,
 												   sizeOfBidSerialized,
 												   sizeOfBidSerializedDigitalSigned,
 												   sizeOfBidderUserClientIDSerialized,
-												   sizeOfSecureBidMessageDataPersonalSerializedCiphered,
-												   sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
-												   sizeOfSecureBidMessageDataPersonalSerialized,
+												   sizeOfSecureBidMessageDataConfidentialSerializedCiphered,
+												   sizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed,
+												   sizeOfSecureBidMessageDataConfidentialSerialized,
 												   sizeOfUserEmailSerialized,
 												   sizeOfUserHomeAddressSerialized, 
 												   sizeOfUserBankAccountNIBSerialized,
