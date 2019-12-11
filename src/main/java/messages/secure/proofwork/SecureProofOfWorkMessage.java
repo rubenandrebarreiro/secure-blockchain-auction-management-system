@@ -96,7 +96,9 @@ public class SecureProofOfWorkMessage {
 	}
 	
 	
-	public void doSecureProofOfWorkMessageSerialized() {
+	public void doSecureProofOfWorkMessageSerialized()
+		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException,
+		   		  NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException {
 			
 		if(!this.isSecureProofOfWorkMessageSerialized) {
 			

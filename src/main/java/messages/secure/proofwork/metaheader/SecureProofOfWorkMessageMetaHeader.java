@@ -82,5 +82,11 @@ public class SecureProofOfWorkMessageMetaHeader {
 		this.isSecureProofOfWorkMessageMetaHeaderSerialized = isSecureProofOfWorkMessageMetaHeaderSerialized;
 		
 	}
+
+
+	public void doSecureProofOfWorkMessageMetaHeaderSerialization() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }
