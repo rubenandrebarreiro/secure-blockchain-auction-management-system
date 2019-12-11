@@ -10,25 +10,16 @@ public class SecureProofOfWorkMessageMetaHeader {
 	private int sizeOfSecureProofOfWorkMessageSolvedBlockSerialized;
 	private int sizeOfSecureProofOfWorkMessageDoSMitigationSerialized;
 	  
-	private int sizeOfSecureBidMessageDataSignatureSerialized;
-	private int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed;
-	  
-	private int sizeOfProofOfWorkSerialized;
-	private int sizeOfBidSerializedDigitalSigned;
-	  
-	private int sizeOfBidderUserClientIDSerialized;
-	  
-	private int sizeOfSecureBidMessageDataPersonalSerializedCiphered;
-	private int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed;
-	private int sizeOfSecureBidMessageDataPersonalSerialized;
-	  
-	private int sizeOfUserEmailSerialized;
-	private int sizeOfUserHomeAddressSerialized;
-	private int sizeOfUserBankAccountNIBSerialized;
+	private int sizeOfSecureBidMessageSolvedBlockConfidentialSerialized;
+	private int sizeOfSecureBidMessageSolvedBlockSignatureSerialized;
+	
+	private int sizeOfBlockAndBlockSolvedHashedSerialized;
+	private int sizeOfBlockSerialized;
+	private int sizeOfBlockSolvedHashedSerialized;
 	
 	
-	private byte[] secureBidMessageMetaHeaderSerialized;
+	private byte[] secureProofOfWorkMessageMetaHeaderSerialized;
 	
-	private boolean isSecureBidMessageMetaHeaderSerialized;
+	private boolean isSecureProofOfWorkMessageMetaHeaderSerialized;
 	
 }
