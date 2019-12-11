@@ -354,9 +354,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		SecureBidMessageDoSMitigation secureBidMessageDosMitigation = serializedBidInfo.getSecureBidMessageDoSMitigation();
 		SecureBidMessageComponents secureBidMessageComponents = serializedBidInfo.getSecureBidMessageComponents();
 		
-		secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeReceived();
+		secureBidMessageKeyExchange.buildSecureCommonKeyExchangeReceived();
 		
-		if(secureBidMessageKeyExchange.getIsSecureBidMessageKeyExchangeSerializedCipheredSignedValid()) {
+		if(secureBidMessageKeyExchange.getIsSecureCommonKeyExchangeSerializedCipheredSignedValid()) {
 						
 			if(secureBidMessageDosMitigation.checkIfHashOfSecureBidMessageDoSMitigationIsValid()) {
 				
