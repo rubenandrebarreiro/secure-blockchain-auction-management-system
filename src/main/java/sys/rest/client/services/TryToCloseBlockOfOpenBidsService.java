@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import main.java.common.utils.CommonUtils;
 import main.java.resources.bid.Bid;
-import main.java.resources.block.Block;
+import main.java.resources.block.BlockOld;
 import main.java.resources.cryptopuzzle.CryptoPuzzleSolverForProofOfWork;
 
 public class TryToCloseBlockOfOpenBidsService implements Runnable {
@@ -82,7 +82,7 @@ public class TryToCloseBlockOfOpenBidsService implements Runnable {
 			}
 
 
-			Block blockOfOpenBidsForChallenge = new Block( ( (Bid[]) chosenOpenBidsToMineList.toArray() ) );
+			BlockOld blockOfOpenBidsForChallenge = new BlockOld( ( (Bid[]) chosenOpenBidsToMineList.toArray() ) );
 
 			try {
 

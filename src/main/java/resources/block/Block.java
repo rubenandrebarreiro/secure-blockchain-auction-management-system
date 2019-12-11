@@ -1,7 +1,5 @@
 package main.java.resources.block;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -9,51 +7,95 @@ import main.java.resources.bid.Bid;
 
 public class Block {
 
-	private Bid[] bidsToMine;
+	private int blockID;
 	
-	private int randomNonce;
+	
+	private byte[] previousBlockHashed;
+	
+	
+	private Bid[] bidsOfCurrentBlockToTryToMine;
+	
+	private byte[] bidsOfCurrentBlockToTryToMineSerialized;
+	
+	private int sizeOfBidsOfCurrentBlockToTryToMine;
+	
+	private boolean areBidsOfCurrentBlockToTryToMineSerialized;
+	
+	
+	private byte strategyForCryptoPuzzle;
+	
+	private SecureRandom secureRandom;
+	
+	private int nonce;
+	
 	
 	private byte[] blockSerialized;
 	
+	private int sizeOfBlockSerialized;
+	
 	private boolean isBlockSerialized;
+	
 	
 	private byte[] blockSerializedHashed;
 	
 	private boolean isBlockSerializedHashed;
 	
-	private boolean isBlockMinedAndClosed;
+	
+	private boolean isBlockSerializedMined;
 	
 	
-	public Block(Bid[] bidsToMine) {
-		
-		this.bidsToMine = bidsToMine;
-		
-		SecureRandom secureRandom = new SecureRandom();
-		this.randomNonce = secureRandom.nextInt();
-		
-		this.blockSerialized = null;
-		this.isBlockSerialized = false;
-		
-		this.blockSerializedHashed = null;
-		this.isBlockSerializedHashed = false;
+	public Block() {
 		
 	}
 	
 	
-	public Bid[] getBidsToMine() {
-		return bidsToMine;
+	
+	
+	public int getBlockID() {
+		return this.blockID;
 	}
 	
-	public int getRandomNonce() {
-		return this.randomNonce;
+	
+	public byte[] getPreviousBlockHashed() {
+		return this.previousBlockHashed;
+	}
+	
+	
+	public Bid[] getBidsOfCurrentBlockToTryToMine() {
+		return this.bidsOfCurrentBlockToTryToMine;
+	}
+	
+	public byte[] getBidsOfCurrentBlockToTryToMineSerialized() {
+		return this.bidsOfCurrentBlockToTryToMineSerialized;
+	}
+	
+	public int getSizeOfBidsOfCurrentBlockToTryToMine() {
+		return this.sizeOfBidsOfCurrentBlockToTryToMine;
+	}
+	
+	public boolean getAreBidsOfCurrentBlockToTryToMineSerialized() {
+		return this.areBidsOfCurrentBlockToTryToMineSerialized;
 	}
 
+	public void setAreBidsOfCurrentBlockToTryToMineSerialized(boolean areBidsOfCurrentBlockToTryToMineSerialized) {
+		this.areBidsOfCurrentBlockToTryToMineSerialized = areBidsOfCurrentBlockToTryToMineSerialized;
+	}
+	
+	public byte getStrategyForCryptoPuzzle() {
+		return this.strategyForCryptoPuzzle;
+	}
+	
+	public int getNonce() {
+		return this.nonce;
+	}
+	
+	
 	public byte[] getBlockSerialized() {
 		return this.blockSerialized;
 	}
-
-	public void setBlockSerialized(byte[] blockSerialized) {
-		this.blockSerialized = blockSerialized;
+	
+	public int getSizeOfBlockSerialized() {
+		return this.sizeOfBlockSerialized;
 	}
 	
 	public boolean getIsBlockSerialized() {
@@ -64,6 +106,10 @@ public class Block {
 		this.isBlockSerialized = isBlockSerialized;
 	}
 	
+	public byte[] getBlockSerializedHashed() {
+		return this.blockSerializedHashed;
+	}
+	
 	public boolean getIsBlockSerializedHashed() {
 		return this.isBlockSerializedHashed;
 	}
@@ -72,30 +118,26 @@ public class Block {
 		this.isBlockSerializedHashed = isBlockSerializedHashed;
 	}
 	
-	public byte[] getBlockSerializedHashed() {
-		return this.blockSerializedHashed;
+	public boolean getIsBlockSerializedMined() {
+		return this.isBlockSerializedMined;
 	}
 	
-	public void setBlockSerializedHashed(byte[] blockSerializedHashed) {
-		this.blockSerializedHashed = blockSerializedHashed;
+	public void setIsBlockSerializedMined(boolean isBlockSerializedMined) {
+		this.isBlockSerializedMined = isBlockSerializedMined;
 	}
 	
-	public boolean isBlockMinedAndClosed() {
-		return isBlockMinedAndClosed;
-	}
 	
-	public void setIsBlockMinedAndClosed(boolean isBlockMinedAndClosed) {
-		this.isBlockMinedAndClosed = isBlockMinedAndClosed;
-	}
 	
-	public void doBlockSerialization() {
+	
+	public void doBidsOfCurrentBlockToTryToMineSerialization() {
 		
-		boolean isPossibleToDoBlockSerialization = 
-				( !this.isBlockSerialized && !this.isBlockSerializedHashed );
+		boolean isPossibleToDoBidsOfCurrentBlockToTryToMineSerialization = 
+				( !this.areBidsOfCurrentBlockToTryToMineSerialized && !this.isBlockSerialized && 
+				  !this.isBlockSerializedHashed && !this.isBlockSerializedMined );
 		
-		if(isPossibleToDoBlockSerialization) {
+		if(isPossibleToDoBidsOfCurrentBlockToTryToMineSerialization) {
 		
-			int newSizeOfBlockSerialized = 0;
+			int newSizeOfBidsOfCurrentBlockToTryToMineSerialized = 0;
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -109,13 +151,13 @@ public class Block {
 			int serializationOffset = 0;
 			
 			
-			for(Bid bidToMine : bidsToMine) {
+			for(Bid bidToMine : this.bidsOfCurrentBlockToTryToMine) {
 
 				bidToMine.doSerialization();
 				
 				if(this.blockSerialized == null) {
 					
-					this.blockSerialized = bidToMine.getBidSerializedBytes();
+					this.bidsOfCurrentBlockToTryToMineSerialized = bidToMine.getBidSerializedBytes();
 					
 				}
 				else {
@@ -124,42 +166,28 @@ public class Block {
 					
 					int sizeOfSerializedBid = serializedBidBytes.length;
 					
-					newSizeOfBlockSerialized = ( this.blockSerialized.length + sizeOfSerializedBid );
+					newSizeOfBidsOfCurrentBlockToTryToMineSerialized = ( this.bidsOfCurrentBlockToTryToMineSerialized.length + sizeOfSerializedBid );
 					
-					this.blockSerialized = Arrays.copyOf(this.blockSerialized, newSizeOfBlockSerialized);
+					this.blockSerialized = Arrays.copyOf(this.blockSerialized, newSizeOfBidsOfCurrentBlockToTryToMineSerialized);
 					
 					// Fills the byte array of the Block's Serialization with
 					// the correspondent bytes from the current Bid serialized,
 					// From the position corresponding to the length of the previous Bid's Serialization to
 					// the position corresponding to the length of the current Bid's Serialization
-					System.arraycopy(serializedBidBytes, 0, this.blockSerialized, serializationOffset, sizeOfSerializedBid);
+					System.arraycopy(serializedBidBytes, 0, this.bidsOfCurrentBlockToTryToMineSerialized,
+							         serializationOffset, sizeOfSerializedBid);
 					
 				}
 				
-				serializationOffset = this.blockSerialized.length;
+				serializationOffset = this.bidsOfCurrentBlockToTryToMineSerialized.length;
 				
 			}	
 			
-			this.setIsBlockSerialized(true);
+			this.setAreBidsOfCurrentBlockToTryToMineSerialized(true);
 			
 		}
 		
 	}
 	
-	public void doHashOfBlockOfBidsToMine() throws NoSuchAlgorithmException {
-		
-		boolean isPossibleToDoBlockSerializedHash = 
-				( this.isBlockSerialized && !this.isBlockSerializedHashed );
-		
-		if(isPossibleToDoBlockSerializedHash) {
-			
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-			this.blockSerializedHashed = messageDigest.digest(this.blockSerialized);
-
-			this.setIsBlockSerializedHashed(true);	
-			
-		}
-		
-	}
 	
 }

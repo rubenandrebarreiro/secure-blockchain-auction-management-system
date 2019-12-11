@@ -8,7 +8,7 @@ import org.bouncycastle.util.Arrays;
 
 import main.java.common.protocols.NumBytesChallengeType;
 import main.java.common.utils.CommonUtils;
-import main.java.resources.block.Block;
+import main.java.resources.block.BlockOld;
 
 public class CryptoPuzzleSolverForProofOfWork {
 	
@@ -17,7 +17,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 	
 	private byte numBytesToSolveChallengeType;
 	
-	private Block blockOfOpenBidsForChallengeToCheck;
+	private BlockOld blockOfOpenBidsForChallengeToCheck;
 	
 	private byte[] blockOfOpenBidsForChallengeSerializedHashedToMine;
 	
@@ -26,7 +26,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 	
 	public CryptoPuzzleSolverForProofOfWork(byte strategyUsedForCryptoPuzzleSolverForProofOfWork,
 											byte numBytesToSolveChallengeType,
-											Block blockOfOpenBidsForChallengeToCheck)
+											BlockOld blockOfOpenBidsForChallengeToCheck)
 											throws NoSuchAlgorithmException {
 		
 		this.strategyUsedForCryptoPuzzleSolverForProofOfWork = strategyUsedForCryptoPuzzleSolverForProofOfWork;
@@ -49,7 +49,7 @@ public class CryptoPuzzleSolverForProofOfWork {
 		return this.numBytesToSolveChallengeType;
 	}
 	
-	public Block getBlockOfOpenBidsForChallengeToCheck() {
+	public BlockOld getBlockOfOpenBidsForChallengeToCheck() {
 		return this.blockOfOpenBidsForChallengeToCheck;
 	}
 	
