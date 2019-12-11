@@ -27,6 +27,8 @@ public class Block {
 	
 	private byte strategyForCryptoPuzzle;
 	
+	private int numBytesToSolveChallengeDifficultType;
+	
 	private SecureRandom secureRandom;
 	
 	private int nonce;
@@ -47,7 +49,8 @@ public class Block {
 	private boolean isBlockMined;
 	
 	
-	public Block(int blockID, byte[] previousBlockHashed, Bid[] bidsOfCurrentBlockToTryToMine, byte strategyForCryptoPuzzle) {
+	public Block(int blockID, byte[] previousBlockHashed, Bid[] bidsOfCurrentBlockToTryToMine,
+			     byte strategyForCryptoPuzzle, int numBytesToSolveChallengeDifficultType) {
 		
 		this.blockID = blockID;
 		
@@ -60,7 +63,7 @@ public class Block {
 		this.areBidsOfCurrentBlockToTryToMineSerialized = false;
 		
 		this.strategyForCryptoPuzzle = strategyForCryptoPuzzle;
-		
+		this.numBytesToSolveChallengeDifficultType = numBytesToSolveChallengeDifficultType;
 		
 		
 		switch(this.strategyForCryptoPuzzle) {
@@ -129,6 +132,10 @@ public class Block {
 	
 	public byte getStrategyForCryptoPuzzle() {
 		return this.strategyForCryptoPuzzle;
+	}
+	
+	public int numBytesToSolveChallengeDifficultType() {
+		return this.numBytesToSolveChallengeDifficultType;
 	}
 	
 	public int getNonce() {

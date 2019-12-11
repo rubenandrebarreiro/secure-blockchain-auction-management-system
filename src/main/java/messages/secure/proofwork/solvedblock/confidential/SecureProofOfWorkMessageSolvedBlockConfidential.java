@@ -15,11 +15,11 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import main.java.common.utils.CommonUtils;
-import main.java.resources.block.BlockOld;
+import main.java.resources.block.Block;
 
 public class SecureProofOfWorkMessageSolvedBlockConfidential {
 
-	private BlockOld block;
+	private Block block;
 	
 	
 	private byte[] blockSerialized;
@@ -54,7 +54,7 @@ public class SecureProofOfWorkMessageSolvedBlockConfidential {
 	
 	
 	
-	public SecureProofOfWorkMessageSolvedBlockConfidential(BlockOld block, byte[] blockSolvedHashed) {
+	public SecureProofOfWorkMessageSolvedBlockConfidential(Block block, byte[] blockSolvedHashed) {
 		
 		this.block = block;
 		
@@ -112,7 +112,7 @@ public class SecureProofOfWorkMessageSolvedBlockConfidential {
 	
 	
 	
-	public BlockOld getBlock() {
+	public Block getBlock() {
 		return this.block;
 	}
 	
