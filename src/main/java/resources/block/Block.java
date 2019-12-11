@@ -2,6 +2,7 @@ package main.java.resources.block;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 import main.java.resources.bid.Bid;
@@ -9,6 +10,8 @@ import main.java.resources.bid.Bid;
 public class Block {
 
 	private Bid[] bidsToMine;
+	
+	private int randomNonce;
 	
 	private byte[] blockSerialized;
 	
@@ -25,6 +28,9 @@ public class Block {
 		
 		this.bidsToMine = bidsToMine;
 		
+		SecureRandom secureRandom = new SecureRandom();
+		this.randomNonce = secureRandom.nextInt();
+		
 		this.blockSerialized = null;
 		this.isBlockSerialized = false;
 		
@@ -37,9 +43,9 @@ public class Block {
 	public Bid[] getBidsToMine() {
 		return bidsToMine;
 	}
-
-	public void setBidsToMine(Bid[] bidsToMine) {
-		this.bidsToMine = bidsToMine;
+	
+	public int getRandomNonce() {
+		return this.randomNonce;
 	}
 
 	public byte[] getBlockSerialized() {
