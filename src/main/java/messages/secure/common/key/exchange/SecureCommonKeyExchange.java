@@ -30,32 +30,32 @@ public class SecureCommonKeyExchange {
 	private byte[] secretHMACKeyForDoSMitigationInBytes;
 	
 	
-	private byte[] secureBidMessageKeyExchangeSerialized;
+	private byte[] secureCommonKeyExchangeSerialized;
 	
-	private boolean isSecureBidMessageKeyExchangeSerialized;
-	
-	
-	private byte[] secureBidMessageKeyExchangeSerializedCiphered;
-	
-	private int sizeOfSecureBidMessageKeyExchangeSerializedCiphered;
-	
-	private boolean isSecureBidMessageKeyExchangeSerializedCiphered;
+	private boolean isSecureCommonKeyExchangeSerialized;
 	
 	
-	private byte[] secureBidMessageKeyExchangeSerializedCipheredSigned;
+	private byte[] secureCommonKeyExchangeSerializedCiphered;
 	
-	private boolean isSecureBidMessageKeyExchangeSerializedCipheredSigned;
+	private int sizeOfSecureCommonKeyExchangeSerializedCiphered;
 	
-	private int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned;
-	
-	private boolean isSecureBidMessageKeyExchangeSerializedCipheredSignedVerified;
-	
-	private boolean isSecureBidMessageKeyExchangeSerializedCipheredSignedValid;
+	private boolean isSecureCommonKeyExchangeSerializedCiphered;
 	
 	
-	private byte[] secureBidMessageKeyExchangeSerializedCipheredAndSigned;
+	private byte[] secureCommonKeyExchangeSerializedCipheredSigned;
 	
-	private boolean isSecureBidMessageKeyExchangeSerializedCipheredAndSigned;
+	private boolean isSecureCommonKeyExchangeSerializedCipheredSigned;
+	
+	private int sizeOfSecureCommonKeyExchangeSerializedCipheredSigned;
+	
+	private boolean isSecureCommonKeyExchangeSerializedCipheredSignedVerified;
+	
+	private boolean isSecureCommonKeyExchangeSerializedCipheredSignedValid;
+	
+	
+	private byte[] secureCommonKeyExchangeSerializedCipheredAndSigned;
+	
+	private boolean isSecureCommonKeyExchangeSerializedCipheredAndSigned;
 	
 	private String userPeerID;
 	
@@ -66,46 +66,46 @@ public class SecureCommonKeyExchange {
 		this.secretSymmetricKeyInBytes = secretSymmetricKeyInBytes;
 		this.secretHMACKeyForDoSMitigationInBytes = secretHMACKeyForDoSMitigationInBytes;
 		
-		this.secureBidMessageKeyExchangeSerialized = null;
-		this.isSecureBidMessageKeyExchangeSerialized = false;
+		this.secureCommonKeyExchangeSerialized = null;
+		this.isSecureCommonKeyExchangeSerialized = false;
 		
-		this.secureBidMessageKeyExchangeSerializedCiphered = null;
-		this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 0;
-		this.isSecureBidMessageKeyExchangeSerializedCiphered = false;
+		this.secureCommonKeyExchangeSerializedCiphered = null;
+		this.sizeOfSecureCommonKeyExchangeSerializedCiphered = 0;
+		this.isSecureCommonKeyExchangeSerializedCiphered = false;
 		
-		this.secureBidMessageKeyExchangeSerializedCipheredSigned = null;
-		this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned = 0;
-		this.isSecureBidMessageKeyExchangeSerializedCipheredSigned = false;
+		this.secureCommonKeyExchangeSerializedCipheredSigned = null;
+		this.sizeOfSecureCommonKeyExchangeSerializedCipheredSigned = 0;
+		this.isSecureCommonKeyExchangeSerializedCipheredSigned = false;
 		
-		this.secureBidMessageKeyExchangeSerializedCipheredAndSigned = null;
-		this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned = false;
+		this.secureCommonKeyExchangeSerializedCipheredAndSigned = null;
+		this.isSecureCommonKeyExchangeSerializedCipheredAndSigned = false;
 		
 		this.userPeerID = userPeerID;
 		
 	}
 	
 	
-	public SecureCommonKeyExchange(byte[] secureBidMessageKeyExchangeSerializedCipheredAndSigned,
-								   int sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
-								   int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
+	public SecureCommonKeyExchange(byte[] secureCommonKeyExchangeSerializedCipheredAndSigned,
+								   int sizeOfSecureCommonKeyExchangeSerializedCiphered,
+								   int sizeOfSecureCommonKeyExchangeSerializedCipheredSigned,
 								   String userPeerID) {
 		
-		this.secureBidMessageKeyExchangeSerializedCipheredAndSigned = 
-				secureBidMessageKeyExchangeSerializedCipheredAndSigned;
-		this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned = true;
+		this.secureCommonKeyExchangeSerializedCipheredAndSigned = 
+				secureCommonKeyExchangeSerializedCipheredAndSigned;
+		this.isSecureCommonKeyExchangeSerializedCipheredAndSigned = true;
 		
-		this.secureBidMessageKeyExchangeSerializedCiphered = null;
-		this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 
-				sizeOfSecureBidMessageKeyExchangeSerializedCiphered;
-		this.isSecureBidMessageKeyExchangeSerializedCiphered = true;
+		this.secureCommonKeyExchangeSerializedCiphered = null;
+		this.sizeOfSecureCommonKeyExchangeSerializedCiphered = 
+				sizeOfSecureCommonKeyExchangeSerializedCiphered;
+		this.isSecureCommonKeyExchangeSerializedCiphered = true;
 		
-		this.secureBidMessageKeyExchangeSerializedCipheredSigned = null;
-		this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned = 
-				sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned;
-		this.isSecureBidMessageKeyExchangeSerializedCipheredSigned = true;
+		this.secureCommonKeyExchangeSerializedCipheredSigned = null;
+		this.sizeOfSecureCommonKeyExchangeSerializedCipheredSigned = 
+				sizeOfSecureCommonKeyExchangeSerializedCipheredSigned;
+		this.isSecureCommonKeyExchangeSerializedCipheredSigned = true;
 		
-		this.secureBidMessageKeyExchangeSerialized = null;
-		this.isSecureBidMessageKeyExchangeSerialized = true;
+		this.secureCommonKeyExchangeSerialized = null;
+		this.isSecureCommonKeyExchangeSerialized = true;
 		
 		this.secretSymmetricKeyInBytes = null;
 		this.secretHMACKeyForDoSMitigationInBytes = null;
@@ -122,144 +122,144 @@ public class SecureCommonKeyExchange {
 		return this.secretHMACKeyForDoSMitigationInBytes;
 	}
 	
-	public byte[] getSecureBidMessageKeyExchangeSerialized() {
-		return this.secureBidMessageKeyExchangeSerialized;
+	public byte[] getSecureCommonKeyExchangeSerialized() {
+		return this.secureCommonKeyExchangeSerialized;
 	}
 	
-	public boolean getIsSecureBidMessageKeyExchangeSerialized() {
-		return this.isSecureBidMessageKeyExchangeSerialized;
+	public boolean getIsSecureCommonKeyExchangeSerialized() {
+		return this.isSecureCommonKeyExchangeSerialized;
 	}
 	
-	public void setIsSecureBidMessageKeyExchangeSerialized
-		  (boolean isSecureBidMessageKeyExchangeSerialized) {
+	public void setIsSecureCommonKeyExchangeSerialized
+		  (boolean isSecureCommonKeyExchangeSerialized) {
 		
-		this.isSecureBidMessageKeyExchangeSerialized = 
-				isSecureBidMessageKeyExchangeSerialized;
+		this.isSecureCommonKeyExchangeSerialized = 
+				isSecureCommonKeyExchangeSerialized;
 	
 	}
 	
-	public byte[] getSecureBidMessageKeyExchangeSerializedCiphered() {
-		return this.secureBidMessageKeyExchangeSerializedCiphered;
+	public byte[] getSecureCommonKeyExchangeSerializedCiphered() {
+		return this.secureCommonKeyExchangeSerializedCiphered;
 	}
 	
-	public int getSizeOfSecureBidMessageKeyExchangeSerializedCiphered() {
-		return this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered;
+	public int getSizeOfSecureCommonKeyExchangeSerializedCiphered() {
+		return this.sizeOfSecureCommonKeyExchangeSerializedCiphered;
 	}
 	
-	public boolean getIsSecureBidMessageKeyExchangeSerializedCiphered() {
-		return this.isSecureBidMessageKeyExchangeSerializedCiphered;
+	public boolean getIsSecureCommonKeyExchangeSerializedCiphered() {
+		return this.isSecureCommonKeyExchangeSerializedCiphered;
 	}
 	
-	public void setIsSecureBidMessageKeyExchangeSerializedCiphered
-		  (boolean isSecureBidMessageKeyExchangeSerializedCiphered) {
+	public void setIsSecureCommonKeyExchangeSerializedCiphered
+		  (boolean isSecureCommonKeyExchangeSerializedCiphered) {
 		
-		this.isSecureBidMessageKeyExchangeSerializedCiphered = 
-				isSecureBidMessageKeyExchangeSerializedCiphered;
+		this.isSecureCommonKeyExchangeSerializedCiphered = 
+				isSecureCommonKeyExchangeSerializedCiphered;
 	
 	}
 	
-	public byte[] getSecureBidMessageKeyExchangeSerializedCipheredSigned() {
-		return this.secureBidMessageKeyExchangeSerializedCipheredSigned;
+	public byte[] getSecureCommonKeyExchangeSerializedCipheredSigned() {
+		return this.secureCommonKeyExchangeSerializedCipheredSigned;
 	}
 	
-	public boolean getIsSecureBidMessageKeyExchangeSerializedCipheredSigned() {
-		return this.isSecureBidMessageKeyExchangeSerializedCipheredSigned;
+	public boolean getIsSecureCommonKeyExchangeSerializedCipheredSigned() {
+		return this.isSecureCommonKeyExchangeSerializedCipheredSigned;
 	}
 	
-	public void setIsSecureBidMessageKeyExchangeSerializedCipheredSigned
-		  (boolean isSecureBidMessageKeyExchangeSerializedCipheredSigned) {
+	public void setIsSecureCommonKeyExchangeSerializedCipheredSigned
+		  (boolean isSecureCommonKeyExchangeSerializedCipheredSigned) {
 		
-		this.isSecureBidMessageKeyExchangeSerializedCipheredSigned = 
-				isSecureBidMessageKeyExchangeSerializedCipheredSigned;
+		this.isSecureCommonKeyExchangeSerializedCipheredSigned = 
+				isSecureCommonKeyExchangeSerializedCipheredSigned;
 	
 	}
 	
-	public int getSizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned() {
-		return this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned;
+	public int getSizeOfSecureCommonKeyExchangeSerializedCipheredSigned() {
+		return this.sizeOfSecureCommonKeyExchangeSerializedCipheredSigned;
 	}
 	
-	public boolean getIsSecureBidMessageKeyExchangeSerializedCipheredSignedVerified() {
-		return this.isSecureBidMessageKeyExchangeSerializedCipheredSignedVerified;
+	public boolean getIsSecureCommonKeyExchangeSerializedCipheredSignedVerified() {
+		return this.isSecureCommonKeyExchangeSerializedCipheredSignedVerified;
 	}
 	
-	public void setIsSecureBidMessageKeyExchangeSerializedCipheredSignedVerified
-	      (boolean isSecureBidMessageKeyExchangeSerializedCipheredSignedVerified) {
+	public void setIsSecureCommonKeyExchangeSerializedCipheredSignedVerified
+	      (boolean isSecureCommonKeyExchangeSerializedCipheredSignedVerified) {
 		
-		this.isSecureBidMessageKeyExchangeSerializedCipheredSignedVerified = 
-				isSecureBidMessageKeyExchangeSerializedCipheredSignedVerified;
-		
-	}
-	
-	public boolean getIsSecureBidMessageKeyExchangeSerializedCipheredSignedValid() {
-		return this.isSecureBidMessageKeyExchangeSerializedCipheredSignedValid;
-	}
-	
-	public void setIsSecureBidMessageKeyExchangeSerializedCipheredSignedValid
-    	  (boolean isSecureBidMessageKeyExchangeSerializedCipheredSignedValid) {
-	
-		this.isSecureBidMessageKeyExchangeSerializedCipheredSignedValid = 
-				isSecureBidMessageKeyExchangeSerializedCipheredSignedValid;
+		this.isSecureCommonKeyExchangeSerializedCipheredSignedVerified = 
+				isSecureCommonKeyExchangeSerializedCipheredSignedVerified;
 		
 	}
 	
+	public boolean getIsSecureCommonKeyExchangeSerializedCipheredSignedValid() {
+		return this.isSecureCommonKeyExchangeSerializedCipheredSignedValid;
+	}
+	
+	public void setIsSecureCommonKeyExchangeSerializedCipheredSignedValid
+    	  (boolean isSecureCommonKeyExchangeSerializedCipheredSignedValid) {
+	
+		this.isSecureCommonKeyExchangeSerializedCipheredSignedValid = 
+				isSecureCommonKeyExchangeSerializedCipheredSignedValid;
 		
-	public byte[] getSecureBidMessageKeyExchangeSerializedCipheredAndSigned() {
-		return this.secureBidMessageKeyExchangeSerializedCipheredAndSigned;
 	}
 	
-	public boolean getIsSecureBidMessageKeyExchangeSerializedCipheredAndSigned() {
-		return this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned;
-	}
-	
-	public void setIsSecureBidMessageKeyExchangeSerializedCipheredAndSigned
-		  (boolean isSecureBidMessageKeyExchangeSerializedCipheredAndSigned) {
 		
-		this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned = 
-				isSecureBidMessageKeyExchangeSerializedCipheredAndSigned;
+	public byte[] getSecureCommonKeyExchangeSerializedCipheredAndSigned() {
+		return this.secureCommonKeyExchangeSerializedCipheredAndSigned;
+	}
+	
+	public boolean getIsSecureCommonKeyExchangeSerializedCipheredAndSigned() {
+		return this.isSecureCommonKeyExchangeSerializedCipheredAndSigned;
+	}
+	
+	public void setIsSecureCommonKeyExchangeSerializedCipheredAndSigned
+		  (boolean isSecureCommonKeyExchangeSerializedCipheredAndSigned) {
+		
+		this.isSecureCommonKeyExchangeSerializedCipheredAndSigned = 
+				isSecureCommonKeyExchangeSerializedCipheredAndSigned;
 	
 	}
 	
-	public void buildSecureBidMessageKeyExchangeToSend() 
+	public void buildSecureCommonKeyExchangeToSend() 
 		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 
-		boolean isPossibleToBuildSecureBidMessageKeyExchangeToSend = 
-				( !this.getIsSecureBidMessageKeyExchangeSerialized() && 
-				  !this.getIsSecureBidMessageKeyExchangeSerializedCiphered() && 
-				  !this.getIsSecureBidMessageKeyExchangeSerializedCipheredSigned() &&
-				  !this.getIsSecureBidMessageKeyExchangeSerializedCipheredAndSigned() );	
+		boolean isPossibleToBuildSecureCommonKeyExchangeToSend = 
+				( !this.getIsSecureCommonKeyExchangeSerialized() && 
+				  !this.getIsSecureCommonKeyExchangeSerializedCiphered() && 
+				  !this.getIsSecureCommonKeyExchangeSerializedCipheredSigned() &&
+				  !this.getIsSecureCommonKeyExchangeSerializedCipheredAndSigned() );	
 
-		if(isPossibleToBuildSecureBidMessageKeyExchangeToSend) {
+		if(isPossibleToBuildSecureCommonKeyExchangeToSend) {
 
-			this.doSerializationOfSecureBidMessageKeyExchange();
+			this.doSerializationOfSecureCommonKeyExchange();
 
-			this.encryptSecureBidMessageKeyExchangeSerialized();
+			this.encryptSecureCommonKeyExchangeSerialized();
 						
-			this.signSecureBidMessageKeyExchangeSerializedCiphered();
+			this.signSecureCommonKeyExchangeSerializedCiphered();
 
-			this.doSecureBidMessageKeyExchangeSerializedCipheredAndSigned();
+			this.doSecureCommonKeyExchangeSerializedCipheredAndSigned();
 			
 		}
 
 	}
 		
-	public void buildSecureBidMessageKeyExchangeReceived()
+	public void buildSecureCommonKeyExchangeReceived()
 		   throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		
-		boolean isPossibleToBuildSecureBidMessageKeyExchangeReceived = 
-				( this.getIsSecureBidMessageKeyExchangeSerialized() && 
-				  this.getIsSecureBidMessageKeyExchangeSerializedCiphered() && 
-				  this.getIsSecureBidMessageKeyExchangeSerializedCipheredSigned() &&
-				  this.getIsSecureBidMessageKeyExchangeSerializedCipheredAndSigned() );	
+		boolean isPossibleToBuildSecureCommonKeyExchangeReceived = 
+				( this.getIsSecureCommonKeyExchangeSerialized() && 
+				  this.getIsSecureCommonKeyExchangeSerializedCiphered() && 
+				  this.getIsSecureCommonKeyExchangeSerializedCipheredSigned() &&
+				  this.getIsSecureCommonKeyExchangeSerializedCipheredAndSigned() );	
 
-		if(isPossibleToBuildSecureBidMessageKeyExchangeReceived) {
+		if(isPossibleToBuildSecureCommonKeyExchangeReceived) {
 			
-			this.undoSecureBidMessageKeyExchangeSerializedCipheredAndSigned();
+			this.undoSecureCommonKeyExchangeSerializedCipheredAndSigned();
 						
-			if(this.checkIfSecureBidMessageKeyExchangeSerializedCipheredSignedIsValid()) {
+			if(this.checkIfSecureCommonKeyExchangeSerializedCipheredSignedIsValid()) {
 				
-				this.decryptSecureBidMessageKeyExchangeSerialized();
+				this.decryptSecureCommonKeyExchangeSerialized();
 				
-				this.undoSerializationOfSecureBidMessageKeyExchange();
+				this.undoSerializationOfSecureCommonKeyExchange();
 				
 			}
 			
@@ -267,21 +267,21 @@ public class SecureCommonKeyExchange {
 	}
 	
 	
-	public void doSerializationOfSecureBidMessageKeyExchange() {
+	public void doSerializationOfSecureCommonKeyExchange() {
 		
-		boolean isPossibleToDoSerializationOfSecureBidMessageKeyExchange = 
-				( !this.isSecureBidMessageKeyExchangeSerialized && 
-				  !this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+		boolean isPossibleToDoSerializationOfSecureCommonKeyExchange = 
+				( !this.isSecureCommonKeyExchangeSerialized && 
+				  !this.isSecureCommonKeyExchangeSerializedCiphered &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredSigned &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredAndSigned);
 		
-		if(isPossibleToDoSerializationOfSecureBidMessageKeyExchange) {
+		if(isPossibleToDoSerializationOfSecureCommonKeyExchange) {
 			
 			int sizeOfSecureKeyExchangeSerialized = 
 					( this.secretSymmetricKeyInBytes.length +
 					  this.secretHMACKeyForDoSMitigationInBytes.length);
 			
-			this.secureBidMessageKeyExchangeSerialized = 
+			this.secureCommonKeyExchangeSerialized = 
 					new byte[sizeOfSecureKeyExchangeSerialized];
 					
 			// Operations to Fill a Byte Array, with the following parameters:
@@ -299,7 +299,7 @@ public class SecureCommonKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secretSymmetricKeyInBytes, 0, this.secureBidMessageKeyExchangeSerialized,
+			System.arraycopy(this.secretSymmetricKeyInBytes, 0, this.secureCommonKeyExchangeSerialized,
 							 serializationOffset, this.secretSymmetricKeyInBytes.length);
 			serializationOffset += this.secretSymmetricKeyInBytes.length;
 			
@@ -307,26 +307,26 @@ public class SecureCommonKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secretHMACKeyForDoSMitigationInBytes, 0, this.secureBidMessageKeyExchangeSerialized,
+			System.arraycopy(this.secretHMACKeyForDoSMitigationInBytes, 0, this.secureCommonKeyExchangeSerialized,
 					         serializationOffset, this.secretHMACKeyForDoSMitigationInBytes.length);
 			
 			
 			
-			this.setIsSecureBidMessageKeyExchangeSerialized(true);
+			this.setIsSecureCommonKeyExchangeSerialized(true);
 			
 		}
 		
 	}
 	
-	public void undoSerializationOfSecureBidMessageKeyExchange() {
+	public void undoSerializationOfSecureCommonKeyExchange() {
 		
-		boolean isPossibleToUndoSerializationOfSecureBidMessageKeyExchange = 
-				(  this.isSecureBidMessageKeyExchangeSerialized && 
-				  !this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+		boolean isPossibleToUndoSerializationOfSecureCommonKeyExchange = 
+				(  this.isSecureCommonKeyExchangeSerialized && 
+				  !this.isSecureCommonKeyExchangeSerializedCiphered &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredSigned &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredAndSigned);
 		
-		if(isPossibleToUndoSerializationOfSecureBidMessageKeyExchange) {
+		if(isPossibleToUndoSerializationOfSecureCommonKeyExchange) {
 			
 			this.secretSymmetricKeyInBytes = new byte[CommonUtils.LENGTH_256_BITS_IN_BYTES];
 			this.secretHMACKeyForDoSMitigationInBytes = new byte[CommonUtils.LENGTH_256_BITS_IN_BYTES];
@@ -347,7 +347,7 @@ public class SecureCommonKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageKeyExchangeSerialized, serializationOffset, this.secretSymmetricKeyInBytes,
+			System.arraycopy(this.secureCommonKeyExchangeSerialized, serializationOffset, this.secretSymmetricKeyInBytes,
 							 0, this.secretSymmetricKeyInBytes.length);
 			serializationOffset += this.secretSymmetricKeyInBytes.length;
 			
@@ -355,25 +355,25 @@ public class SecureCommonKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageKeyExchangeSerialized, serializationOffset, this.secretHMACKeyForDoSMitigationInBytes,
+			System.arraycopy(this.secureCommonKeyExchangeSerialized, serializationOffset, this.secretHMACKeyForDoSMitigationInBytes,
 					         0, this.secretHMACKeyForDoSMitigationInBytes.length);
 			
-			this.setIsSecureBidMessageKeyExchangeSerialized(false);
+			this.setIsSecureCommonKeyExchangeSerialized(false);
 			
 		}
 		
 	}
 	
-	public void encryptSecureBidMessageKeyExchangeSerialized() {
+	public void encryptSecureCommonKeyExchangeSerialized() {
 		
-		boolean isPossibleToEncryptSecureBidMessageKeyExchangeSerialized = 
-				(  this.isSecureBidMessageKeyExchangeSerialized && 
-				  !this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+		boolean isPossibleToEncryptSecureCommonKeyExchangeSerialized = 
+				(  this.isSecureCommonKeyExchangeSerialized && 
+				  !this.isSecureCommonKeyExchangeSerializedCiphered &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredSigned &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredAndSigned);
 		
 		
-		if(isPossibleToEncryptSecureBidMessageKeyExchangeSerialized) {
+		if(isPossibleToEncryptSecureCommonKeyExchangeSerialized) {
 			
 			Key secretKeyBytes = readKeysFromKeystore("auctionServer").getPublic();  //TODO Public Key of the Server
 			
@@ -384,22 +384,22 @@ public class SecureCommonKeyExchange {
 		 	    String symmetricEncryptionPadding = "NoPadding";
 				
 				String provider = "BC";
-				Cipher secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher = 
+				Cipher secureCommonKeyExchangeAgreeementSymmetricEncryptionCipher = 
 						Cipher.getInstance(String.format("%s/%s/%s",
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								           provider );
 				
-				secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
+				secureCommonKeyExchangeAgreeementSymmetricEncryptionCipher
 					.init(Cipher.ENCRYPT_MODE, secretKeyBytes, new SecureRandom());
 
 				
-				this.secureBidMessageKeyExchangeSerializedCiphered = 
-						secureBidMessageKeyExchangeAgreeementSymmetricEncryptionCipher
-						.doFinal(this.secureBidMessageKeyExchangeSerialized);
+				this.secureCommonKeyExchangeSerializedCiphered = 
+						secureCommonKeyExchangeAgreeementSymmetricEncryptionCipher
+						.doFinal(this.secureCommonKeyExchangeSerialized);
 				
-				System.err.println("Ciphered data size: " + this.secureBidMessageKeyExchangeSerializedCiphered.length);
+				System.err.println("Ciphered data size: " + this.secureCommonKeyExchangeSerializedCiphered.length);
 				
-				this.setIsSecureBidMessageKeyExchangeSerializedCiphered(true);		
+				this.setIsSecureCommonKeyExchangeSerializedCiphered(true);		
 				
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
@@ -436,15 +436,15 @@ public class SecureCommonKeyExchange {
 		}
 	}
 	
-	public void decryptSecureBidMessageKeyExchangeSerialized() {
+	public void decryptSecureCommonKeyExchangeSerialized() {
 		
-		boolean isPossibleToDecryptSecureBidMessageKeyExchangeSerializedCiphered = 
-				(  this.isSecureBidMessageKeyExchangeSerialized && 
-				   this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+		boolean isPossibleToDecryptSecureCommonKeyExchangeSerializedCiphered = 
+				(  this.isSecureCommonKeyExchangeSerialized && 
+				   this.isSecureCommonKeyExchangeSerializedCiphered &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredSigned &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredAndSigned);
 		
-		if(isPossibleToDecryptSecureBidMessageKeyExchangeSerializedCiphered) {
+		if(isPossibleToDecryptSecureCommonKeyExchangeSerializedCiphered) {
 			
 			Key secretKeyBytes = readKeysFromKeystore("auctionServer").getPrivate(); //TODO Private Key of the Server
 			
@@ -455,35 +455,35 @@ public class SecureCommonKeyExchange {
 		 	    String symmetricEncryptionPadding = "NoPadding";
 				
 				String provider = "BC";
-				Cipher secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher = 
+				Cipher secureCommonKeyExchangeAgreeementSymmetricEncryptionDecipher = 
 						Cipher.getInstance(String.format("%s/%s/%s",
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								           provider);
 				
 			
-				secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
+				secureCommonKeyExchangeAgreeementSymmetricEncryptionDecipher
 					.init(Cipher.DECRYPT_MODE, secretKeyBytes);
 				
-				this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 
-						this.secureBidMessageKeyExchangeSerializedCiphered.length;
+				this.sizeOfSecureCommonKeyExchangeSerializedCiphered = 
+						this.secureCommonKeyExchangeSerializedCiphered.length;
 				
 			  	// The Plain Text of the bytes of the data input received through the communication channel
-			  	this.secureBidMessageKeyExchangeSerialized = 
-			  			new byte[ secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
-			  	                  .getOutputSize(this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered) ];
+			  	this.secureCommonKeyExchangeSerialized = 
+			  			new byte[ secureCommonKeyExchangeAgreeementSymmetricEncryptionDecipher
+			  	                  .getOutputSize(this.sizeOfSecureCommonKeyExchangeSerializedCiphered) ];
 			    
-			  	int sizeOfSecureBidMessageKeyExchangeSerialized = 
-			  											 secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
-				  									     .update(this.secureBidMessageKeyExchangeSerializedCiphered, 
-				  										   	     0, this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
-				  											     this.secureBidMessageKeyExchangeSerialized, 0);
+			  	int sizeOfSecureCommonKeyExchangeSerialized = 
+			  											 secureCommonKeyExchangeAgreeementSymmetricEncryptionDecipher
+				  									     .update(this.secureCommonKeyExchangeSerializedCiphered, 
+				  										   	     0, this.sizeOfSecureCommonKeyExchangeSerializedCiphered,
+				  											     this.secureCommonKeyExchangeSerialized, 0);
 			  	
-			  	secureBidMessageKeyExchangeAgreeementSymmetricEncryptionDecipher
-			  									   .doFinal(this.secureBidMessageKeyExchangeSerialized,
-			  											    sizeOfSecureBidMessageKeyExchangeSerialized);
+			  	secureCommonKeyExchangeAgreeementSymmetricEncryptionDecipher
+			  									   .doFinal(this.secureCommonKeyExchangeSerialized,
+			  											    sizeOfSecureCommonKeyExchangeSerialized);
 			    
 			  	
-				this.setIsSecureBidMessageKeyExchangeSerializedCiphered(false);		
+				this.setIsSecureCommonKeyExchangeSerializedCiphered(false);		
 				
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
@@ -525,68 +525,68 @@ public class SecureCommonKeyExchange {
 	}
 	
 	
-	public void signSecureBidMessageKeyExchangeSerializedCiphered()
+	public void signSecureCommonKeyExchangeSerializedCiphered()
 		   throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		
-		boolean isPossibleToSignSecureBidMessageKeyExchangeSerializedCiphered = 
-				(  this.isSecureBidMessageKeyExchangeSerialized && 
-				   this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+		boolean isPossibleToSignSecureCommonKeyExchangeSerializedCiphered = 
+				(  this.isSecureCommonKeyExchangeSerialized && 
+				   this.isSecureCommonKeyExchangeSerializedCiphered &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredSigned &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredAndSigned);
 		
 		
-		if(isPossibleToSignSecureBidMessageKeyExchangeSerializedCiphered) {
+		if(isPossibleToSignSecureCommonKeyExchangeSerializedCiphered) {
 			
-			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
+			Signature secureCommonKeyExchangeSerializedCipheredSignature = 
 					  Signature.getInstance("SHA256withRSA");
 			
 			PrivateKey userClientPrivateKey = readKeysFromKeystore(userPeerID).getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
 			
-			secureBidMessageKeyExchangeSerializedCipheredSignature.initSign(userClientPrivateKey);
+			secureCommonKeyExchangeSerializedCipheredSignature.initSign(userClientPrivateKey);
 			
-			secureBidMessageKeyExchangeSerializedCipheredSignature
-			.update(this.secureBidMessageKeyExchangeSerializedCiphered);
+			secureCommonKeyExchangeSerializedCipheredSignature
+			.update(this.secureCommonKeyExchangeSerializedCiphered);
 			
-			this.secureBidMessageKeyExchangeSerializedCipheredSigned = 
-				 secureBidMessageKeyExchangeSerializedCipheredSignature.sign();
+			this.secureCommonKeyExchangeSerializedCipheredSigned = 
+				 secureCommonKeyExchangeSerializedCipheredSignature.sign();
 			
 			
 			
-			this.setIsSecureBidMessageKeyExchangeSerializedCipheredSigned(true);
+			this.setIsSecureCommonKeyExchangeSerializedCipheredSigned(true);
 			
 		}
 		
 	}
 	
 	
-	public boolean checkIfSecureBidMessageKeyExchangeSerializedCipheredSignedIsValid()
+	public boolean checkIfSecureCommonKeyExchangeSerializedCipheredSignedIsValid()
 		   throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 			
-		boolean isPossibleToVerifySecureBidMessageKeyExchangeSerializedCipheredSigned = 
-				(  this.isSecureBidMessageKeyExchangeSerialized && 
-				   this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				   this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+		boolean isPossibleToVerifySecureCommonKeyExchangeSerializedCipheredSigned = 
+				(  this.isSecureCommonKeyExchangeSerialized && 
+				   this.isSecureCommonKeyExchangeSerializedCiphered &&
+				   this.isSecureCommonKeyExchangeSerializedCipheredSigned &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredAndSigned);
 		
 		
-		if(isPossibleToVerifySecureBidMessageKeyExchangeSerializedCipheredSigned) {
+		if(isPossibleToVerifySecureCommonKeyExchangeSerializedCipheredSigned) {
 			
-			Signature secureBidMessageKeyExchangeSerializedCipheredSignature = 
+			Signature secureCommonKeyExchangeSerializedCipheredSignature = 
 					  Signature.getInstance("SHA256withRSA");
 			
 			PublicKey userClientPublicKey = readCertificate(userPeerID).getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
 			
-			secureBidMessageKeyExchangeSerializedCipheredSignature.initVerify(userClientPublicKey);
+			secureCommonKeyExchangeSerializedCipheredSignature.initVerify(userClientPublicKey);
 			
-			secureBidMessageKeyExchangeSerializedCipheredSignature
-			.update(this.secureBidMessageKeyExchangeSerializedCiphered);
+			secureCommonKeyExchangeSerializedCipheredSignature
+			.update(this.secureCommonKeyExchangeSerializedCiphered);
 			
-			this.isSecureBidMessageKeyExchangeSerializedCipheredSignedValid = 
-					secureBidMessageKeyExchangeSerializedCipheredSignature
-					.verify(this.secureBidMessageKeyExchangeSerializedCipheredSigned);
+			this.isSecureCommonKeyExchangeSerializedCipheredSignedValid = 
+					secureCommonKeyExchangeSerializedCipheredSignature
+					.verify(this.secureCommonKeyExchangeSerializedCipheredSigned);
 		
 			
-			if(this.isSecureBidMessageKeyExchangeSerializedCipheredSignedValid) {
+			if(this.isSecureCommonKeyExchangeSerializedCipheredSignedValid) {
 				
 				System.out.println("Valid Signature!!!");
 				
@@ -597,11 +597,11 @@ public class SecureCommonKeyExchange {
 	        	
 	        }
 			
-			this.setIsSecureBidMessageKeyExchangeSerializedCipheredSignedVerified(true);
-			this.setIsSecureBidMessageKeyExchangeSerializedCipheredSigned(false);
+			this.setIsSecureCommonKeyExchangeSerializedCipheredSignedVerified(true);
+			this.setIsSecureCommonKeyExchangeSerializedCipheredSigned(false);
 			
 			
-			return this.isSecureBidMessageKeyExchangeSerializedCipheredSignedValid;
+			return this.isSecureCommonKeyExchangeSerializedCipheredSignedValid;
 					
 		}
 		
@@ -609,23 +609,23 @@ public class SecureCommonKeyExchange {
 		
 	}
 
-	public void doSecureBidMessageKeyExchangeSerializedCipheredAndSigned() {
+	public void doSecureCommonKeyExchangeSerializedCipheredAndSigned() {
 		
-		boolean isPossibleToDoSecureBidMessageKeyExchangeSerializedCipheredAndSigned = 
-				(  this.isSecureBidMessageKeyExchangeSerialized && 
-				   this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				   this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				  !this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+		boolean isPossibleToDoSecureCommonKeyExchangeSerializedCipheredAndSigned = 
+				(  this.isSecureCommonKeyExchangeSerialized && 
+				   this.isSecureCommonKeyExchangeSerializedCiphered &&
+				   this.isSecureCommonKeyExchangeSerializedCipheredSigned &&
+				  !this.isSecureCommonKeyExchangeSerializedCipheredAndSigned);
 		
 		
-		if(isPossibleToDoSecureBidMessageKeyExchangeSerializedCipheredAndSigned) {
+		if(isPossibleToDoSecureCommonKeyExchangeSerializedCipheredAndSigned) {
 			
-			int sizeOfSecureBidMessageKeyExchangeSerializedCipheredAndSigned =
-					( this.secureBidMessageKeyExchangeSerializedCiphered.length +
-					  this.secureBidMessageKeyExchangeSerializedCipheredSigned.length );
+			int sizeOfSecureCommonKeyExchangeSerializedCipheredAndSigned =
+					( this.secureCommonKeyExchangeSerializedCiphered.length +
+					  this.secureCommonKeyExchangeSerializedCipheredSigned.length );
 			
-			this.secureBidMessageKeyExchangeSerializedCipheredAndSigned = 
-					new byte[ sizeOfSecureBidMessageKeyExchangeSerializedCipheredAndSigned ];
+			this.secureCommonKeyExchangeSerializedCipheredAndSigned = 
+					new byte[ sizeOfSecureCommonKeyExchangeSerializedCipheredAndSigned ];
 
 			
 			// Operations to Fill a Byte Array, with the following parameters:
@@ -643,42 +643,42 @@ public class SecureCommonKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageKeyExchangeSerializedCiphered, 0,
-					         this.secureBidMessageKeyExchangeSerializedCipheredAndSigned,
-							 serializationOffset, this.secureBidMessageKeyExchangeSerializedCiphered.length);
-			serializationOffset += this.secureBidMessageKeyExchangeSerializedCiphered.length;
+			System.arraycopy(this.secureCommonKeyExchangeSerializedCiphered, 0,
+					         this.secureCommonKeyExchangeSerializedCipheredAndSigned,
+							 serializationOffset, this.secureCommonKeyExchangeSerializedCiphered.length);
+			serializationOffset += this.secureCommonKeyExchangeSerializedCiphered.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageKeyExchangeSerializedCipheredSigned, 0,
-					         this.secureBidMessageKeyExchangeSerializedCipheredAndSigned,
-					         serializationOffset, this.secureBidMessageKeyExchangeSerializedCiphered.length);
+			System.arraycopy(this.secureCommonKeyExchangeSerializedCipheredSigned, 0,
+					         this.secureCommonKeyExchangeSerializedCipheredAndSigned,
+					         serializationOffset, this.secureCommonKeyExchangeSerializedCiphered.length);
 			
 			
-			this.setIsSecureBidMessageKeyExchangeSerializedCipheredAndSigned(true);
+			this.setIsSecureCommonKeyExchangeSerializedCipheredAndSigned(true);
 			
 		}
 		
 	}
 	
-	public void undoSecureBidMessageKeyExchangeSerializedCipheredAndSigned() {
+	public void undoSecureCommonKeyExchangeSerializedCipheredAndSigned() {
 		
-		boolean isPossibleToUndoSecureBidMessageKeyExchangeSerializedCipheredAndSigned = 
-				(  this.isSecureBidMessageKeyExchangeSerialized && 
-				   this.isSecureBidMessageKeyExchangeSerializedCiphered &&
-				   this.isSecureBidMessageKeyExchangeSerializedCipheredSigned &&
-				   this.isSecureBidMessageKeyExchangeSerializedCipheredAndSigned);
+		boolean isPossibleToUndoSecureCommonKeyExchangeSerializedCipheredAndSigned = 
+				(  this.isSecureCommonKeyExchangeSerialized && 
+				   this.isSecureCommonKeyExchangeSerializedCiphered &&
+				   this.isSecureCommonKeyExchangeSerializedCipheredSigned &&
+				   this.isSecureCommonKeyExchangeSerializedCipheredAndSigned);
 		
 		
-		if(isPossibleToUndoSecureBidMessageKeyExchangeSerializedCipheredAndSigned) {
+		if(isPossibleToUndoSecureCommonKeyExchangeSerializedCipheredAndSigned) {
 			
-			this.secureBidMessageKeyExchangeSerializedCiphered = 
-					new byte[ this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered ];
+			this.secureCommonKeyExchangeSerializedCiphered = 
+					new byte[ this.sizeOfSecureCommonKeyExchangeSerializedCiphered ];
 
-			this.secureBidMessageKeyExchangeSerializedCipheredSigned = 
-					new byte[ this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned ];
+			this.secureCommonKeyExchangeSerializedCipheredSigned = 
+					new byte[ this.sizeOfSecureCommonKeyExchangeSerializedCipheredSigned ];
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -695,21 +695,21 @@ public class SecureCommonKeyExchange {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageKeyExchangeSerializedCipheredAndSigned, serializationOffset,
-							 this.secureBidMessageKeyExchangeSerializedCiphered,
-							 0, this.secureBidMessageKeyExchangeSerializedCiphered.length);
-			serializationOffset += this.secureBidMessageKeyExchangeSerializedCiphered.length;
+			System.arraycopy(this.secureCommonKeyExchangeSerializedCipheredAndSigned, serializationOffset,
+							 this.secureCommonKeyExchangeSerializedCiphered,
+							 0, this.secureCommonKeyExchangeSerializedCiphered.length);
+			serializationOffset += this.secureCommonKeyExchangeSerializedCiphered.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageKeyExchangeSerializedCipheredAndSigned, serializationOffset,
-					         this.secureBidMessageKeyExchangeSerializedCipheredSigned,
-					         0, this.secureBidMessageKeyExchangeSerializedCipheredSigned.length);
+			System.arraycopy(this.secureCommonKeyExchangeSerializedCipheredAndSigned, serializationOffset,
+					         this.secureCommonKeyExchangeSerializedCipheredSigned,
+					         0, this.secureCommonKeyExchangeSerializedCipheredSigned.length);
 			
 			
-			this.setIsSecureBidMessageKeyExchangeSerializedCipheredAndSigned(false);
+			this.setIsSecureCommonKeyExchangeSerializedCipheredAndSigned(false);
 			
 		}
 	}
