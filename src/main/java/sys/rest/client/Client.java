@@ -604,9 +604,9 @@ public class Client implements ClientAPI {
 					currentUser.getUserPeerID());
 			
 
-			secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeToSend();
-			secureBidMessageKeyExchangeSerializedCiphered = secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCiphered();
-			secureBidMessageKeyExchangeSerializedCipheredSigned = secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCipheredSigned();
+			secureBidMessageKeyExchange.buildSecureCommonKeyExchangeToSend();
+			secureBidMessageKeyExchangeSerializedCiphered = secureBidMessageKeyExchange.getSecureCommonKeyExchangeSerializedCiphered();
+			secureBidMessageKeyExchangeSerializedCipheredSigned = secureBidMessageKeyExchange.getSecureCommonKeyExchangeSerializedCipheredSigned();
 
 			secureBidMessageDataConfidentialSerializedCiphered = secureBidMessageDataConfidential.getSecureBidMessageDataConfidentialSerializedCiphered();
 			secureBidMessageDataConfidentialSerializedCipheredHashed = secureBidMessageDataConfidential.getSecureBidMessageDataConfidentialSerializedCipheredHashed();	
