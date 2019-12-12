@@ -27,6 +27,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -37,16 +38,17 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+
 import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
 import main.java.messages.secure.bid.SecureBidMessage;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.components.data.SecureBidMessageData;
-import main.java.messages.secure.bid.components.data.personal.SecureBidMessageDataPersonal;
+import main.java.messages.secure.bid.components.data.confidential.SecureBidMessageDataConfidential;
 import main.java.messages.secure.bid.components.data.signature.SecureBidMessageDataSignature;
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
-import main.java.messages.secure.bid.key.exchange.SecureBidMessageKeyExchange;
+import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.resources.auction.Auction;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
@@ -348,13 +350,13 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		serializedBidInfo.undoSecureBidMessageSerialized();
 
 		SecureBidMessageData secureBidMessageData = null;
-		SecureBidMessageKeyExchange secureBidMessageKeyExchange = serializedBidInfo.getSecureBidMessageKeyExchange();
+		SecureCommonKeyExchange secureBidMessageKeyExchange = serializedBidInfo.getSecureBidMessageKeyExchange();
 		SecureBidMessageDoSMitigation secureBidMessageDosMitigation = serializedBidInfo.getSecureBidMessageDoSMitigation();
 		SecureBidMessageComponents secureBidMessageComponents = serializedBidInfo.getSecureBidMessageComponents();
 		
-		secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeReceived();
+		secureBidMessageKeyExchange.buildSecureCommonKeyExchangeReceived();
 		
-		if(secureBidMessageKeyExchange.getIsSecureBidMessageKeyExchangeSerializedCipheredSignedValid()) {
+		if(secureBidMessageKeyExchange.getIsSecureCommonKeyExchangeSerializedCipheredSignedValid()) {
 						
 			if(secureBidMessageDosMitigation.checkIfHashOfSecureBidMessageDoSMitigationIsValid()) {
 				
@@ -366,8 +368,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				SecureBidMessageDataSignature secureBidMessageDataSignature = secureBidMessageData.getSecureBidMessageDataSignature();
 				secureBidMessageDataSignature.buildSecureBidMessageDataSignatureReceived();
 				
-				SecureBidMessageDataPersonal secureBidMessageDataPersonal = secureBidMessageData.getSecureBidMessageDataPersonal();
-				secureBidMessageDataPersonal.buildSecureBidMessageDataPersonalReceived();
+				SecureBidMessageDataConfidential secureBidMessageDataConfidential = secureBidMessageData.getSecureBidMessageDataConfidential();
+				secureBidMessageDataConfidential.buildSecureBidMessageDataConfidentialReceived();
 				
 				
 				String bidJson = gson.toJson(secureBidMessageData.getSecureBidMessageDataSignature().getBid());

@@ -3,31 +3,35 @@ package main.java.sys.rest.client.services;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 import main.java.common.utils.CommonUtils;
 import main.java.resources.bid.Bid;
 import main.java.resources.block.Block;
-import main.java.resources.cryptopuzzle.CryptoPuzzleSolverForProofOfWork;
 
-public class TryToCloseBlockOfOpenBidsService implements Runnable {
+public class TryToMineBlockOfOpenBidsService implements Runnable {
 
-	private byte strategyForTryToCloseBlockOfBids;
+	private byte strategyForTryToMineBlockOfBids;
 
 	private byte numBytesToSolveChallengeType;
 	
-	private List<Bid> openBidsList;
-
+	private Map<Integer, Bid> openBidsMap;
 	
-	public TryToCloseBlockOfOpenBidsService(byte strategyForTryToCloseBlockOfBids,
-											byte numBytesToSolveChallengeType,
-											List<Bid> openBidsList) {
+	private Map<Integer, Block> minedBlockMap;
+	
+	
+	public TryToMineBlockOfOpenBidsService(byte strategyForTryToMineBlockOfBids,
+										   byte numBytesToSolveChallengeType,
+										   Map<Integer, Bid> openBidsList,
+										   Map<Integer, Block> minedBlockMap) {
 
-		this.strategyForTryToCloseBlockOfBids = strategyForTryToCloseBlockOfBids;
+		this.strategyForTryToMineBlockOfBids = strategyForTryToMineBlockOfBids;
 		this.numBytesToSolveChallengeType = numBytesToSolveChallengeType;
 
-		this.openBidsList = openBidsList;
+		this.openBidsMap = openBidsList;
+		this.minedBlockMap = minedBlockMap;
 
 	}
 
@@ -41,7 +45,7 @@ public class TryToCloseBlockOfOpenBidsService implements Runnable {
 				interruptedException.printStackTrace();
 			}
 
-			List<Bid> openBidsToMineList = this.openBidsList.stream()
+			List<Bid> openBidsToMineList = this.openBidsMap.values().stream()
 					.filter(bid -> !bid.getIsBidMined())
 					.collect(Collectors.toList());
 
@@ -81,22 +85,30 @@ public class TryToCloseBlockOfOpenBidsService implements Runnable {
 
 			}
 
-
-			Block blockOfOpenBidsForChallenge = new Block( ( (Bid[]) chosenOpenBidsToMineList.toArray() ) );
-
+			int previousBlockID = ( this.minedBlockMap.size() - 1 );
+			int currentBlockID = ( previousBlockID + 1 );
+			
+			Block previousBlock = this.minedBlockMap.get(previousBlockID);
+			byte[] previousBlockHashed = previousBlock.getBlockSerializedHashed();
+			
+			
+			Block blockOfOpenBidsForChallenge = new Block( currentBlockID, previousBlockHashed, ( (Bid[]) chosenOpenBidsToMineList.toArray() ), this.strategyForTryToMineBlockOfBids, this.numBytesToSolveChallengeType );
+			
+			blockOfOpenBidsForChallenge.doBidsOfCurrentBlockToTryToMineSerialization();
+			
+			
 			try {
-
-				CryptoPuzzleSolverForProofOfWork cryptoPuzzleSolverForProofOfWork = 
-						new CryptoPuzzleSolverForProofOfWork( this.strategyForTryToCloseBlockOfBids, 
-														      this.numBytesToSolveChallengeType,
-															  blockOfOpenBidsForChallenge );
-
-				cryptoPuzzleSolverForProofOfWork.solveBlockChallenge();
-
+				
+				blockOfOpenBidsForChallenge.startProcessToTryToSolveBlockHashChallenge();
+				blockOfOpenBidsForChallenge.tryToSolveBlockHashChallenge();
+				
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				
 				noSuchAlgorithmException.printStackTrace();
+				
 			}
+			
 			
 			// TODO - Broadcast of ProofOfWorkMessage
 			

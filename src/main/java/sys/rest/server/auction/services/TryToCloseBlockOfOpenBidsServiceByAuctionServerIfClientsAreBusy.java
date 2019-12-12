@@ -10,30 +10,35 @@ import java.util.stream.Collectors;
 import main.java.common.utils.CommonUtils;
 import main.java.resources.bid.Bid;
 import main.java.resources.block.Block;
-import main.java.resources.cryptopuzzle.CryptoPuzzleSolverForProofOfWork;
 import main.java.resources.user.User;
 
 public class TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy implements Runnable {
 
-	private byte strategyForTryToCloseBlockOfBids;
+	private byte strategyForTryToMineBlockOfBids;
 
 	private byte numBytesToSolveChallengeType;
 	
-	private Map<String, User> usersList;
 	
-	private Map<Long, Bid> openBidsList;
+	private Map<Integer, User> usersList;
+	
+	private Map<Integer, Bid> openBidsList;
+	
+	private Map<Integer, Block> minedBlockMap;
+	
 	
 	
 	public TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy(byte strategyForTryToCloseBlockOfBids,
 																           byte numBytesToSolveChallengeType,
-															 	           Map<String, User> usersList, 
-															 	           Map<Long, Bid> openBidsList) {
+																           Map<Integer, User> usersList,
+																           Map<Integer, Bid> openBidsList,
+																		   Map<Integer, Block> minedBlockMap) {
 		
-		this.strategyForTryToCloseBlockOfBids = strategyForTryToCloseBlockOfBids;
+	    this.strategyForTryToMineBlockOfBids = strategyForTryToCloseBlockOfBids;
 		this.numBytesToSolveChallengeType = numBytesToSolveChallengeType;
 		
 		this.usersList = usersList;
 		this.openBidsList = openBidsList;
+		this.minedBlockMap = minedBlockMap;
 		
 	}
 	
@@ -67,8 +72,8 @@ public class TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy imp
 			if(tryToCloseBids) {
 				
 				List<Bid> openBidsToMineList = this.openBidsList.values().stream()
-											   .filter(bid -> !bid.getIsBidMined())
-											   .collect(Collectors.toList());
+												   .filter(bid -> !bid.getIsBidMined())
+												   .collect(Collectors.toList());
 				
 				
 				int numPossibleOpenBidsToMine = openBidsToMineList.size();
@@ -110,21 +115,33 @@ public class TryToCloseBlockOfOpenBidsServiceByAuctionServerIfClientsAreBusy imp
 				}
 				
 				
-				Block blockOfOpenBidsForChallenge = new Block( ( (Bid[]) chosenOpenBidsToMineList.toArray() ) );
+				int previousBlockID = ( this.minedBlockMap.size() - 1 );
+				int currentBlockID = ( previousBlockID + 1 );
+				
+				Block previousBlock = this.minedBlockMap.get(previousBlockID);
+				byte[] previousBlockHashed = previousBlock.getBlockSerializedHashed();
+				
+				
+				Block blockOfOpenBidsForChallenge = 
+						new Block( currentBlockID, previousBlockHashed, 
+								   ( (Bid[]) chosenOpenBidsToMineList.toArray() ), 
+								   this.strategyForTryToMineBlockOfBids, this.numBytesToSolveChallengeType );
+				
+				blockOfOpenBidsForChallenge.doBidsOfCurrentBlockToTryToMineSerialization();
+				
 				
 				try {
 					
-					CryptoPuzzleSolverForProofOfWork cryptoPuzzleSolverForProofOfWork = 
-							new CryptoPuzzleSolverForProofOfWork( this.strategyForTryToCloseBlockOfBids, 
-																  this.numBytesToSolveChallengeType,
-																  blockOfOpenBidsForChallenge );
-				
-					cryptoPuzzleSolverForProofOfWork.solveBlockChallenge();
+					blockOfOpenBidsForChallenge.startProcessToTryToSolveBlockHashChallenge();
+					blockOfOpenBidsForChallenge.tryToSolveBlockHashChallenge();
 					
 				}
 				catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+					
 					noSuchAlgorithmException.printStackTrace();
+					
 				}
+				
 				
 				// TODO - Broadcast of ProofOfWorkMessage
 				

@@ -11,8 +11,8 @@ import javax.crypto.NoSuchPaddingException;
 import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
-import main.java.messages.secure.bid.key.exchange.SecureBidMessageKeyExchange;
 import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
+import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 
 public class SecureBidMessage {
 	
@@ -20,7 +20,7 @@ public class SecureBidMessage {
 	
 	private String userPeerID;
 	
-	private SecureBidMessageKeyExchange secureBidMessageKeyExchange;
+	private SecureCommonKeyExchange secureBidMessageKeyExchange;
 	
 	private SecureBidMessageComponents secureBidMessageComponents;
 	
@@ -33,7 +33,7 @@ public class SecureBidMessage {
 	
 	public SecureBidMessage(SecureBidMessageMetaHeader secureBidMessageMetaHeader,
 							String userPeerID,
-							SecureBidMessageKeyExchange secureBidMessageKeyExchange,
+							SecureCommonKeyExchange secureBidMessageKeyExchange,
 							SecureBidMessageComponents secureBidMessageComponents,
 							SecureBidMessageDoSMitigation secureBidMessageDoSMitigation) {
 		
@@ -70,7 +70,7 @@ public class SecureBidMessage {
 		return this.userPeerID;
 	}
 	
-	public SecureBidMessageKeyExchange getSecureBidMessageKeyExchange() {
+	public SecureCommonKeyExchange getSecureBidMessageKeyExchange() {
 		return this.secureBidMessageKeyExchange;
 	}
 	
@@ -107,9 +107,9 @@ public class SecureBidMessage {
 			
 			byte[] userPeerIDSerialized = CommonUtils.fromStringToByteArray(userPeerID);
 			
-			this.secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeToSend();
+			this.secureBidMessageKeyExchange.buildSecureCommonKeyExchangeToSend();
 			byte[] secureBidMessageKeyExchangeSerializedCipheredAndSigned = 
-					this.secureBidMessageKeyExchange.getSecureBidMessageKeyExchangeSerializedCipheredAndSigned();
+					this.secureBidMessageKeyExchange.getSecureCommonKeyExchangeSerializedCipheredAndSigned();
 			
 			this.secureBidMessageComponents.doSecureBidMessageComponentsSerialization();
 			byte[] secureBidMessageComponentsSerialized = 
@@ -289,8 +289,8 @@ public class SecureBidMessage {
 			  
 			int sizeOfSecureBidMessageDataSignatureSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataSignatureSerialized();
-			int sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed();
+			int sizeOfSecureBidMessageDataConfidentialSerializedCipheredAndHashed = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataConfidentialSerializedCipheredAndHashed();
 			  
 			int sizeOfBidSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfBidSerialized();
@@ -300,12 +300,12 @@ public class SecureBidMessage {
 			int sizeOfBidderUserClientIDSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfBidderUserClientIDSerialized();
 			  
-			int sizeOfSecureBidMessageDataPersonalSerializedCiphered = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedCiphered();
-			int sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerializedCipheredHashed();
-			int sizeOfSecureBidMessageDataPersonalSerialized = 
-					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataPersonalSerialized();
+			int sizeOfSecureBidMessageDataConfidentialSerializedCiphered = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataConfidentialSerializedCiphered();
+			int sizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed();
+			int sizeOfSecureBidMessageDataConfidentialSerialized = 
+					this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageDataConfidentialSerialized();
 			  
 			int sizeOfUserEmailSerialized = 
 					this.secureBidMessageMetaHeader.getSizeOfUserEmailSerialized();
@@ -317,13 +317,13 @@ public class SecureBidMessage {
 			this.userPeerID = CommonUtils.fromByteArrayToString(userPeerIDSerialized);
 			
 			this.secureBidMessageKeyExchange = 
-					new SecureBidMessageKeyExchange(secureBidMessageKeyExchangeSerialized,
-													sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
-													sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
-													userPeerID);
+					new SecureCommonKeyExchange(secureBidMessageKeyExchangeSerialized,
+												sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
+												sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
+												userPeerID);
 		
 			try {
-				this.secureBidMessageKeyExchange.buildSecureBidMessageKeyExchangeReceived();
+				this.secureBidMessageKeyExchange.buildSecureCommonKeyExchangeReceived();
 			} catch (InvalidKeyException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -337,16 +337,16 @@ public class SecureBidMessage {
 			
 			this.secureBidMessageComponents = 
 					new SecureBidMessageComponents(secureBidMessageComponentsSerialized,
-												   this.secureBidMessageKeyExchange.getSecretSymmetricKeyForDataPersonalInBytes(),
+												   this.secureBidMessageKeyExchange.getSecretSymmetricKeyInBytes(),
 												   sizeOfSecureBidMessageDataSerialized,
 												   sizeOfSecureBidMessageDataSignatureSerialized,
-												   sizeOfSecureBidMessageDataPersonalSerializedCipheredAndHashed,
+												   sizeOfSecureBidMessageDataConfidentialSerializedCipheredAndHashed,
 												   sizeOfBidSerialized,
 												   sizeOfBidSerializedDigitalSigned,
 												   sizeOfBidderUserClientIDSerialized,
-												   sizeOfSecureBidMessageDataPersonalSerializedCiphered,
-												   sizeOfSecureBidMessageDataPersonalSerializedCipheredHashed,
-												   sizeOfSecureBidMessageDataPersonalSerialized,
+												   sizeOfSecureBidMessageDataConfidentialSerializedCiphered,
+												   sizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed,
+												   sizeOfSecureBidMessageDataConfidentialSerialized,
 												   sizeOfUserEmailSerialized,
 												   sizeOfUserHomeAddressSerialized, 
 												   sizeOfUserBankAccountNIBSerialized,
