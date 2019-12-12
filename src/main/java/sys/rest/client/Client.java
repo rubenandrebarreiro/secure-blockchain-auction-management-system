@@ -49,7 +49,6 @@ import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
-import main.java.resources.user.UserBidInfo;
 import main.java.sys.SSLSocketAuctionOperation;
 import main.java.sys.SSLSocketMessage;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
@@ -691,7 +690,6 @@ public class Client implements ClientAPI {
 		}
 		
 		
-		UserBidInfo bidInfo = new UserBidInfo(currentUser, Double.parseDouble(bidAmount));
 		String bidInfoSerialiazed = gson.toJson(bidMessage);
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
