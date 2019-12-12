@@ -54,8 +54,7 @@ public class AuctionServerEntryPoint extends Thread{
 			tlsConfigurationReader = new AuctionServerTLSConfigurationReader(AUCTION_SERVER_TLS_CONFIGURATION_PATH);
 			storesConfigurationReader = new AuctionServerKeyStoreConfigurationReader(AUCTION_SERVER_STORES_CONFIGURATION_PATH);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printErrorStringWithClassName("Configuration file not found!\n" + e.getMessage());
 		}
 		
 		System.setProperty("javax.net.ssl.keyStore", storesConfigurationReader.getKeyStoreFileLocationPath());
