@@ -159,8 +159,7 @@ public class Client implements ClientAPI {
 		try {
 			tlsConfigurationReader = new AuctionServerTLSConfigurationReader(USER_TLS_CONFIGURATION_PATH);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printErrorStringWithClassName("Configuration file not found!\n" + e.getMessage());
 		}
 		
 		//SSL Connection
