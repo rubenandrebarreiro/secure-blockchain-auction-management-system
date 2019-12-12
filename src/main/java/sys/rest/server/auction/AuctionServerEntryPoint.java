@@ -21,7 +21,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
-public class AuctionServerEntryPoint extends Thread{
+public class AuctionServerEntryPoint{
 
 	private static final String AUCTION_SERVER_TLS_CONFIGURATION_PATH = "res/configurations/auction-server-tls-configuration.conf";
 	private static final String AUCTION_SERVER_STORES_CONFIGURATION_PATH = "res/configurations/auction-server-keystore-configuration.conf";
