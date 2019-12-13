@@ -38,6 +38,8 @@ public class AuctionServerTLSConfigurationReader {
 	public AuctionServerTLSConfigurationReader(String tlsConfigurationsFilePath) 
 		   throws FileNotFoundException {
 
+		System.out.println("---------------------" + this.getClass().getCanonicalName() + " start---------------------");
+		
 		this.readTLSConfigurations(tlsConfigurationsFilePath);
 
 		System.out.println();
@@ -75,7 +77,7 @@ public class AuctionServerTLSConfigurationReader {
 
 
 	private void readTLSConfigurations(String tlsConfigurationsPath) throws FileNotFoundException {
-
+		
 		List<String> availableTLSVersionsList = new ArrayList<String>();
 
 		List<String> availableTLSCiphersuitesList = new ArrayList<String>();
@@ -211,6 +213,10 @@ public class AuctionServerTLSConfigurationReader {
 					nextLine = auctionServerTLSConfigurationFileReader.nextLine();
 
 				}
+				
+				System.out.println();
+				System.out.println();
+				
 			}
 
 		}
@@ -224,7 +230,11 @@ public class AuctionServerTLSConfigurationReader {
 
 
 		auctionServerTLSConfigurationFileReader.close();
+		
+		System.out.println("---------------------" + this.getClass().getCanonicalName() + " finish---------------------");
 
+		System.out.println();
+		
 	}
 
 	
