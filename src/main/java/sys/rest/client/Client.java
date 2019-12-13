@@ -52,6 +52,8 @@ import main.java.resources.user.UserAuctionInfo;
 import main.java.sys.SSLSocketAuctionOperation;
 import main.java.sys.SSLSocketMessage;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
+import main.java.sys.rest.server.auction.messageTypes.MessageEnvelope;
+import main.java.sys.rest.server.auction.messageTypes.MessageEnvelopeTypes;
 
 public class Client implements ClientAPI {
 
@@ -183,12 +185,38 @@ public class Client implements ClientAPI {
 			inputStreamThread = new Thread() {
 				public void run() {
 					try {
+						String response;
+						MessageEnvelope envelope;
+						MessageEnvelopeTypes messageType;
+						String message;
 						inputStream = socket.getInputStream();
-						br = new BufferedReader(new InputStreamReader(inputStream));
-						while(!socket.isClosed()) {
+						BufferedReader socketReader = new BufferedReader(new InputStreamReader(inputStream));
+						while(true) {
 							// TODO Read and handle response
-							//response = br.readLine();
-							System.out.println("Socket received something!\n" + br.readLine());
+							response = socketReader.readLine();
+							System.out.println("Socket received something! -> " + response);
+							try {
+								envelope = gson.fromJson(response, MessageEnvelope.class);
+								message = envelope.getMessage();
+								messageType = envelope.getType();
+								switch (messageType) {
+								case SIMPLE_RESPONSE:
+									System.out.println(message);
+									break;
+								case COMPLEX_RESPONSE:
+									System.out.println(getPrettyJsonString(message));
+									break;
+								case PROOF_OF_WORK:
+								// TODO complete
+									printErrorStringWithClassName("PROOF OF WORK!!!");
+									break;
+								default:
+									break;
+								}
+							} catch (Exception e) {
+								printErrorStringWithClassName("Received something unexpected? -> " + e.getMessage());
+							}
+
 						}
 					} catch (IOException e) {
 						printErrorStringWithClassName("Error setting up inputStream!\n" + e.getMessage());
@@ -534,8 +562,7 @@ public class Client implements ClientAPI {
 
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.OPEN_AUCTION,
 				new HashMap<String, String>(), postData);
-		String result = sendMessage(message);
-		System.out.println(result);
+		sendMessage(message);
 	}
 
 	private void closeAuction() throws IOException {
@@ -544,8 +571,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionIDToClose);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CLOSE_AUCTION, paramsMap, "");
-		String result = sendMessage(message);
-		System.out.println(result);
+		sendMessage(message);
 	}
 
 	private void createBid() throws IOException{
@@ -716,32 +742,25 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.ADD_BID, paramsMap, bidInfoSerialiazed);
-		String result = sendMessage(message);
-		System.out.println(result);
+		sendMessage(message);
 	}
 
 	private void listAll() throws IOException {
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_AUCTIONS,
 				new HashMap<String, String>(), "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 
 	private void listOpened() throws IOException {
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_AUCTIONS,
 				new HashMap<String, String>(), "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 
 	private void listClosed() throws IOException {
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_AUCTIONS,
 				new HashMap<String, String>(), "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 
 	private void listAllByUserID() throws IOException{
@@ -751,9 +770,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("product-owner-user-client-id", userID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_AUCTIONS_BY_OWNER,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 
 	private void listOpenedByUserID() throws IOException{
@@ -763,9 +780,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("product-owner-user-client-id", userID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_AUCTIONS_BY_OWNER,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 
 	private void listClosedByUserID() throws IOException{
@@ -775,9 +790,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("product-owner-user-client-id", userID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_AUCTIONS_BY_OWNER,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 
 	private void listAllByAuctionID() throws IOException {
@@ -787,9 +800,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_AUCTIONS_BY_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 
 	private void listOpenByAuctionID() throws IOException {
@@ -799,9 +810,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_AUCTIONS_BY_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 
 	private void listClosedByAuctionID() throws IOException {
@@ -811,9 +820,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_AUCTIONS_BY_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 
 	private void listBidsOfAllAuctionsByAuctionID() throws IOException {
@@ -823,9 +830,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void listBidsOfOpenedAuctionByAuctionID() throws IOException {
@@ -835,9 +840,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void listBidsOfClosedAuctionsByAuctionID() throws IOException {
@@ -847,9 +850,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("auction-id", auctionID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void listBidsOfAllAuctionsByAuctionIDAndClientID() throws IOException {
@@ -862,9 +863,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", bidderID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void listBidsOfOpenedAuctionsByAuctionIDAndClientID() throws IOException {
@@ -877,9 +876,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", bidderID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void listBidsOfClosedAuctionsByAuctionIDAndClientID() throws IOException {
@@ -892,9 +889,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", bidderID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void listAllBidsByClientID() throws IOException {
@@ -904,9 +899,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", bidderID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_BIDS_BY_CLIENT_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void listOpenedBidsByClientID() throws IOException {
@@ -916,9 +909,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", bidderID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_BIDS_BY_CLIENT_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void listClosedBidsByClientID() throws IOException {
@@ -928,9 +919,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", bidderID);
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_BIDS_BY_CLIENT_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void checkOutcomeAllAuctions() throws IOException {
@@ -938,9 +927,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_ALL_AUCTION,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void checkOutcomeOpenedAuctions() throws IOException {
@@ -948,9 +935,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_OPENED_AUCTION,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void checkOutcomeClosedAuctions() throws IOException {
@@ -958,9 +943,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_CLOSED_AUCTION,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void checkOutcomeAllAuctionsByAuctionID() throws IOException {
@@ -971,9 +954,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_ALL_AUCTION_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void checkOutcomeOpenedAuctionsByAuctionID() throws IOException {
@@ -984,9 +965,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_OPENED_AUCTION_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void checkOutcomeClosedAuctionsByAuctionID() throws IOException {
@@ -997,9 +976,7 @@ public class Client implements ClientAPI {
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
 		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_CLOSED_AUCTION_ID,
 				paramsMap, "");
-		String result = sendMessage(message);
-		String prettyResult = getPrettyJsonString(result);
-		System.out.println(prettyResult);
+		sendMessage(message);
 	}
 	
 	private void helpScreen() {
@@ -1057,13 +1034,11 @@ public class Client implements ClientAPI {
 //		return sslReadResponse(in);
 //	}
 	
-	private String sendMessage(SSLSocketMessage message) throws IOException {
+	private void sendMessage(SSLSocketMessage message) {
 		PrintWriter printWriter = new PrintWriter(outputStream);
 
 		printWriter.print(gson.toJson(message) + System.lineSeparator());
 		printWriter.flush();
-		
-		return "Sent message!";
 	}
 	
 	private String getPrettyJsonString(String string) {
