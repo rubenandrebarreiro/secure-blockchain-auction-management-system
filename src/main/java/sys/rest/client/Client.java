@@ -49,11 +49,11 @@ import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
-import main.java.sys.SSLSocketAuctionOperation;
-import main.java.sys.SSLSocketMessage;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 import main.java.sys.rest.server.auction.messageTypes.MessageEnvelope;
 import main.java.sys.rest.server.auction.messageTypes.MessageEnvelopeTypes;
+import main.java.sys.rest.server.auction.messageTypes.MessageEnvelopeAuctionTypes;
+import main.java.sys.rest.server.auction.messageTypes.MessageEnvelopeAuction;
 
 public class Client implements ClientAPI {
 
@@ -560,7 +560,7 @@ public class Client implements ClientAPI {
 
 		String postData = gson.toJson(userAuctionInfo);
 
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.OPEN_AUCTION,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.OPEN_AUCTION,
 				new HashMap<String, String>(), postData);
 		sendMessage(message);
 	}
@@ -570,7 +570,7 @@ public class Client implements ClientAPI {
 		String auctionIDToClose = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionIDToClose);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CLOSE_AUCTION, paramsMap, "");
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.CLOSE_AUCTION, paramsMap, "");
 		sendMessage(message);
 	}
 
@@ -741,24 +741,24 @@ public class Client implements ClientAPI {
 		String bidInfoSerialiazed = gson.toJson(bidMessage);
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.ADD_BID, paramsMap, bidInfoSerialiazed);
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.ADD_BID, paramsMap, bidInfoSerialiazed);
 		sendMessage(message);
 	}
 
 	private void listAll() throws IOException {
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_AUCTIONS,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_ALL_AUCTIONS,
 				new HashMap<String, String>(), "");
 		sendMessage(message);
 	}
 
 	private void listOpened() throws IOException {
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_AUCTIONS,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_OPENED_AUCTIONS,
 				new HashMap<String, String>(), "");
 		sendMessage(message);
 	}
 
 	private void listClosed() throws IOException {
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_AUCTIONS,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_CLOSED_AUCTIONS,
 				new HashMap<String, String>(), "");
 		sendMessage(message);
 	}
@@ -768,7 +768,7 @@ public class Client implements ClientAPI {
 		String userID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("product-owner-user-client-id", userID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_AUCTIONS_BY_OWNER,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_ALL_AUCTIONS_BY_OWNER,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -778,7 +778,7 @@ public class Client implements ClientAPI {
 		String userID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("product-owner-user-client-id", userID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_AUCTIONS_BY_OWNER,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_OPENED_AUCTIONS_BY_OWNER,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -788,7 +788,7 @@ public class Client implements ClientAPI {
 		String userID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("product-owner-user-client-id", userID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_AUCTIONS_BY_OWNER,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_CLOSED_AUCTIONS_BY_OWNER,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -798,7 +798,7 @@ public class Client implements ClientAPI {
 		String auctionID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_AUCTIONS_BY_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_ALL_AUCTIONS_BY_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -808,7 +808,7 @@ public class Client implements ClientAPI {
 		String auctionID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_AUCTIONS_BY_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_OPENED_AUCTIONS_BY_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -818,7 +818,7 @@ public class Client implements ClientAPI {
 		String auctionID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_AUCTIONS_BY_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_CLOSED_AUCTIONS_BY_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -828,7 +828,7 @@ public class Client implements ClientAPI {
 		String auctionID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -838,7 +838,7 @@ public class Client implements ClientAPI {
 		String auctionID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -848,7 +848,7 @@ public class Client implements ClientAPI {
 		String auctionID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -861,7 +861,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
 		paramsMap.put("bidder-user-client-id", bidderID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -874,7 +874,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
 		paramsMap.put("bidder-user-client-id", bidderID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -887,7 +887,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
 		paramsMap.put("bidder-user-client-id", bidderID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -897,7 +897,7 @@ public class Client implements ClientAPI {
 		String bidderID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("bidder-user-client-id", bidderID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_ALL_BIDS_BY_CLIENT_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_ALL_BIDS_BY_CLIENT_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -907,7 +907,7 @@ public class Client implements ClientAPI {
 		String bidderID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("bidder-user-client-id", bidderID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_OPENED_BIDS_BY_CLIENT_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_OPENED_BIDS_BY_CLIENT_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -917,7 +917,7 @@ public class Client implements ClientAPI {
 		String bidderID = br.readLine();
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("bidder-user-client-id", bidderID);
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.LIST_CLOSED_BIDS_BY_CLIENT_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.LIST_CLOSED_BIDS_BY_CLIENT_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -925,7 +925,7 @@ public class Client implements ClientAPI {
 	private void checkOutcomeAllAuctions() throws IOException {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_ALL_AUCTION,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.CHECK_OUTCOME_ALL_AUCTION,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -933,7 +933,7 @@ public class Client implements ClientAPI {
 	private void checkOutcomeOpenedAuctions() throws IOException {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_OPENED_AUCTION,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.CHECK_OUTCOME_OPENED_AUCTION,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -941,7 +941,7 @@ public class Client implements ClientAPI {
 	private void checkOutcomeClosedAuctions() throws IOException {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_CLOSED_AUCTION,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.CHECK_OUTCOME_CLOSED_AUCTION,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -952,7 +952,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_ALL_AUCTION_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.CHECK_OUTCOME_ALL_AUCTION_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -963,7 +963,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_OPENED_AUCTION_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.CHECK_OUTCOME_OPENED_AUCTION_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -974,7 +974,7 @@ public class Client implements ClientAPI {
 		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
 		paramsMap.put("bidder-user-client-id", this.currentUser.getUserPeerID());
-		SSLSocketMessage message = new SSLSocketMessage(SSLSocketAuctionOperation.CHECK_OUTCOME_CLOSED_AUCTION_ID,
+		MessageEnvelopeAuction message = new MessageEnvelopeAuction(MessageEnvelopeAuctionTypes.CHECK_OUTCOME_CLOSED_AUCTION_ID,
 				paramsMap, "");
 		sendMessage(message);
 	}
@@ -1034,7 +1034,7 @@ public class Client implements ClientAPI {
 //		return sslReadResponse(in);
 //	}
 	
-	private void sendMessage(SSLSocketMessage message) {
+	private void sendMessage(MessageEnvelopeAuction message) {
 		PrintWriter printWriter = new PrintWriter(outputStream);
 
 		printWriter.print(gson.toJson(message) + System.lineSeparator());

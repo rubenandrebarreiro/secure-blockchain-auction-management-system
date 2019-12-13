@@ -52,9 +52,9 @@ import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.resources.auction.Auction;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
-import main.java.sys.SSLSocketMessage;
 import main.java.sys.rest.server.auction.messageTypes.MessageEnvelope;
 import main.java.sys.rest.server.auction.messageTypes.MessageEnvelopeTypes;
+import main.java.sys.rest.server.auction.messageTypes.MessageEnvelopeAuction;
 
 public class AuctionServer extends Thread implements AuctionServerAPI{
 
@@ -99,7 +99,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 					Principal clientID = session.getPeerPrincipal();
 					System.out.println("Client has been identified as: " + clientID);
 				}
-				SSLSocketMessage message = gson.fromJson(jsonMessage, SSLSocketMessage.class);
+				MessageEnvelopeAuction message = gson.fromJson(jsonMessage, MessageEnvelopeAuction.class);
 				if(message != null) {
 
 					switch (message.getOperation()) {
