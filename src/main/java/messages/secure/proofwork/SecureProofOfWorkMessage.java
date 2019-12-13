@@ -22,8 +22,6 @@ public class SecureProofOfWorkMessage {
 	
 	private SecureCommonKeyExchange secureProofOfWorkMessageKeyExchange;
 	
-	//private SecureProofOfWorkMessageSolvedBlock secureProofOfWorkMessageSolvedBlock;
-	
 	private SecureProofOfWorkMessageComponents secureProofOfWorkMessageComponents;
 	
 	private SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation;
@@ -114,24 +112,22 @@ public class SecureProofOfWorkMessage {
 			byte[] secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned = 
 					this.secureProofOfWorkMessageKeyExchange.getSecureCommonKeyExchangeSerializedCipheredAndSigned();
 
-			//TODO
-			
-			/**			
-			this.secureProofOfWorkMessageSolvedBlock.doSecureProofOfWorkMessageSolvedBlockSerialization();
-			byte[] secureProofOfWorkMessageSolvedBlockSerialized = 
-					this.secureProofOfWorkMessageSolvedBlock.getSecureProofOfWorkMessageSolvedBlockSerialized();
+				
+			this.secureProofOfWorkMessageComponents.doSecureProofOfWorkMessageComponentsSerialization();
+			byte[] secureProofOfWorkMessageComponentsSerialized = 
+					this.secureProofOfWorkMessageComponents.getSecureProofOfWorkMessageComponentsSerialized();
 					
 			this.secureProofOfWorkMessageDoSMitigation.doHashOfSecureProofOfWorkMessageDoSMitigation();
 			byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
-					this.secureProofOfWorkMessageDoSMitigation.getSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation();
+					this.secureProofOfWorkMessageDoSMitigation.getSecureProofOfWorkMessageComponentsHashedForDoSMitigation();
 			
 			int sizeOfSecureBidMessageSerialized = (secureProofOfWorkMessageMetaHeaderSerialized.length +
 													userPeerIDSerialized.length +
 												    secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned.length +
-													secureProofOfWorkMessageSolvedBlockSerialized.length +
+													secureProofOfWorkMessageComponentsSerialized.length +
 													secureProofOfWorkMessageDoSMitigationSerialized.length);
-**/
-	//		this.secureProofOfWorkMessageSerialized = new byte[sizeOfSecureBidMessageSerialized];
+
+			this.secureProofOfWorkMessageSerialized = new byte[sizeOfSecureBidMessageSerialized];
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -172,17 +168,17 @@ public class SecureProofOfWorkMessage {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-//			System.arraycopy(secureProofOfWorkMessageSolvedBlockSerialized, 0, this.secureProofOfWorkMessageSerialized,
-//							 serializationOffset, secureProofOfWorkMessageSolvedBlockSerialized.length);
-//			serializationOffset += secureProofOfWorkMessageSolvedBlockSerialized.length;
-//		
+			System.arraycopy(secureProofOfWorkMessageComponentsSerialized, 0, this.secureProofOfWorkMessageSerialized,
+							 serializationOffset, secureProofOfWorkMessageComponentsSerialized.length);
+			serializationOffset += secureProofOfWorkMessageComponentsSerialized.length;
+		
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-//			System.arraycopy(secureProofOfWorkMessageDoSMitigationSerialized, 0, this.secureProofOfWorkMessageSerialized,
-//							 serializationOffset, secureProofOfWorkMessageDoSMitigationSerialized.length);
-//			
+			System.arraycopy(secureProofOfWorkMessageDoSMitigationSerialized, 0, this.secureProofOfWorkMessageSerialized,
+							 serializationOffset, secureProofOfWorkMessageDoSMitigationSerialized.length);
+			
 			
 			this.setIsSecureProofOfWorkMessageSerialized(true);
 			
