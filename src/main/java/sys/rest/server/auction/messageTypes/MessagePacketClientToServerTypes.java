@@ -1,6 +1,6 @@
 package main.java.sys.rest.server.auction.messageTypes;
 
-public enum MessageEnvelopeAuctionTypes {
+public enum MessagePacketClientToServerTypes {
 
 	OPEN_AUCTION, 
 	CLOSE_AUCTION,
@@ -28,5 +28,6 @@ public enum MessageEnvelopeAuctionTypes {
 	CHECK_OUTCOME_CLOSED_AUCTION,
 	CHECK_OUTCOME_ALL_AUCTION_ID,
 	CHECK_OUTCOME_OPENED_AUCTION_ID,
-	CHECK_OUTCOME_CLOSED_AUCTION_ID
+	CHECK_OUTCOME_CLOSED_AUCTION_ID,
+	PROOF_WORK_SENT
 }

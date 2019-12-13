@@ -3,20 +3,20 @@ package main.java.sys.rest.server.auction.messageTypes;
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class MessageEnvelopeAuction implements Serializable {
+public class MessagePacketClientToServer implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -5475198985218772861L;
 	
-	private MessageEnvelopeAuctionTypes operation;
+	private MessagePacketClientToServerTypes operation;
 	
 	private HashMap<String, String> paramsMap;
 	
 	private String body;
 	
-	public MessageEnvelopeAuction(MessageEnvelopeAuctionTypes operation,
+	public MessagePacketClientToServer(MessagePacketClientToServerTypes operation,
 							HashMap<String, String> paramsMap,
 							String body) {
 		this.operation = operation;
@@ -24,11 +24,11 @@ public class MessageEnvelopeAuction implements Serializable {
 		this.body = body;
 	}
 
-	public MessageEnvelopeAuctionTypes getOperation() {
+	public MessagePacketClientToServerTypes getOperation() {
 		return operation;
 	}
 
-	public void setOperation(MessageEnvelopeAuctionTypes operation) {
+	public void setOperation(MessagePacketClientToServerTypes operation) {
 		this.operation = operation;
 	}
 

@@ -60,8 +60,8 @@ public class SecureCommonKeyExchange {
 	private String userPeerID;
 	
 	public SecureCommonKeyExchange(byte[] secretSymmetricKeyInBytes,
-									   byte[] secretHMACKeyForDoSMitigationInBytes,
-									   String userPeerID) {
+								   byte[] secretHMACKeyForDoSMitigationInBytes,
+								   String userPeerID) {
 			
 		this.secretSymmetricKeyInBytes = secretSymmetricKeyInBytes;
 		this.secretHMACKeyForDoSMitigationInBytes = secretHMACKeyForDoSMitigationInBytes;

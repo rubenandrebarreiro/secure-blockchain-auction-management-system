@@ -1,4 +1,4 @@
-package main.java.messages.secure.proofwork.solvedblock;
+package main.java.messages.secure.proofwork.components.solvedblock;
 import java.util.ArrayList;
 import com.google.gson.GsonBuilder;
 

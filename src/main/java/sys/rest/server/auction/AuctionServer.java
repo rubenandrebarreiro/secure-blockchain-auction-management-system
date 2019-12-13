@@ -53,9 +53,9 @@ import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.resources.auction.Auction;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
-import main.java.sys.rest.server.auction.messageTypes.MessageEnvelope;
-import main.java.sys.rest.server.auction.messageTypes.MessageEnvelopeTypes;
-import main.java.sys.rest.server.auction.messageTypes.MessageEnvelopeAuction;
+import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClient;
+import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClientTypes;
+import main.java.sys.rest.server.auction.messageTypes.MessagePacketClientToServer;
 
 public class AuctionServer extends Thread implements AuctionServerAPI{
 
@@ -88,7 +88,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public void run() {
 		String arg1 = null, arg2 = null;
 		HttpResponse response = null;
-		MessageEnvelopeTypes messageType = null;
+		MessagePacketServerToClientTypes messageType = null;
 		boolean exitFlag = false;
 		
 		if(mutualAuth) {
@@ -105,122 +105,122 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			while(!exitFlag) {
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
-				MessageEnvelopeAuction message = gson.fromJson(jsonMessage, MessageEnvelopeAuction.class);
+				MessagePacketClientToServer message = gson.fromJson(jsonMessage, MessagePacketClientToServer.class);
 				if(message != null) {
 
 					switch (message.getOperation()) {
 					case OPEN_AUCTION:
 						response = createAuction(message.getBody());
-						messageType = MessageEnvelopeTypes.SIMPLE_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.SIMPLE_RESPONSE;
 						break;
 					case CLOSE_AUCTION:
 						response = closeAuction(message.getParamsMap().get("auction-id"));
-						messageType = MessageEnvelopeTypes.SIMPLE_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.SIMPLE_RESPONSE;
 						break;
 					case ADD_BID:
 						arg1 = message.getParamsMap().get("auction-id");
 						arg2 = message.getBody();
 						response = addBidToOpenedProductAuction(arg1, arg2);
-						messageType = MessageEnvelopeTypes.SIMPLE_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.SIMPLE_RESPONSE;
 						break;
 					case LIST_ALL_AUCTIONS:
 						response = listAllProductsAuctions();
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_AUCTIONS:
 						response = listOpenedProductsAuctions();
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_AUCTIONS:
 						response = listClosedProductsAuctions();
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_ALL_AUCTIONS_BY_OWNER:
 						response = listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_AUCTIONS_BY_OWNER:
 						response = listOpenedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_AUCTIONS_BY_OWNER:
 						response = listClosedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_ALL_AUCTIONS_BY_ID:
 						response = findProductAuctionByID(message.getParamsMap().get("auction-id"));
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_AUCTIONS_BY_ID:
 						response = findOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_AUCTIONS_BY_ID:
 						response = findClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
 						response = listAllBidsOfProductAuctionByID(message.getParamsMap().get("auction-id"));
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
 						response = listAllBidsOfOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
 						response = listAllBidsOfClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 						arg1 = message.getParamsMap().get("auction-id");
 						arg2 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInAllProductAuctionByID(arg1, arg2);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 						arg1 = message.getParamsMap().get("auction-id");
 						arg2 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(arg1, arg2);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
 						arg1 = message.getParamsMap().get("auction-id");
 						arg2 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 						
 					case LIST_ALL_BIDS_BY_CLIENT_ID:
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientID(arg1);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_BIDS_BY_CLIENT_ID:
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = listOpenedBidsMadeByBidderUserClientID(arg1);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_BIDS_BY_CLIENT_ID:
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = listClosedBidsMadeByBidderUserClientID(arg1);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					
 					
 					case CHECK_OUTCOME_ALL_AUCTION:
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_OPENED_AUCTION:
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_CLOSED_AUCTION:
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					
 					
@@ -228,19 +228,19 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						arg2 = message.getParamsMap().get("auction-id");
 						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_OPENED_AUCTION_ID:
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						arg2 = message.getParamsMap().get("auction-id");
 						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_CLOSED_AUCTION_ID:
 						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						arg2 = message.getParamsMap().get("auction-id");
 						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
-						messageType = MessageEnvelopeTypes.COMPLEX_RESPONSE;
+						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;						
 						
 					default:
@@ -944,12 +944,12 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return builder.toString();
 	}
 
-	private void sslWriteResponse(OutputStream socketOutStream, HttpResponse response, MessageEnvelopeTypes messageType) throws ParseException, IOException {
+	private void sslWriteResponse(OutputStream socketOutStream, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
 		String message = response.getStatusLine().toString();
 		printErrorStringWithClassName("SENDING SOMETHING!\n" + message);
 		if(response.getEntity() != null && response.getEntity().getContentLength() != 0)
 			message = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
-		MessageEnvelope envelope = new MessageEnvelope(messageType, message);
+		MessagePacketServerToClient envelope = new MessagePacketServerToClient(messageType, message);
 		String envelopeJson = gson.toJson(envelope);
 		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
 		printWriter.print(envelopeJson + System.lineSeparator());

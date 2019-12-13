@@ -10,9 +10,9 @@ import javax.crypto.NoSuchPaddingException;
 
 import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
+import main.java.messages.secure.proofwork.components.SecureProofOfWorkMessageComponents;
 import main.java.messages.secure.proofwork.dos.mitigation.SecureProofOfWorkMessageDoSMitigation;
 import main.java.messages.secure.proofwork.metaheader.SecureProofOfWorkMessageMetaHeader;
-import main.java.messages.secure.proofwork.solvedblock.SecureProofOfWorkMessageSolvedBlock;
 
 public class SecureProofOfWorkMessage {
 	
@@ -22,7 +22,9 @@ public class SecureProofOfWorkMessage {
 	
 	private SecureCommonKeyExchange secureProofOfWorkMessageKeyExchange;
 	
-	private SecureProofOfWorkMessageSolvedBlock secureProofOfWorkMessageSolvedBlock;
+	//private SecureProofOfWorkMessageSolvedBlock secureProofOfWorkMessageSolvedBlock;
+	
+	private SecureProofOfWorkMessageComponents secureProofOfWorkMessageComponents;
 	
 	private SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation;
 	
@@ -35,13 +37,13 @@ public class SecureProofOfWorkMessage {
 	public SecureProofOfWorkMessage(SecureProofOfWorkMessageMetaHeader secureProofOfWorkMessageMetaHeader,
 									String userPeerID,
 									SecureCommonKeyExchange secureProofOfWorkMessageKeyExchange,
-									SecureProofOfWorkMessageSolvedBlock secureProofOfWorkMessageSolvedBlock,
+									SecureProofOfWorkMessageComponents secureProofOfWorkMessageComponents,
 									SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation) {
 
 		this.secureProofOfWorkMessageMetaHeader = secureProofOfWorkMessageMetaHeader;
 		this.userPeerID = userPeerID;
 		this.secureProofOfWorkMessageKeyExchange = secureProofOfWorkMessageKeyExchange;
-		this.secureProofOfWorkMessageSolvedBlock = secureProofOfWorkMessageSolvedBlock;
+		this.secureProofOfWorkMessageComponents = secureProofOfWorkMessageComponents;
 		this.secureProofOfWorkMessageDoSMitigation = secureProofOfWorkMessageDoSMitigation;
 		
 		this.secureProofOfWorkMessageSerialized = null;
@@ -58,7 +60,7 @@ public class SecureProofOfWorkMessage {
 		this.secureProofOfWorkMessageMetaHeader = null;
 		this.userPeerID = null;
 		this.secureProofOfWorkMessageKeyExchange = null;
-		this.secureProofOfWorkMessageSolvedBlock = null;
+		this.secureProofOfWorkMessageComponents = null;
 		this.secureProofOfWorkMessageDoSMitigation = null;
 		
 	}
@@ -75,8 +77,8 @@ public class SecureProofOfWorkMessage {
 		return this.secureProofOfWorkMessageKeyExchange;
 	}
 	
-	public SecureProofOfWorkMessageSolvedBlock getSecureProofOfWorkMessageSolvedBlock() {
-		return this.secureProofOfWorkMessageSolvedBlock;
+	public SecureProofOfWorkMessageComponents getSecureProofOfWorkMessageComponents() {
+		return this.secureProofOfWorkMessageComponents;
 	}
 	
 	public SecureProofOfWorkMessageDoSMitigation getSecureProofOfWorkMessageDoSMitigation() {
@@ -111,7 +113,10 @@ public class SecureProofOfWorkMessage {
 			this.secureProofOfWorkMessageKeyExchange.buildSecureCommonKeyExchangeToSend();
 			byte[] secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned = 
 					this.secureProofOfWorkMessageKeyExchange.getSecureCommonKeyExchangeSerializedCipheredAndSigned();
+
+			//TODO
 			
+			/**			
 			this.secureProofOfWorkMessageSolvedBlock.doSecureProofOfWorkMessageSolvedBlockSerialization();
 			byte[] secureProofOfWorkMessageSolvedBlockSerialized = 
 					this.secureProofOfWorkMessageSolvedBlock.getSecureProofOfWorkMessageSolvedBlockSerialized();
@@ -125,8 +130,8 @@ public class SecureProofOfWorkMessage {
 												    secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned.length +
 													secureProofOfWorkMessageSolvedBlockSerialized.length +
 													secureProofOfWorkMessageDoSMitigationSerialized.length);
-
-			this.secureProofOfWorkMessageSerialized = new byte[sizeOfSecureBidMessageSerialized];
+**/
+	//		this.secureProofOfWorkMessageSerialized = new byte[sizeOfSecureBidMessageSerialized];
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -167,17 +172,17 @@ public class SecureProofOfWorkMessage {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(secureProofOfWorkMessageSolvedBlockSerialized, 0, this.secureProofOfWorkMessageSerialized,
-							 serializationOffset, secureProofOfWorkMessageSolvedBlockSerialized.length);
-			serializationOffset += secureProofOfWorkMessageSolvedBlockSerialized.length;
-		
+//			System.arraycopy(secureProofOfWorkMessageSolvedBlockSerialized, 0, this.secureProofOfWorkMessageSerialized,
+//							 serializationOffset, secureProofOfWorkMessageSolvedBlockSerialized.length);
+//			serializationOffset += secureProofOfWorkMessageSolvedBlockSerialized.length;
+//		
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(secureProofOfWorkMessageDoSMitigationSerialized, 0, this.secureProofOfWorkMessageSerialized,
-							 serializationOffset, secureProofOfWorkMessageDoSMitigationSerialized.length);
-			
+//			System.arraycopy(secureProofOfWorkMessageDoSMitigationSerialized, 0, this.secureProofOfWorkMessageSerialized,
+//							 serializationOffset, secureProofOfWorkMessageDoSMitigationSerialized.length);
+//			
 			
 			this.setIsSecureProofOfWorkMessageSerialized(true);
 			

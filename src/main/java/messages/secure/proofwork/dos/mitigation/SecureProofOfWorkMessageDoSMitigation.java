@@ -15,125 +15,125 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.util.Arrays;
 
 import main.java.common.utils.CommonUtils;
-import main.java.messages.secure.proofwork.solvedblock.SecureProofOfWorkMessageSolvedBlock;
+import main.java.messages.secure.proofwork.components.solvedblock.SecureProofOfWorkMessageComponentsSolvedBlock;
 
 public class SecureProofOfWorkMessageDoSMitigation {
 
-	private SecureProofOfWorkMessageSolvedBlock secureProofOfWorkMessageSolvedBlock;
+	private SecureProofOfWorkMessageComponentsSolvedBlock secureProofOfWorkMessageComponentsSolvedBlock;
 	
-	private byte[] secureProofOfWorkMessageSolvedBlockSerialized;
+	private byte[] secureProofOfWorkMessageComponentsSolvedBlockSerialized;
 	
-	private byte[] secureProofOfWorkMessageSolvedBlockHashedForDoSMitigation;
+	private byte[] secureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation;
 	
 	private byte[] secretHMACKeyForDoSMitigationInBytes;
 	
-	private boolean isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation;
+	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation;
 	
-	private boolean isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationVerified;
+	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationVerified;
 	
-	private boolean isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid;
+	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid;
 	
-	private int sizeOfSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation;
+	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation;
 	
 	
 	public SecureProofOfWorkMessageDoSMitigation
-	      (SecureProofOfWorkMessageSolvedBlock secureProofOfWorkMessageSolvedBlock) {
+	      (SecureProofOfWorkMessageComponentsSolvedBlock secureProofOfWorkMessageComponentsSolvedBlock) {
 		
-		this.secureProofOfWorkMessageSolvedBlock = secureProofOfWorkMessageSolvedBlock;
+		this.secureProofOfWorkMessageComponentsSolvedBlock = secureProofOfWorkMessageComponentsSolvedBlock;
 		
-		this.secureProofOfWorkMessageSolvedBlockSerialized = null;
+		this.secureProofOfWorkMessageComponentsSolvedBlockSerialized = null;
 		
-		this.secureProofOfWorkMessageSolvedBlockHashedForDoSMitigation = null;
+		this.secureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation = null;
 		
-		this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation = false;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation = false;
 		
-		this.sizeOfSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation = 0;
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation = 0;
 		
 	}
 	
 	
-	public SecureProofOfWorkMessageDoSMitigation(byte[] secureProofOfWorkMessageSolvedBlockSerialized,
-												 byte[] secureProofOfWorkMessageSolvedBlockHashedForDoSMitigation,
+	public SecureProofOfWorkMessageDoSMitigation(byte[] secureProofOfWorkMessageComponentsSolvedBlockSerialized,
+												 byte[] secureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation,
 									             byte[] secretHMACKeyForDoSMitigationInBytes) {
 		
-		this.secureProofOfWorkMessageSolvedBlock = null;
+		this.secureProofOfWorkMessageComponentsSolvedBlock = null;
 		
-		this.secureProofOfWorkMessageSolvedBlockSerialized = secureProofOfWorkMessageSolvedBlockSerialized;
+		this.secureProofOfWorkMessageComponentsSolvedBlockSerialized = secureProofOfWorkMessageComponentsSolvedBlockSerialized;
 		
-		this.secureProofOfWorkMessageSolvedBlockHashedForDoSMitigation = 
-				secureProofOfWorkMessageSolvedBlockHashedForDoSMitigation;
+		this.secureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation = 
+				secureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation;
 		
 		this.secretHMACKeyForDoSMitigationInBytes = 
 				secretHMACKeyForDoSMitigationInBytes;
 		
-		this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation = true;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation = true;
 		
-		this.sizeOfSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation = 
-				this.secureProofOfWorkMessageSolvedBlockHashedForDoSMitigation.length;
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation = 
+				this.secureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation.length;
 		
 	}
 
 
 
 
-	public SecureProofOfWorkMessageSolvedBlock getSecureProofOfWorkMessageSolvedBlock() {
-		return this.secureProofOfWorkMessageSolvedBlock;
+	public SecureProofOfWorkMessageComponentsSolvedBlock getSecureProofOfWorkMessageComponentsSolvedBlock() {
+		return this.secureProofOfWorkMessageComponentsSolvedBlock;
 	}
 	
-	public byte[] getSecureProofOfWorkMessageSolvedBlockSerialized() {
-		return this.secureProofOfWorkMessageSolvedBlockSerialized;
+	public byte[] getSecureProofOfWorkMessageComponentsSolvedBlockSerialized() {
+		return this.secureProofOfWorkMessageComponentsSolvedBlockSerialized;
 	}
 	
-	public byte[] getSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation() {
-		return this.secureProofOfWorkMessageSolvedBlockHashedForDoSMitigation;
+	public byte[] getSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation() {
+		return this.secureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation;
 	}
 	
 	public byte[] getSecretHMACKeyForDoSMitigationInBytes() {
 		return this.secretHMACKeyForDoSMitigationInBytes;
 	}
 	
-	public boolean getIsSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation() {
-		return this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation;
+	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation() {
+		return this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation;
 	}
 
 
-	public void setIsSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation
-		  (boolean isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation) {
+	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation
+		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation) {
 		
-		this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation =
-						isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation =
+						isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation;
 	
 	}
 
-	public boolean getIsSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationVerified() {
-		return this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationVerified;
+	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationVerified() {
+		return this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationVerified;
 	}
 
 
-	public void setIsSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationVerified
-		  (boolean isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationVerified) {
+	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationVerified
+		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationVerified) {
 		
-		this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationVerified =
-				isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationVerified;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationVerified =
+				isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationVerified;
 	
 	}
 	
-	public boolean getIsSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid() {
-		return this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid;
+	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid() {
+		return this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid;
 	}
 
 
-	public void setIsSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid
-		  (boolean isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid) {
+	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid
+		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid) {
 		
-		this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid =
-				isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid =
+				isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid;
 	
 	}
 	
 	
-	public int getSizeOfSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation() {
-		return this.sizeOfSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation;
+	public int getSizeOfSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation() {
+		return this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation;
 	}
 	
 	
@@ -141,14 +141,16 @@ public class SecureProofOfWorkMessageDoSMitigation {
 		   throws NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, 
 		          NoSuchPaddingException, InvalidAlgorithmParameterException, SignatureException {
 		
-		if(!this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation) {
+		if(!this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation) {
 			
-			this.secureProofOfWorkMessageSolvedBlock.doSecureProofOfWorkMessageSolvedBlockSerialization();
-			this.secureProofOfWorkMessageSolvedBlockSerialized = 
-					this.secureProofOfWorkMessageSolvedBlock.getSecureProofOfWorkMessageSolvedBlockSerialized();
+			this.secureProofOfWorkMessageComponentsSolvedBlock
+				.doSecureProofOfWorkMessageComponentsSolvedBlockSerialization();
+			this.secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
+					this.secureProofOfWorkMessageComponentsSolvedBlock
+						.getSecureProofOfWorkMessageComponentsSolvedBlockSerialized();
 			
-			// Starts the MAC Hash process over the Secure Message serialized (applying the HMAC or CMAC operation),
-			// before the sending of the final concatenation of it with Secure Message serialized
+			// Starts the MAC Hash process over the Secure MessageComponents serialized (applying the HMAC or CMAC operation),
+			// before the sending of the final concatenation of it with Secure MessageComponents serialized
 			try {
 				
 				// The Initialization Vector and its Parameter's Specifications
@@ -158,25 +160,25 @@ public class SecureProofOfWorkMessageDoSMitigation {
 				SecretKeySpec keySpec = new SecretKeySpec(this.secretHMACKeyForDoSMitigationInBytes, "HMacSHA256");
 				// The configuration, initialization and update of the MAC Hash process
 				mac.init(keySpec);
-				mac.update(this.secureProofOfWorkMessageSolvedBlockSerialized);
+				mac.update(this.secureProofOfWorkMessageComponentsSolvedBlockSerialized);
 				
-				// Performs the final operation of MAC Hash process over the Secure Message serialized
+				// Performs the final operation of MAC Hash process over the Secure MessageComponents serialized
 				// (applying the HMAC or CMAC operation)
-				this.secureProofOfWorkMessageSolvedBlockHashedForDoSMitigation = mac.doFinal();
+				this.secureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation = mac.doFinal();
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("Error occurred during the Hashing Function over the Secure MessageComponents's Attributes:");
 				System.err.println("- Cryptographic Algorithm not found!!!");
 				noSuchAlgorithmException.printStackTrace();
 			}
 			catch (InvalidKeyException invalidKeyException) {
-				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("Error occurred during the Hashing Function over the Secure MessageComponents's Attributes:");
 				System.err.println("- Invalid Secret Key!!!");
 				invalidKeyException.printStackTrace();
 			}
 			
 			
-			this.setIsSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation(true);
+			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation(true);
 			
 		}
 		
@@ -184,12 +186,13 @@ public class SecureProofOfWorkMessageDoSMitigation {
 	
 	public boolean checkIfHashOfSecureProofOfWorkMessageDoSMitigationIsValid() throws NoSuchAlgorithmException {
 		
-		if(this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation) {
+		if(this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation) {
 			
-			byte[] secureProofOfWorkMessageSolvedBlockSerializedHashedToCompare = this.secureProofOfWorkMessageSolvedBlockSerialized;
+			byte[] secureProofOfWorkMessageComponentsSolvedBlockSerializedHashedToCompare = 
+				   this.secureProofOfWorkMessageComponentsSolvedBlockSerialized;
 			
-			// Starts the MAC Hash process over the Secure Message serialized received (applying the HMAC or CMAC operation),
-			// comparing it with Secure Message serialized hashed received (the MAC Hash process related to the Fast Secure Message Check)
+			// Starts the MAC Hash process over the Secure MessageComponents serialized received (applying the HMAC or CMAC operation),
+			// comparing it with Secure MessageComponents serialized hashed received (the MAC Hash process related to the Fast Secure MessageComponents Check)
 			try {
 			
 				// The Initialization Vector and its Parameter's Specifications
@@ -197,39 +200,39 @@ public class SecureProofOfWorkMessageDoSMitigation {
 				SecretKeySpec keySpec = new SecretKeySpec(this.secretHMACKeyForDoSMitigationInBytes, "HMacSHA256");
 				// The configuration, initialization and update of the MAC Hash process
 				mac.init(keySpec);
-				mac.update(secureProofOfWorkMessageSolvedBlockSerializedHashedToCompare);
+				mac.update(secureProofOfWorkMessageComponentsSolvedBlockSerializedHashedToCompare);
 				
-				// Performs the final operation of MAC Hash process over the Secure Message serialized
+				// Performs the final operation of MAC Hash process over the Secure MessageComponents serialized
 				// (applying the HMAC or CMAC operation)
-				secureProofOfWorkMessageSolvedBlockSerializedHashedToCompare = mac.doFinal();
+				secureProofOfWorkMessageComponentsSolvedBlockSerializedHashedToCompare = mac.doFinal();
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("Error occurred during the Hashing Function over the Secure MessageComponents's Attributes:");
 				System.err.println("- Cryptographic Algorithm not found!!!");
 				noSuchAlgorithmException.printStackTrace();
 			}
 			catch (InvalidKeyException invalidKeyException) {
-				System.err.println("Error occurred during the Hashing Function over the Secure Message's Attributes:");
+				System.err.println("Error occurred during the Hashing Function over the Secure MessageComponents's Attributes:");
 				System.err.println("- Invalid Secret Key!!!");
 				invalidKeyException.printStackTrace();
 			}
 			
-			this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid = 
-									  Arrays.areEqual(this.getSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation(), 
-											  		  secureProofOfWorkMessageSolvedBlockSerializedHashedToCompare) ? 
-															  true : false;
+			this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid = 
+				  Arrays.areEqual(this.getSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation(), 
+						  		  secureProofOfWorkMessageComponentsSolvedBlockSerializedHashedToCompare) ? 
+										  true : false;
 			
-			if(!this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid) {
-				System.err.println("The Fast Secure Message Check it's not valid:");
-				System.err.println("- The Secure Message will be ignored!!!");
+			if(!this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid) {
+				System.err.println("The Fast Secure MessageComponents Check it's not valid:");
+				System.err.println("- The Secure MessageComponents will be ignored!!!");
 			}
 
 			
-			this.setIsSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationVerified(true);
-			this.setIsSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigation(false);
+			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationVerified(true);
+			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigation(false);
 			
 			
-			return this.isSecureProofOfWorkMessageSolvedBlockHashedForDoSMitigationValid;
+			return this.isSecureProofOfWorkMessageComponentsSolvedBlockHashedForDoSMitigationValid;
 			
 		}
 		

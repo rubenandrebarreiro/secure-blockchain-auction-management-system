@@ -1,8 +1,8 @@
 package main.java.sys.rest.server.auction.messageTypes;
 
-public class MessageEnvelope {
+public class MessagePacketServerToClient {
 
-	private MessageEnvelopeTypes type;
+	private MessagePacketServerToClientTypes type;
 	
 	private String message;
 	
@@ -11,16 +11,16 @@ public class MessageEnvelope {
 	 * @param type of message inside
 	 * @param message contents in JSON
 	 */
-	public MessageEnvelope(MessageEnvelopeTypes type, String message) {
+	public MessagePacketServerToClient(MessagePacketServerToClientTypes type, String message) {
 		this.type = type;
 		this.message = message;
 	}
 
-	public MessageEnvelopeTypes getType() {
+	public MessagePacketServerToClientTypes getType() {
 		return type;
 	}
 
-	public void setType(MessageEnvelopeTypes type) {
+	public void setType(MessagePacketServerToClientTypes type) {
 		this.type = type;
 	}
 
