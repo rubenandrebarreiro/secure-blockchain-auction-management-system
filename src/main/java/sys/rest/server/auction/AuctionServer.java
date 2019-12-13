@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.crypto.NoSuchPaddingException;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
@@ -88,17 +89,22 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		String arg1 = null, arg2 = null;
 		HttpResponse response = null;
 		MessageEnvelopeTypes messageType = null;
-
+		boolean exitFlag = false;
+		
+		if(mutualAuth) {
+			SSLSession session = responseSocket.getSession();
+			Principal clientID;
+			try {
+				clientID = session.getPeerPrincipal();
+				System.out.println("Client has been identified as: " + clientID);
+			} catch (SSLPeerUnverifiedException e) {
+				printErrorStringWithClassName("Error getting peer principal!\n" + e.getMessage());
+			}
+		}
+		
 		try {
-			while(true) {
-				System.out.println("Connected clients are: " );
-				connectedClientsMap.forEach((x,y) -> System.out.println(x + " " + y));
+			while(!exitFlag) {
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
-				if(mutualAuth) {
-					SSLSession session = responseSocket.getSession();
-					Principal clientID = session.getPeerPrincipal();
-					System.out.println("Client has been identified as: " + clientID);
-				}
 				MessageEnvelopeAuction message = gson.fromJson(jsonMessage, MessageEnvelopeAuction.class);
 				if(message != null) {
 
@@ -238,10 +244,13 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						break;						
 						
 					default:
-						//TODO Error somewhere?
 						break;
 					}
 					sslWriteResponse(responseSocket.getOutputStream(), response, messageType);
+				}
+				else {
+					// Not supposed to get null messages Except is the client disconnects.
+					exitFlag = true;
 				}
 			}
 		} catch (Exception e) {

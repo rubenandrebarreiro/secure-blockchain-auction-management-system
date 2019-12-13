@@ -185,16 +185,16 @@ public class Client implements ClientAPI {
 			inputStreamThread = new Thread() {
 				public void run() {
 					try {
+						boolean exitFlag = false;
 						String response;
 						MessageEnvelope envelope;
 						MessageEnvelopeTypes messageType;
 						String message;
 						inputStream = socket.getInputStream();
 						BufferedReader socketReader = new BufferedReader(new InputStreamReader(inputStream));
-						while(true) {
+						while(!exitFlag) {
 							// TODO Read and handle response
 							response = socketReader.readLine();
-							System.out.println("Socket received something! -> " + response);
 							try {
 								envelope = gson.fromJson(response, MessageEnvelope.class);
 								message = envelope.getMessage();
@@ -214,7 +214,13 @@ public class Client implements ClientAPI {
 									break;
 								}
 							} catch (Exception e) {
-								printErrorStringWithClassName("Received something unexpected? -> " + e.getMessage());
+								if(response == null) {
+									exitFlag = true;
+									currentUser = null;
+									System.out.println("Server disconnected!");
+								}
+								else
+									printErrorStringWithClassName("Received something unexpected? -> " + e.getMessage());
 							}
 
 						}
