@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Map;
@@ -15,10 +16,12 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
-public class AuctionServerEntryPoint extends Thread{
+public class AuctionServerEntryPoint{
 
 	private static final String AUCTION_SERVER_TLS_CONFIGURATION_PATH = "res/configurations/auction-server-tls-configuration.conf";
 	private static final String AUCTION_SERVER_STORES_CONFIGURATION_PATH = "res/configurations/auction-server-keystore-configuration.conf";
@@ -36,6 +39,11 @@ public class AuctionServerEntryPoint extends Thread{
 	
 	
 	public static void main(String[] args) throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+		// if provider is not present, add it
+		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+		    // insert at specific position
+		    Security.addProvider(new BouncyCastleProvider());
+		}
 		new AuctionServerEntryPoint();
 	}
 	
@@ -46,8 +54,7 @@ public class AuctionServerEntryPoint extends Thread{
 			tlsConfigurationReader = new AuctionServerTLSConfigurationReader(AUCTION_SERVER_TLS_CONFIGURATION_PATH);
 			storesConfigurationReader = new AuctionServerKeyStoreConfigurationReader(AUCTION_SERVER_STORES_CONFIGURATION_PATH);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printErrorStringWithClassName("Configuration file not found!\n" + e.getMessage());
 		}
 		
 		System.setProperty("javax.net.ssl.keyStore", storesConfigurationReader.getKeyStoreFileLocationPath());

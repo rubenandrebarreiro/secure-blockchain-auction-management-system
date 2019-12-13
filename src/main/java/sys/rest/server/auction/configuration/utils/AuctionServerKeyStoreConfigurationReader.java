@@ -47,6 +47,8 @@ public class AuctionServerKeyStoreConfigurationReader {
 	
 	public AuctionServerKeyStoreConfigurationReader(String keyStoreConfigurationsFilePath) throws FileNotFoundException {
 
+		System.out.println("---------------------" + this.getClass().getCanonicalName() + " start---------------------");		
+		
 		this.readKeyStoreConfigurations(keyStoreConfigurationsFilePath);
 
 		System.out.println();
@@ -258,6 +260,10 @@ public class AuctionServerKeyStoreConfigurationReader {
 
 		auctionServerKeyStoreConfigurationFileReader.close();
 
+		System.out.println("---------------------" + this.getClass().getCanonicalName() + " finish---------------------");
+		
+		System.out.println();
+		
 	}
 
 

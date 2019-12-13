@@ -1,22 +1,22 @@
-package main.java.sys;
+package main.java.sys.rest.server.auction.messageTypes;
 
 import java.io.Serializable;
 import java.util.HashMap;
 
-public class SSLSocketMessage implements Serializable {
+public class MessageEnvelopeAuction implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -5475198985218772861L;
 	
-	private SSLSocketAuctionOperation operation;
+	private MessageEnvelopeAuctionTypes operation;
 	
 	private HashMap<String, String> paramsMap;
 	
 	private String body;
 	
-	public SSLSocketMessage(SSLSocketAuctionOperation operation,
+	public MessageEnvelopeAuction(MessageEnvelopeAuctionTypes operation,
 							HashMap<String, String> paramsMap,
 							String body) {
 		this.operation = operation;
@@ -24,11 +24,11 @@ public class SSLSocketMessage implements Serializable {
 		this.body = body;
 	}
 
-	public SSLSocketAuctionOperation getOperation() {
+	public MessageEnvelopeAuctionTypes getOperation() {
 		return operation;
 	}
 
-	public void setOperation(SSLSocketAuctionOperation operation) {
+	public void setOperation(MessageEnvelopeAuctionTypes operation) {
 		this.operation = operation;
 	}
 

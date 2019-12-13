@@ -1,6 +1,6 @@
-package main.java.sys;
+package main.java.sys.rest.server.auction.messageTypes;
 
-public enum SSLSocketAuctionOperation {
+public enum MessageEnvelopeAuctionTypes {
 
 	OPEN_AUCTION, 
 	CLOSE_AUCTION,
