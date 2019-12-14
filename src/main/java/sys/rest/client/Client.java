@@ -594,24 +594,24 @@ public class Client implements ClientAPI {
 		
 		Bid bid = new Bid(random.nextLong(), currentUser.getUserPeerID(), Double.parseDouble(bidAmount));
 		
-		SecureBidMessageDataSignature secureBidMessageDataSignature = new SecureBidMessageDataSignature(
-				bid,
-				currentUser.getUserPeerID());
+		SecureBidMessageDataSignature secureBidMessageDataSignature = 
+				new SecureBidMessageDataSignature(bid,
+												  currentUser.getUserPeerID());
 		
-		SecureBidMessageDataConfidential secureBidMessageDataConfidential = new SecureBidMessageDataConfidential(
-				currentUser.getUserEmail(),
-				currentUser.getUserHomeAddress(),
-				currentUser.getUserBankAccountNIB());
-		
-		SecureBidMessageData secureBidMessageData = new SecureBidMessageData(
-				secureBidMessageDataSignature,
-				secureBidMessageDataConfidential,
-				currentUser.getUserPeerID());
-		
-		SecureCommonHeader secureCommonHeader = new SecureCommonHeader(
-				VersionNumber.VERSION_01.getVersionNumber(),
-				MessageType.MESSAGE_TYPE_1.getMessageType(),
-				System.currentTimeMillis());
+		SecureBidMessageDataConfidential secureBidMessageDataConfidential =
+				new SecureBidMessageDataConfidential(currentUser.getUserEmail(),
+													 currentUser.getUserHomeAddress(),
+													 currentUser.getUserBankAccountNIB());
+												
+		SecureBidMessageData secureBidMessageData = 
+				new SecureBidMessageData(secureBidMessageDataSignature,
+								         secureBidMessageDataConfidential,
+										 currentUser.getUserPeerID());
+								
+		SecureCommonHeader secureCommonHeader = 
+				new SecureCommonHeader(VersionNumber.VERSION_01.getVersionNumber(),
+									   MessageType.MESSAGE_TYPE_1.getMessageType(),
+									   System.currentTimeMillis());
 		
 		SecureBidMessageComponents secureBidMessageComponents = null;
 		
