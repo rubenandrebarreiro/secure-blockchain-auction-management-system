@@ -7,9 +7,9 @@ public class SecureProofOfWorkMessageMetaHeader {
 	private int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered;
 	private int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned;
 	
-	private int sizeOfSecureProofOfWorkMessageSolvedBlockSerialized;
+	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
 	private int sizeOfSecureProofOfWorkMessageDoSMitigationSerialized;
-	  
+	
 	private int sizeOfSecureBidMessageSolvedBlockConfidentialSerialized;
 	private int sizeOfSecureBidMessageSolvedBlockSignatureSerialized;
 	
@@ -23,7 +23,47 @@ public class SecureProofOfWorkMessageMetaHeader {
 	private boolean isSecureProofOfWorkMessageMetaHeaderSerialized;
 	
 	
-	public SecureProofOfWorkMessageMetaHeader() {
+	public SecureProofOfWorkMessageMetaHeader(int sizeOfUserPeerIDSerialized,
+											  
+											  int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered,
+											  int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned,
+											  
+											  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized,
+											  int sizeOfSecureProofOfWorkMessageDoSMitigationSerialized,
+											  
+											  int sizeOfSecureBidMessageSolvedBlockConfidentialSerialized,
+											  int sizeOfSecureBidMessageSolvedBlockSignatureSerialized,
+											  
+											  int sizeOfBlockAndBlockSolvedHashedSerialized,
+											  int sizeOfBlockSerialized,
+											  int sizeOfBlockSolvedHashedSerialized) {
+		
+		
+		this.sizeOfUserPeerIDSerialized = sizeOfUserPeerIDSerialized;
+		
+		this.sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered = 
+					sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered;
+		this.sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned = 
+					sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned;
+		
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized = 
+					sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
+		this.sizeOfSecureProofOfWorkMessageDoSMitigationSerialized = 
+					sizeOfSecureProofOfWorkMessageDoSMitigationSerialized;
+		
+		this.sizeOfSecureBidMessageSolvedBlockConfidentialSerialized = 
+					sizeOfSecureBidMessageSolvedBlockConfidentialSerialized;
+		this.sizeOfSecureBidMessageSolvedBlockSignatureSerialized = 
+					sizeOfSecureBidMessageSolvedBlockSignatureSerialized;
+		
+		this.sizeOfBlockAndBlockSolvedHashedSerialized = sizeOfBlockAndBlockSolvedHashedSerialized;
+		this.sizeOfBlockSerialized = sizeOfBlockSerialized;
+		this.sizeOfBlockSolvedHashedSerialized = sizeOfBlockSolvedHashedSerialized;
+		
+		
+		this.secureProofOfWorkMessageMetaHeaderSerialized = null;
+		
+		this.isSecureProofOfWorkMessageMetaHeaderSerialized = false;
 		
 	}
 	
@@ -40,8 +80,8 @@ public class SecureProofOfWorkMessageMetaHeader {
 		return this.sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned;
 	}
 
-	public int getSizeOfSecureProofOfWorkMessageSolvedBlockSerialized() {
-		return this.sizeOfSecureProofOfWorkMessageSolvedBlockSerialized;
+	public int getSizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized() {
+		return this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
 	}
 	
 	public int getSizeOfSecureProofOfWorkMessageDoSMitigationSerialized() {

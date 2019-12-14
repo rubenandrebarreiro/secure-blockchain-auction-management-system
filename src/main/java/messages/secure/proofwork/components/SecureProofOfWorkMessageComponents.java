@@ -180,12 +180,10 @@ public class SecureProofOfWorkMessageComponents {
 			
 			
 			this.setIsSecureProofOfWorkMessageComponentsSerialized(true);
+		
 		}
-		
-		
-		
-		
-		
+				
 	}
+	
 	
 }
