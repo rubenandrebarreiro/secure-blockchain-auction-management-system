@@ -27,7 +27,7 @@ public class Block {
 	
 	private byte strategyForCryptoPuzzle;
 	
-	private int numBytesToSolveChallengeDifficultType;
+	private int numBytesToSolveChallengeDifficultyType;
 	
 	private SecureRandom secureRandom;
 	
@@ -50,7 +50,7 @@ public class Block {
 	
 	
 	public Block(int blockID, byte[] previousBlockHashed, Bid[] bidsOfCurrentBlockToTryToMine,
-			     byte strategyForCryptoPuzzle, int numBytesToSolveChallengeDifficultType) {
+			     byte strategyForCryptoPuzzle, int numBytesToSolveChallengeDifficultyType) {
 		
 		this.blockID = blockID;
 		
@@ -63,7 +63,7 @@ public class Block {
 		this.areBidsOfCurrentBlockToTryToMineSerialized = false;
 		
 		this.strategyForCryptoPuzzle = strategyForCryptoPuzzle;
-		this.numBytesToSolveChallengeDifficultType = numBytesToSolveChallengeDifficultType;
+		this.numBytesToSolveChallengeDifficultyType = numBytesToSolveChallengeDifficultyType;
 		
 		
 		switch(this.strategyForCryptoPuzzle) {
@@ -134,8 +134,8 @@ public class Block {
 		return this.strategyForCryptoPuzzle;
 	}
 	
-	public int numBytesToSolveChallengeDifficultType() {
-		return this.numBytesToSolveChallengeDifficultType;
+	public int numBytesToSolveChallengeDifficultyType() {
+		return this.numBytesToSolveChallengeDifficultyType;
 	}
 	
 	public int getNonce() {
@@ -366,13 +366,10 @@ public class Block {
 		
 		if(isPossibleToTryToSolveBlockHashChallenge) {			
 			
-			// TODO change dynamic/random difficulty of challenge between 2 and 5
-			int difficulty = 4;
+			byte[] challengeTarget = new byte[ this.numBytesToSolveChallengeDifficultyType ]; 
 			
-			
-			byte[] challengeTarget = new byte[difficulty]; 
-			
-			while( !Arrays.copyOfRange(this.blockSerializedHashed, 0, difficulty).equals(challengeTarget) ) {
+			while( !Arrays.copyOfRange(this.blockSerializedHashed, 0, this.numBytesToSolveChallengeDifficultyType)
+						  .equals(challengeTarget) ) {
 			
 				this.startProcessToTryToSolveBlockHashChallenge();
 				

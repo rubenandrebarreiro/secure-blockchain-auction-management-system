@@ -122,6 +122,25 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 			Block previousBlock = this.minedBlockMap.get(previousBlockID);
 			byte[] previousBlockHashed = previousBlock.getBlockSerializedHashed();
 			
+			switch(this.numBytesToSolveChallengeType) {
+				
+				case 0x01:
+					break;
+					
+				case 0x02:
+					break;
+					
+				case 0x03:
+					break;
+					
+				case 0x04:
+					break;
+					
+				default:
+					break;
+					
+			}
+			
 			
 			Block blockOfOpenBidsForChallenge = new Block( currentBlockID, previousBlockHashed,
 									( (Bid[]) chosenOpenBidsToMineList.toArray() ),

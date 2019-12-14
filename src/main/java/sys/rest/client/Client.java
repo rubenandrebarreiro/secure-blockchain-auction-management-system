@@ -16,6 +16,7 @@ import java.security.Security;
 import java.security.SignatureException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import javax.crypto.NoSuchPaddingException;
@@ -36,7 +37,10 @@ import com.j256.ormlite.support.ConnectionSource;
 
 import main.java.api.rest.client.ClientAPI;
 import main.java.common.protocols.MessageType;
+import main.java.common.protocols.NumBytesChallengeType;
+import main.java.common.protocols.StrategyCryptoPuzzle;
 import main.java.common.protocols.VersionNumber;
+import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.SecureBidMessage;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.components.data.SecureBidMessageData;
@@ -47,8 +51,10 @@ import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
 import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.resources.bid.Bid;
+import main.java.resources.block.Block;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
+import main.java.sys.rest.client.services.TryToMineBlockOfOpenBidsService;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClient;
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClientTypes;
@@ -109,6 +115,12 @@ public class Client implements ClientAPI {
 	private Thread inputStreamThread;
 	private InputStream inputStream;
 	private OutputStream outputStream;
+	
+	
+	private TryToMineBlockOfOpenBidsService tryToMineBlockOfOpenBidsService;
+	
+	private Thread tryToMineBlockOfOpenBidsServiceThread;
+	
 	
 	public static void main(String[] args) {
 
@@ -181,6 +193,17 @@ public class Client implements ClientAPI {
 			socket.setEnabledProtocols(tlsConfigurationReader.getAvailableTLSVersions());
 			//		    socket.setSoTimeout(1000);
 			socket.startHandshake();
+			
+			
+			this.tryToMineBlockOfOpenBidsService = 
+					new TryToMineBlockOfOpenBidsService(this,
+														StrategyCryptoPuzzle.STRATEGY_CRYPTO_PUZZLE_1.getStrategyUsedForCryptoPuzzle(),
+														NumBytesChallengeType.NUM_BYTES_CHALLENGE_TYPE_3.getNumBytesChallengeType(),
+														/**openBidsList**/ null, /**minedBlockMap**/ null);
+			
+			this.tryToMineBlockOfOpenBidsServiceThread = new Thread(this.tryToMineBlockOfOpenBidsService);
+			this.tryToMineBlockOfOpenBidsServiceThread.start();
+			
 			
 			inputStreamThread = new Thread() {
 				public void run() {
