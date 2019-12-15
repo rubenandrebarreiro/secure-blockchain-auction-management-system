@@ -358,7 +358,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockConfidential {
 
 
 				String provider = "BC";
-				Cipher SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher = 
+				Cipher secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher = 
 						Cipher.getInstance(String.format("%s/%s/%s",
 								symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								provider );
@@ -371,7 +371,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockConfidential {
 					// The parameter specifications for the IV (Initialisation Vector)	
 					System.out.println("[SecureProofOfWorkMessageComponentsSolvedBlockConfidential.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
 					initialisationVectorBytes = 
-							CommonUtils.generateIV(SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher);
+							CommonUtils.generateIV(secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher);
 
 					// Showing the randomly defined IV (Initialisation Vector)
 					System.out.println("[SecureProofOfWorkMessageComponentsSolvedBlockConfidential.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
@@ -379,7 +379,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockConfidential {
 
 					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
 					
-					SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher
+					secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher
 							.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
 
 				}
@@ -389,13 +389,13 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockConfidential {
 					// The parameter specifications for the IV (Initialisation Vector)
 					System.out.println("[SecureProofOfWorkMessageComponentsSolvedBlockConfidential.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
 
-					SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher
+					secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher
 					.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
 
 				}
 
 				this.blockSerializedAndSolvedHashedCiphered = 
-						SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher
+						secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedSymmetricEncryptionCipher
 						.doFinal(this.blockSerializedAndSolvedHashed);
 
 
@@ -466,7 +466,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockConfidential {
 				
 				
 				String provider = "BC";
-				Cipher SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher = 
+				Cipher secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher = 
 						Cipher.getInstance(String.format("%s/%s/%s",
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								           provider );
@@ -484,7 +484,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockConfidential {
 									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
 					
 					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
-					SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+					secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
 						.init(Cipher.DECRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
 				}
 				else {
@@ -493,7 +493,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockConfidential {
 					// The parameter specifications for the IV (Initialisation Vector)
 					System.out.println("[SecureProofOfWorkMessageComponentsSolvedBlockConfidential.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
 					
-					SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+					secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
 						.init(Cipher.DECRYPT_MODE, secretKeySpecifications);
 					
 				}
@@ -503,15 +503,15 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockConfidential {
 				
 			  	// The Plain Text of the bytes of the SolvedBlock input received through the communication channel
 			  	this.blockSerializedAndSolvedHashed = 
-			  			new byte[ SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+			  			new byte[ secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
 			  	                  .getOutputSize(this.sizeOfBlockSerializedAndSolvedHashedCiphered) ];
 			    
-			  	this.sizeOfBlockSerializedAndSolvedHashed = SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+			  	this.sizeOfBlockSerializedAndSolvedHashed = secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
 										  								    .update(this.blockSerializedAndSolvedHashedCiphered, 
 										  									   	    0, this.sizeOfBlockSerializedAndSolvedHashedCiphered,
 										  										    this.blockSerializedAndSolvedHashed, 0);
 			  	
-			  	SecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
+			  	secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerializedAndHashedSymmetricEncryptionDecipher
 			  									   .doFinal(this.blockSerializedAndSolvedHashed,
 			  											    this.sizeOfBlockSerializedAndSolvedHashed);
 			    
