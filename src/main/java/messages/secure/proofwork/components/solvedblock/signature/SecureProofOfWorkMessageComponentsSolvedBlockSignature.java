@@ -166,9 +166,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockSignature {
 	public void signSecureProofOfWorkMessageComponentsSolvedBlock()
 		   throws SignatureException, InvalidKeyException, NoSuchAlgorithmException {
 
-		boolean isPossibleToSignBidSerialized = true;
-		
-		if(isPossibleToSignBidSerialized) {
+		if(!this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned) {
 
 			Signature secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature = 
 					  Signature.getInstance("SHA256withRSA");
@@ -192,11 +190,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockSignature {
 	
 	public boolean checkIfProofOfWorkMessageComponentsSolvedBlockDigitalSignedIsValid()
 		   throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-				
-		boolean isPossibleToVerifyProofOfWorkMessageComponentsSolvedBlockDigitalSigned = true; //TODO
-
-
-		if(isPossibleToVerifyProofOfWorkMessageComponentsSolvedBlockDigitalSigned) {
+			
+		if(this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned) {
 
 			Signature secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature = 
 					Signature.getInstance("SHA256withRSA");
