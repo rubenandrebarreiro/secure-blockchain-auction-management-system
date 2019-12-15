@@ -1,8 +1,19 @@
 package main.java.messages.secure.receipt.components;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.security.SignatureException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.common.header.SecureCommonHeader;
@@ -33,7 +44,20 @@ public class SecureReceiptMessageComponents {
 	
 	private byte[] secureReceiptMessageComponentsSerialized;
 	
+	private int sizeOfSecureReceiptMessageComponentsSerialized;
+	
 	private boolean isSecureReceiptMessageComponentsSerialized;
+	
+	
+	private byte[] secretSymmetricKeyForComponentsInBytes;
+	
+	
+	private byte[] secureReceiptMessageComponentsSerializedCiphered;
+	
+	private int sizeOfSecureReceiptMessageComponentsSerializedCiphered;
+	
+	
+	private boolean isSecureReceiptMessageComponentsSerializedCiphered;
 	
 	
 	private String userPeerID;
@@ -58,11 +82,15 @@ public class SecureReceiptMessageComponents {
 		this.secureReceiptMessageComponentsSerialized = null;
 		this.isSecureReceiptMessageComponentsSerialized = false;
 		
+		this.secureReceiptMessageComponentsSerializedCiphered = null;
+		this.isSecureReceiptMessageComponentsSerializedCiphered = false;
+		
 		this.userPeerID = null;
 		
 	}
 	
-	public SecureReceiptMessageComponents(byte[] secureReceiptMessageComponentsSerialized,
+	public SecureReceiptMessageComponents(byte[] secureReceiptMessageComponentsSerializedCiphered,
+										  byte[] secretSymmetricKeyForComponentsInBytes,
 										  int sizeOfSecureReceiptMessageComponentsDataSerialized,
 										  int sizeOfSecureReceiptMessageComponentsDataInfoSerialized,
 										  int sizeOfSecureReceiptMessageComponentsDataSignatureSerialized,
@@ -70,7 +98,14 @@ public class SecureReceiptMessageComponents {
 										  int sizeOfBidderUserClientIDSerialized,
 										  String userPeerID) {
 		
-		this.secureReceiptMessageComponentsSerialized = secureReceiptMessageComponentsSerialized;
+		this.secureReceiptMessageComponentsSerializedCiphered = secureReceiptMessageComponentsSerializedCiphered;
+		this.sizeOfSecureReceiptMessageComponentsSerializedCiphered = 
+						this.secureReceiptMessageComponentsSerializedCiphered.length;
+		this.isSecureReceiptMessageComponentsSerialized = true;
+		
+		this.secretSymmetricKeyForComponentsInBytes = secretSymmetricKeyForComponentsInBytes;
+		
+		this.secureReceiptMessageComponentsSerialized = null;
 		this.isSecureReceiptMessageComponentsSerialized = true;
 		
 		this.secureCommonHeader = null;
@@ -79,14 +114,14 @@ public class SecureReceiptMessageComponents {
 		this.secureReceiptMessageComponentsData = null;
 		this.secureReceiptMessageComponentsDataSerialized = null;
 		this.sizeOfSecureReceiptMessageComponentsDataSerialized = 
-				sizeOfSecureReceiptMessageComponentsDataSerialized;
+						sizeOfSecureReceiptMessageComponentsDataSerialized;
 		
 		this.sizeOfSecureReceiptMessageComponentsDataInfoSerialized = 
-				sizeOfSecureReceiptMessageComponentsDataInfoSerialized;
+						sizeOfSecureReceiptMessageComponentsDataInfoSerialized;
 		this.sizeOfSecureReceiptMessageComponentsDataSignatureSerialized = 
-				sizeOfSecureReceiptMessageComponentsDataSignatureSerialized;
+						sizeOfSecureReceiptMessageComponentsDataSignatureSerialized;
 		this.sizeOfSecureReceiptMessageComponentsDataResponseSerialized = 
-				sizeOfSecureReceiptMessageComponentsDataResponseSerialized;
+						sizeOfSecureReceiptMessageComponentsDataResponseSerialized;
 		this.sizeOfBidderUserClientIDSerialized = sizeOfBidderUserClientIDSerialized;
 		
 		this.userPeerID = userPeerID;
@@ -138,6 +173,10 @@ public class SecureReceiptMessageComponents {
 		return this.secureReceiptMessageComponentsSerialized;
 	}
 	
+	public int getSizeOfSecureReceiptMessageComponentsSerialized() {
+		return this.sizeOfSecureReceiptMessageComponentsSerialized;
+	}
+	
 	public boolean getIsSecureReceiptMessageComponentsSerialized() {
 		return this.isSecureReceiptMessageComponentsSerialized;
 	}
@@ -150,6 +189,28 @@ public class SecureReceiptMessageComponents {
 		
 	}
 	
+	
+	public byte[] getSecretSymmetricKeyForComponentsInBytes() {
+		return this.secretSymmetricKeyForComponentsInBytes;
+	}
+	
+	public byte[] getSecureReceiptMessageComponentsSerializedCiphered() {
+		return this.secureReceiptMessageComponentsSerializedCiphered;
+	}
+	
+	public boolean getIsSecureReceiptMessageComponentsSerializedCiphered() {
+		return this.isSecureReceiptMessageComponentsSerializedCiphered;
+	}
+	
+	public void setIsSecureReceiptMessageComponentsSerializedCiphered
+		  (boolean isSecureReceiptMessageComponentsSerializedCiphered) {
+		
+		this.isSecureReceiptMessageComponentsSerializedCiphered =
+				isSecureReceiptMessageComponentsSerializedCiphered;
+		
+	}
+	
+	
 	public String getUserPeerID() {
 		return this.userPeerID;
 	}
@@ -159,7 +220,11 @@ public class SecureReceiptMessageComponents {
 	public void doSecureReceiptMessageComponentsSerialization()
 		   throws InvalidKeyException, SignatureException, NoSuchAlgorithmException {
 		
-		if(!this.isSecureReceiptMessageComponentsSerialized) {
+		boolean isPossibleToDoSecureReceiptMessageComponentsSerialization = 
+				( !this.isSecureReceiptMessageComponentsSerialized && 
+				  !this.isSecureReceiptMessageComponentsSerializedCiphered );
+		
+		if( isPossibleToDoSecureReceiptMessageComponentsSerialization ) {
 			
 			this.secureCommonHeader.doSecureCommonHeaderSerialization();
 			this.secureCommonHeaderSerialized = 
@@ -214,7 +279,11 @@ public class SecureReceiptMessageComponents {
 	
 	public void undoSecureReceiptMessageComponentsSerialization() {
 		
-		if(this.isSecureReceiptMessageComponentsSerialized) {
+		boolean isPossibleToUndoSecureReceiptMessageComponentsSerialization = 
+				(  this.isSecureReceiptMessageComponentsSerialized && 
+				  !this.isSecureReceiptMessageComponentsSerializedCiphered );
+		
+		if( isPossibleToUndoSecureReceiptMessageComponentsSerialization ) {
 			
 			this.secureCommonHeaderSerialized = new byte[ CommonUtils.COMMON_HEADER_LENGTH ];
 			this.secureReceiptMessageComponentsDataSerialized = 
@@ -263,5 +332,250 @@ public class SecureReceiptMessageComponents {
 		}
 		
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public void encryptSecureReceiptMessageComponents() {
+		
+		boolean isPossibleToEncryptSecureReceiptMessageComponents = 
+			  (  this.isSecureReceiptMessageComponentsSerialized && 
+			    !this.isSecureReceiptMessageComponentsSerializedCiphered);
+			
+		if(isPossibleToEncryptSecureReceiptMessageComponents) {
+			
+			try {
+				byte[] key = CommonUtils.createKeyForAES(256, new SecureRandom()).getEncoded();
+				this.secretSymmetricKeyForComponentsInBytes = key;
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchProviderException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} // TODO Symmetric Key generated on the fly with KeyGen (secretHMACKeyForDoSMitigationInBytes)
+
+			try {
+
+				String symmetricEncryptionAlgorithm = "AES";
+				String symmetricEncryptionMode = "CBC";
+				String symmetricEncryptionPadding = "PKCS7Padding";
+
+
+				// Set the Secret Key and its specifications,
+				// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
+				SecretKeySpec secretKeySpecifications = new SecretKeySpec(this.secretSymmetricKeyForComponentsInBytes, symmetricEncryptionAlgorithm);
+
+
+				String provider = "BC";
+				Cipher secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher = 
+						Cipher.getInstance(String.format("%s/%s/%s",
+								symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
+								provider );
+
+				byte[] initialisationVectorBytes = null;
+
+				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
+
+					// Algorithms that don't need IV (Initialisation Vector): ECB
+					// The parameter specifications for the IV (Initialisation Vector)	
+					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
+					initialisationVectorBytes = 
+							CommonUtils.generateIV(secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher);
+
+					// Showing the randomly defined IV (Initialisation Vector)
+					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
+							+ CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
+
+					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
+					
+					secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher
+							.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
+
+				}
+				else {
+
+					// Algorithms that need IV (Initialisation Vector)
+					// The parameter specifications for the IV (Initialisation Vector)
+					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
+
+					secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher
+							.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
+
+				}
+
+				this.secureReceiptMessageComponentsSerializedCiphered = 
+						secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher
+						.doFinal(this.secureReceiptMessageComponentsSerialized);
+
+
+				this.setIsSecureReceiptMessageComponentsSerializedCiphered(true);		
+
+			}
+			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Cryptographic Algorithm not found!!!");
+				noSuchAlgorithmException.printStackTrace();
+			}
+			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
+				invalidAlgorithmParameterException.printStackTrace();
+			}
+			catch (NoSuchProviderException noSuchProviderException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Cryptograhic Provider not found!!!");
+				noSuchProviderException.printStackTrace();
+			}
+			catch (NoSuchPaddingException noSuchPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Padding Method not found!!!");
+				noSuchPaddingException.printStackTrace();
+			}
+			catch (BadPaddingException badPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Bad/Wrong Padding Method in use!!!");
+				badPaddingException.printStackTrace();
+			}
+			catch (InvalidKeyException invalidKeyException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Invalid Cryptographic Algorithm's Secret Key!!!");
+				invalidKeyException.printStackTrace();
+			}
+			catch (IllegalBlockSizeException illegalBlockSizeException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure Message's Payload:");
+				System.err.println("- Illegal Cryptographic Algorithm's Block Size!!!");
+				illegalBlockSizeException.printStackTrace();
+			}	
+		}
+		
+	}
+	
+	public void decryptBlockSerializedAndSolvedHashed() {
+		
+		boolean isPossibleToDecryptSecureReceiptMessageComponents = 
+				  (  this.isSecureReceiptMessageComponentsSerialized && 
+				     this.isSecureReceiptMessageComponentsSerializedCiphered);
+				
+		
+		if(isPossibleToDecryptSecureReceiptMessageComponents) {
+			
+			byte[] secretKeyBytes = this.secretSymmetricKeyForComponentsInBytes; // TODO Symmetric Key contained in the Envelope (secretHMACKeyForDoSMitigationInBytes)
+			
+			try {
+				
+				String symmetricEncryptionAlgorithm = "AES";
+				String symmetricEncryptionMode = "CBC";
+		 	    String symmetricEncryptionPadding = "NoPadding";
+				
+				
+				// Set the Secret Key and its specifications,
+		 		// using the AES (Advanced Encryption Standard - Rijndael) Symmetric Encryption
+				SecretKeySpec secretKeySpecifications = new SecretKeySpec(secretKeyBytes, symmetricEncryptionAlgorithm);
+				
+				
+				String provider = "BC";
+				Cipher secureReceiptMessageComponentsSerializedSymmetricEncryptionDecipher = 
+						Cipher.getInstance(String.format("%s/%s/%s",
+										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
+								           provider );
+				
+				byte[] initialisationVectorBytes = null;
+			
+				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
+					
+					// Algorithms that don't need IV (Initialisation Vector): ECB
+					// The parameter specifications for the IV (Initialisation Vector)	
+					System.out.println("[SecureReceiptMessageComponents.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
+					
+					// Showing the randomly defined IV (Initialisation Vector)
+					System.out.println("[SecureReceiptMessageComponents.DECRYPT] - IV (Initialisation Vector) is:\n- " 
+									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
+					
+					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
+					secureReceiptMessageComponentsSerializedSymmetricEncryptionDecipher
+						.init(Cipher.DECRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
+				}
+				else {
+					
+					// Algorithms that need IV (Initialisation Vector)
+					// The parameter specifications for the IV (Initialisation Vector)
+					System.out.println("[SecureReceiptMessageComponents.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
+					
+					secureReceiptMessageComponentsSerializedSymmetricEncryptionDecipher
+						.init(Cipher.DECRYPT_MODE, secretKeySpecifications);
+					
+				}
+				
+				this.sizeOfSecureReceiptMessageComponentsSerializedCiphered = 
+						this.secureReceiptMessageComponentsSerializedCiphered.length;
+				
+			  	// The Plain Text of the bytes of the SolvedBlock input received through the communication channel
+			  	this.secureReceiptMessageComponentsSerialized = 
+			  			new byte[ secureReceiptMessageComponentsSerializedSymmetricEncryptionDecipher
+			  	                  .getOutputSize(this.sizeOfSecureReceiptMessageComponentsSerializedCiphered) ];
+			    
+			  	this.sizeOfSecureReceiptMessageComponentsSerialized = secureReceiptMessageComponentsSerializedSymmetricEncryptionDecipher
+										  								    .update(this.secureReceiptMessageComponentsSerializedCiphered, 
+										  									   	    0, this.sizeOfSecureReceiptMessageComponentsSerializedCiphered,
+										  										    this.secureReceiptMessageComponentsSerialized, 0);
+			  	
+			  	secureReceiptMessageComponentsSerializedSymmetricEncryptionDecipher
+  									   .doFinal(this.secureReceiptMessageComponentsSerialized,
+  											    this.sizeOfSecureReceiptMessageComponentsSerialized);
+    
+			  	
+				this.setIsSecureReceiptMessageComponentsSerializedCiphered(false);		
+				
+			}
+			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Cryptographic Algorithm not found!!!");
+				noSuchAlgorithmException.printStackTrace();
+			}
+			catch (InvalidAlgorithmParameterException invalidAlgorithmParameterException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Invalid Cryptographic Algorithm's Parameters!!!");
+				invalidAlgorithmParameterException.printStackTrace();
+			}
+			catch (NoSuchProviderException noSuchProviderException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Cryptograhic Provider not found!!!");
+				noSuchProviderException.printStackTrace();
+			}
+			catch (NoSuchPaddingException noSuchPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Padding Method not found!!!");
+				noSuchPaddingException.printStackTrace();
+			}
+			catch (BadPaddingException badPaddingException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Bad/Wrong Padding Method in use!!!");
+				badPaddingException.printStackTrace();
+			}
+			catch (InvalidKeyException invalidKeyException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Invalid Cryptographic Algorithm's Secret Key!!!");
+				invalidKeyException.printStackTrace();
+			}
+			catch (IllegalBlockSizeException illegalBlockSizeException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- Illegal Cryptographic Algorithm's Block Size!!!");
+				illegalBlockSizeException.printStackTrace();
+			}
+			catch (ShortBufferException shortBufferException) {
+				System.err.println("Error occurred during the Symmetric Encryption over the Secure ProofOfWork Message's Signature Proposal:");
+				System.err.println("- The Buffer in use, during the Deciphering process it's not correct!!!");
+				shortBufferException.printStackTrace();
+			}
+		}
+		
+	}
+	
 	
 }
