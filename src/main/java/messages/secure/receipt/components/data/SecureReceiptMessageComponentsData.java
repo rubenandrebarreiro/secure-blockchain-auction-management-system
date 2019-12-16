@@ -202,6 +202,13 @@ public class SecureReceiptMessageComponentsData {
 					this.secureReceiptMessageComponentsDataResponseSerialized.length;
 			
 			
+			int sizeOfSecureReceiptMessageComponentsDataSerialized = ( this.sizeOfSecureReceiptMessageComponentsDataInfoSerialized +
+																	   this.sizeOfSecureReceiptMessageComponentsDataSignatureSerialized +
+																	   this.sizeOfSecureReceiptMessageComponentsDataResponseSerialized );
+			
+			this.secureReceiptMessageComponentsDataSerialized = 
+							new byte[ sizeOfSecureReceiptMessageComponentsDataSerialized ];
+			
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied

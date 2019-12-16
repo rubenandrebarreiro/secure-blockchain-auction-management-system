@@ -15,6 +15,7 @@ import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.SignatureException;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -50,6 +51,12 @@ import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigatio
 import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
 import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
+import main.java.messages.secure.receipt.SecureReceiptMessage;
+import main.java.messages.secure.receipt.components.SecureReceiptMessageComponents;
+import main.java.messages.secure.receipt.components.data.SecureReceiptMessageComponentsData;
+import main.java.messages.secure.receipt.components.data.info.SecureReceiptMessageComponentsDataInfo;
+import main.java.messages.secure.receipt.components.data.signature.SecureReceiptMessageComponentsDataSignature;
+import main.java.messages.secure.receipt.dos.mitigation.SecureReceiptMessageDoSMitigation;
 import main.java.resources.bid.Bid;
 import main.java.resources.block.Block;
 import main.java.resources.user.User;
@@ -234,7 +241,8 @@ public class Client implements ClientAPI {
 									printErrorStringWithClassName("PROOF OF WORK!!!");
 									break;
 								case RECEIPT:
-									printErrorStringWithClassName("RECEIPT!! DO SOMETHING!");
+									System.out.println(decodeReceipt(message));
+									break;
 								default:
 									break;
 								}
@@ -244,10 +252,11 @@ public class Client implements ClientAPI {
 									currentUser = null;
 									System.out.println("Server disconnected!");
 								}
-								else
+								else {
 									printErrorStringWithClassName("Received something unexpected? -> " + e.getMessage());
+									printErrorStringWithClassName(response);
+								}
 							}
-
 						}
 					} catch (IOException e) {
 						printErrorStringWithClassName("Error setting up inputStream!\n" + e.getMessage());
@@ -1098,5 +1107,64 @@ public class Client implements ClientAPI {
 	private void printErrorStringWithClassName(Object message) {
 		System.err.println("[" + this.getClass().getCanonicalName() + "] " + 
 				"Response: " + message);
+	}
+	
+	private String decodeReceipt(String toDecode){
+		String result = "COMPLETE ME (THE RECEIPT DECODE) PLS!!!";
+		byte[] secureReceiptMessageSerialized = Base64.getDecoder().decode(toDecode);
+		
+		try {
+			SecureReceiptMessage secureReceiptMessage = 
+					new SecureReceiptMessage(secureReceiptMessageSerialized);
+			
+			secureReceiptMessage.undoSecureReceiptMessageSerialized();
+			
+			SecureReceiptMessageDoSMitigation secureReceiptMessageDoSMitigation =
+					secureReceiptMessage.getSecureReceiptMessageDoSMitigation();
+			
+			if(!secureReceiptMessageDoSMitigation.checkIfHashOfSecureReceiptMessageDoSMitigationIsValid()) {
+				System.out.println("OH NOES!");
+			}
+			else {
+				SecureReceiptMessageComponents secureReceiptMessageComponents = 
+						secureReceiptMessage.getSecureReceiptMessageComponents();
+				
+				secureReceiptMessageComponents.decryptSecureReceiptMessageComponents();
+				secureReceiptMessageComponents.undoSecureReceiptMessageComponentsSerialization();
+				
+				SecureCommonHeader secureCommonHeader = secureReceiptMessageComponents.getSecureCommonHeader();
+				
+				// TODO - verificar header
+				
+				
+				
+				SecureReceiptMessageComponentsData secureReceiptMessageComponentsData = 
+						secureReceiptMessageComponents.getSecureReceiptMessageComponentsData();
+				
+				SecureReceiptMessageComponentsDataInfo secureReceiptMessageComponentsDataInfo = 
+						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataInfo();
+				
+				secureReceiptMessageComponentsDataInfo.undoSecureReceiptMessageComponentsDataInfoSerialization();
+				
+				SecureReceiptMessageComponentsDataSignature secureReceiptMessageComponentsDataSignature = 
+						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataSignature();
+				
+				String secureReceiptMessageComponentsDataResponse = 
+						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataResponse();
+				
+				
+				if(!secureReceiptMessageComponentsDataSignature.checkIfSecureReceiptMessageComponentsDataInfoDigitalSignedIsValid()) {
+					//TODO error
+					result = "ERROR";
+				}
+				else {
+					result =  secureReceiptMessageComponentsDataResponse;
+				}
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 }

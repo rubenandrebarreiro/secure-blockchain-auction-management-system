@@ -39,6 +39,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.bouncycastle.util.encoders.Base64;
 
 import com.google.gson.Gson;
 
@@ -99,7 +100,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public void run() {
 		String arg1 = null, arg2 = null;
 		HttpResponse response = null;
-		byte[] receiptResponse = null;
+		String receiptResponse = null;
 		MessagePacketServerToClientTypes messageType = null;
 		boolean exitFlag = false;
 		
@@ -260,7 +261,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 					default:
 						break;
 					}
-					sslWriteResponse(responseSocket.getOutputStream(),receiptResponse, response, messageType);
+					sslWriteResponse(responseSocket.getOutputStream(), receiptResponse, response, messageType);
 				}
 				else {
 					// Not supposed to get null messages Except is the client disconnects.
@@ -387,7 +388,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	}
 
 	@Override
-	public byte[] addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo)
+	public String addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo)
 			throws SQLException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException, ClientProtocolException, IOException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to add bid to " + openedAuctionID + "!");
@@ -396,7 +397,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		url = removeSpaceFromURL(url);
 		HttpPost postRequest = new HttpPost(url);
 		HttpResponse response = null;
-		byte[] methodResult = null;
+		String methodResult = null;
 		SecureBidMessage bidInfo = gson.fromJson(userBidInfo, SecureBidMessage.class);
 		
 		SecureBidMessage serializedBidInfo = new SecureBidMessage(bidInfo.getSecureBidMessageSerialized());
@@ -459,8 +460,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				
 				
-				String responseStringRepresentation = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
-				
+				String responseStringRepresentation = response.getStatusLine().toString();
+								
 				SecureReceiptMessageComponentsData secureReceiptMessageComponentsData = 
 						new SecureReceiptMessageComponentsData(secureReceiptMessageComponentsDataInfo,
 															   secureReceiptMessageComponentsDataSignature,
@@ -538,7 +539,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				
 				byte[] secureReceiptMessageSerialized = secureReceiptMessage.getSecureReceiptMessageSerialized();
-				methodResult = secureReceiptMessageSerialized;
+				methodResult = java.util.Base64.getEncoder().encodeToString(secureReceiptMessageSerialized);
 			}
 			
 		}
@@ -1065,14 +1066,13 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return builder.toString();
 	}
 
-	private void sslWriteResponse(OutputStream socketOutStream, byte[] receiptMessage, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
+	private void sslWriteResponse(OutputStream socketOutStream, String receiptMessage, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
 		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
 		String httpResponseMessage = null;
-		byte[] byteResponseMessage = null;
 		MessagePacketServerToClient messagePacket = null;
 		if(messageType == MessagePacketServerToClientTypes.RECEIPT && receiptMessage != null) {
-			byteResponseMessage = receiptMessage;
-			messagePacket = new MessagePacketServerToClient(messageType, gson.toJson(byteResponseMessage));
+			httpResponseMessage = receiptMessage;
+			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
 		}
 		else {
 			httpResponseMessage = response.getStatusLine().toString();
@@ -1080,9 +1080,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				httpResponseMessage = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
 			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
 		}
-
-		String envelopeJson = gson.toJson(messagePacket);
-		printWriter.print(envelopeJson + System.lineSeparator());
+		String messagePacketJson = gson.toJson(messagePacket);
+		printErrorStringWithClassName("Sending -> " + messagePacketJson);
+		printWriter.print(messagePacketJson + System.lineSeparator());
 		printWriter.flush();
 	}
 	

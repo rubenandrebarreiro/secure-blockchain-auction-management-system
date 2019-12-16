@@ -114,8 +114,8 @@ public class SecureReceiptMessage {
 
 				
 			this.secureReceiptMessageComponents.doSecureReceiptMessageComponentsSerialization();
-			byte[] secureReceiptMessageComponentsSerialized = 
-					this.secureReceiptMessageComponents.getSecureReceiptMessageComponentsSerialized();
+			byte[] secureReceiptMessageComponentsSerializedCiphered = 
+					this.secureReceiptMessageComponents.getSecureReceiptMessageComponentsSerializedCiphered();
 					
 			this.secureReceiptMessageDoSMitigation.doHashOfSecureReceiptMessageDoSMitigation();
 			byte[] secureReceiptMessageDoSMitigationSerialized = 
@@ -124,7 +124,7 @@ public class SecureReceiptMessage {
 			int sizeOfSecureBidMessageSerialized = (secureReceiptMessageMetaHeaderSerialized.length +
 													userPeerIDSerialized.length +
 												    secureReceiptMessageKeyExchangeSerializedCipheredAndSigned.length +
-													secureReceiptMessageComponentsSerialized.length +
+													secureReceiptMessageComponentsSerializedCiphered.length +
 													secureReceiptMessageDoSMitigationSerialized.length);
 
 			this.secureReceiptMessageSerialized = new byte[sizeOfSecureBidMessageSerialized];
@@ -168,9 +168,9 @@ public class SecureReceiptMessage {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(secureReceiptMessageComponentsSerialized, 0, this.secureReceiptMessageSerialized,
-							 serializationOffset, secureReceiptMessageComponentsSerialized.length);
-			serializationOffset += secureReceiptMessageComponentsSerialized.length;
+			System.arraycopy(secureReceiptMessageComponentsSerializedCiphered, 0, this.secureReceiptMessageSerialized,
+							 serializationOffset, secureReceiptMessageComponentsSerializedCiphered.length);
+			serializationOffset += secureReceiptMessageComponentsSerializedCiphered.length;
 		
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -232,8 +232,7 @@ public class SecureReceiptMessage {
 			
 			
 			int sizeOfSecureReceiptMessageComponentsSerializedCiphered = 
-					( CommonUtils.COMMON_HEADER_LENGTH +
-					  this.secureReceiptMessageMetaHeader.getSizeOfSecureReceiptMessageComponentsSerializedCiphered() );
+					( this.secureReceiptMessageMetaHeader.getSizeOfSecureReceiptMessageComponentsSerializedCiphered() );
 			
 			byte[] secureReceiptMessageComponentsSerializedCiphered = new byte[ sizeOfSecureReceiptMessageComponentsSerializedCiphered ];
 			

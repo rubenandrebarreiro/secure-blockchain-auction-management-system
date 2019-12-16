@@ -84,6 +84,7 @@ public class SecureReceiptMessageComponents {
 		
 		this.secureReceiptMessageComponentsSerializedCiphered = null;
 		this.isSecureReceiptMessageComponentsSerializedCiphered = false;
+		this.sizeOfSecureReceiptMessageComponentsSerializedCiphered = 0;
 		
 		this.userPeerID = null;
 		
@@ -101,7 +102,7 @@ public class SecureReceiptMessageComponents {
 		this.secureReceiptMessageComponentsSerializedCiphered = secureReceiptMessageComponentsSerializedCiphered;
 		this.sizeOfSecureReceiptMessageComponentsSerializedCiphered = 
 						this.secureReceiptMessageComponentsSerializedCiphered.length;
-		this.isSecureReceiptMessageComponentsSerialized = true;
+		this.isSecureReceiptMessageComponentsSerializedCiphered = true;
 		
 		this.secretSymmetricKeyForComponentsInBytes = secretSymmetricKeyForComponentsInBytes;
 		
@@ -210,6 +211,10 @@ public class SecureReceiptMessageComponents {
 		
 	}
 	
+	public int getSizeOfSecureReceiptMessageComponentsSerializedCiphered() {
+		return this.sizeOfSecureReceiptMessageComponentsSerializedCiphered;
+	}
+	
 	
 	public String getUserPeerID() {
 		return this.userPeerID;
@@ -316,7 +321,10 @@ public class SecureReceiptMessageComponents {
 			
 			
 			this.secureCommonHeader = new SecureCommonHeader(this.secureCommonHeaderSerialized);
+			
 			this.secureCommonHeader.undoSecureCommonHeaderSerialization();
+			
+			
 			
 			this.secureReceiptMessageComponentsData = 
 					new SecureReceiptMessageComponentsData(this.secureReceiptMessageComponentsDataSerialized,
@@ -326,6 +334,7 @@ public class SecureReceiptMessageComponents {
 														   this.sizeOfBidderUserClientIDSerialized,
 														   this.userPeerID);
 			
+			secureReceiptMessageComponentsData.undoSecureReceiptMessageComponentsDataSerialization();
 			
 			this.setIsSecureReceiptMessageComponentsSerialized(false);
 			
@@ -413,6 +422,8 @@ public class SecureReceiptMessageComponents {
 						secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher
 						.doFinal(this.secureReceiptMessageComponentsSerialized);
 
+				this.sizeOfSecureReceiptMessageComponentsSerializedCiphered =
+						secureReceiptMessageComponentsSerializedCiphered.length;
 
 				this.setIsSecureReceiptMessageComponentsSerializedCiphered(true);		
 
@@ -456,7 +467,7 @@ public class SecureReceiptMessageComponents {
 		
 	}
 	
-	public void decryptBlockSerializedAndSolvedHashed() {
+	public void decryptSecureReceiptMessageComponents() {
 		
 		boolean isPossibleToDecryptSecureReceiptMessageComponents = 
 				  (  this.isSecureReceiptMessageComponentsSerialized && 

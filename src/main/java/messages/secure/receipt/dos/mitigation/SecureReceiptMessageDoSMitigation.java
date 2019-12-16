@@ -24,7 +24,7 @@ public class SecureReceiptMessageDoSMitigation {
 	private SecureReceiptMessageComponents secureReceiptMessageComponents;
 	
 	
-	private byte[] secureReceiptMessageComponentsSerialized;
+	private byte[] secureReceiptMessageComponentsSerializedCiphered;
 	
 	private byte[] secureReceiptMessageComponentsHashedForDoSMitigation;
 	
@@ -47,7 +47,7 @@ public class SecureReceiptMessageDoSMitigation {
 	
 		this.secureReceiptMessageComponents = secureReceiptMessageComponents;
 		
-		this.secureReceiptMessageComponentsSerialized = null;
+		this.secureReceiptMessageComponentsSerializedCiphered = null;
 		
 		this.secureReceiptMessageComponentsHashedForDoSMitigation = null;
 		
@@ -59,13 +59,13 @@ public class SecureReceiptMessageDoSMitigation {
 
 
 	
-	public SecureReceiptMessageDoSMitigation(byte[] secureReceiptMessageComponentsSerialized,
+	public SecureReceiptMessageDoSMitigation(byte[] secureReceiptMessageComponentsSerializedCiphered,
 											 byte[] secureReceiptMessageComponentsHashedForDoSMitigation,
 								             byte[] secretHMACKeyForDoSMitigationInBytes) {
 	
 		this.secureReceiptMessageComponents = null;
 		
-		this.secureReceiptMessageComponentsSerialized = secureReceiptMessageComponentsSerialized;
+		this.secureReceiptMessageComponentsSerializedCiphered = secureReceiptMessageComponentsSerializedCiphered;
 		
 		this.secureReceiptMessageComponentsHashedForDoSMitigation = 
 				secureReceiptMessageComponentsHashedForDoSMitigation;
@@ -86,8 +86,8 @@ public class SecureReceiptMessageDoSMitigation {
 		return this.secureReceiptMessageComponents;
 	}
 	
-	public byte[] getSecureReceiptMessageComponentsSerialized() {
-		return this.secureReceiptMessageComponentsSerialized;
+	public byte[] getSecureReceiptMessageComponentsSerializedCiphered() {
+		return this.secureReceiptMessageComponentsSerializedCiphered;
 	}
 	
 	public byte[] getSecureReceiptMessageComponentsHashedForDoSMitigation() {
@@ -153,12 +153,10 @@ public class SecureReceiptMessageDoSMitigation {
 			          NoSuchPaddingException, InvalidAlgorithmParameterException, SignatureException {
 			
 		if(!this.isSecureReceiptMessageComponentsHashedForDoSMitigation) {
-				
-			this.secureReceiptMessageComponents
-					.doSecureReceiptMessageComponentsSerialization();
-			this.secureReceiptMessageComponentsSerialized = 
+			
+			this.secureReceiptMessageComponentsSerializedCiphered = 
 						this.secureReceiptMessageComponents
-							.getSecureReceiptMessageComponentsSerialized();
+							.getSecureReceiptMessageComponentsSerializedCiphered();
 				
 			// Starts the MAC Hash process over the Secure MessageComponents serialized (applying the HMAC or CMAC operation),
 			// before the sending of the final concatenation of it with Secure MessageComponents serialized
@@ -171,7 +169,7 @@ public class SecureReceiptMessageDoSMitigation {
 				SecretKeySpec keySpec = new SecretKeySpec(this.secretHMACKeyForDoSMitigationInBytes, "HMacSHA256");
 				// The configuration, initialization and update of the MAC Hash process
 				mac.init(keySpec);
-				mac.update(this.secureReceiptMessageComponentsSerialized);
+				mac.update(this.secureReceiptMessageComponentsSerializedCiphered);
 				
 				// Performs the final operation of MAC Hash process over the Secure MessageComponents serialized
 				// (applying the HMAC or CMAC operation)
@@ -200,8 +198,8 @@ public class SecureReceiptMessageDoSMitigation {
 		
 		if(this.isSecureReceiptMessageComponentsHashedForDoSMitigation) {
 			
-			byte[] secureReceiptMessageComponentsSerializedHashedToCompare = 
-				   this.secureReceiptMessageComponentsSerialized;
+			byte[] secureReceiptMessageComponentsSerializedCipheredHashedToCompare = 
+				   this.secureReceiptMessageComponentsSerializedCiphered;
 			
 			// Starts the MAC Hash process over the Secure MessageComponents serialized received (applying the HMAC or CMAC operation),
 			// comparing it with Secure MessageComponents serialized hashed received (the MAC Hash process related to the Fast Secure MessageComponents Check)
@@ -212,11 +210,11 @@ public class SecureReceiptMessageDoSMitigation {
 				SecretKeySpec keySpec = new SecretKeySpec(this.secretHMACKeyForDoSMitigationInBytes, "HMacSHA256");
 				// The configuration, initialization and update of the MAC Hash process
 				mac.init(keySpec);
-				mac.update(secureReceiptMessageComponentsSerializedHashedToCompare);
+				mac.update(secureReceiptMessageComponentsSerializedCipheredHashedToCompare);
 				
 				// Performs the final operation of MAC Hash process over the Secure MessageComponents serialized
 				// (applying the HMAC or CMAC operation)
-				secureReceiptMessageComponentsSerializedHashedToCompare = mac.doFinal();
+				secureReceiptMessageComponentsSerializedCipheredHashedToCompare = mac.doFinal();
 			}
 			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
 				System.err.println("Error occurred during the Hashing Function over the Secure MessageComponents's Attributes:");
@@ -231,7 +229,7 @@ public class SecureReceiptMessageDoSMitigation {
 			
 			this.isSecureReceiptMessageComponentsHashedForDoSMitigationValid = 
 				  Arrays.areEqual(this.getSecureReceiptMessageComponentsHashedForDoSMitigation(), 
-						  		  secureReceiptMessageComponentsSerializedHashedToCompare) ? 
+						  		  secureReceiptMessageComponentsSerializedCipheredHashedToCompare) ? 
 										  true : false;
 			
 			if(!this.isSecureReceiptMessageComponentsHashedForDoSMitigationValid) {
