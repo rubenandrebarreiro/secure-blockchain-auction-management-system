@@ -43,14 +43,25 @@ import org.apache.http.util.EntityUtils;
 import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
+import main.java.common.protocols.MessageType;
+import main.java.common.protocols.VersionNumber;
 import main.java.messages.secure.bid.SecureBidMessage;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.components.data.SecureBidMessageData;
 import main.java.messages.secure.bid.components.data.confidential.SecureBidMessageDataConfidential;
 import main.java.messages.secure.bid.components.data.signature.SecureBidMessageDataSignature;
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
+import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
+import main.java.messages.secure.receipt.SecureReceiptMessage;
+import main.java.messages.secure.receipt.components.SecureReceiptMessageComponents;
+import main.java.messages.secure.receipt.components.data.SecureReceiptMessageComponentsData;
+import main.java.messages.secure.receipt.components.data.info.SecureReceiptMessageComponentsDataInfo;
+import main.java.messages.secure.receipt.components.data.signature.SecureReceiptMessageComponentsDataSignature;
+import main.java.messages.secure.receipt.dos.mitigation.SecureReceiptMessageDoSMitigation;
+import main.java.messages.secure.receipt.metaheader.SecureReceiptMessageMetaHeader;
 import main.java.resources.auction.Auction;
+import main.java.resources.bid.Bid;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClient;
@@ -88,6 +99,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	public void run() {
 		String arg1 = null, arg2 = null;
 		HttpResponse response = null;
+		byte[] receiptResponse = null;
 		MessagePacketServerToClientTypes messageType = null;
 		boolean exitFlag = false;
 		
@@ -104,6 +116,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		
 		try {
 			while(!exitFlag) {
+				receiptResponse = null;
+				response = null;
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
 				MessagePacketClientToServer message = gson.fromJson(jsonMessage, MessagePacketClientToServer.class);
 				if(message != null) {
@@ -120,8 +134,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 					case ADD_BID:
 						arg1 = message.getParamsMap().get("auction-id");
 						arg2 = message.getBody();
-						response = addBidToOpenedProductAuction(arg1, arg2);
-						messageType = MessagePacketServerToClientTypes.SIMPLE_RESPONSE;
+						receiptResponse = addBidToOpenedProductAuction(arg1, arg2);
+						messageType = MessagePacketServerToClientTypes.RECEIPT;
 						break;
 					case LIST_ALL_AUCTIONS:
 						response = listAllProductsAuctions();
@@ -246,7 +260,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 					default:
 						break;
 					}
-					sslWriteResponse(responseSocket.getOutputStream(), response, messageType);
+					sslWriteResponse(responseSocket.getOutputStream(),receiptResponse, response, messageType);
 				}
 				else {
 					// Not supposed to get null messages Except is the client disconnects.
@@ -373,7 +387,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	}
 
 	@Override
-	public HttpResponse addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo)
+	public byte[] addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo)
 			throws SQLException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException, ClientProtocolException, IOException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to add bid to " + openedAuctionID + "!");
@@ -382,6 +396,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		url = removeSpaceFromURL(url);
 		HttpPost postRequest = new HttpPost(url);
 		HttpResponse response = null;
+		byte[] methodResult = null;
 		SecureBidMessage bidInfo = gson.fromJson(userBidInfo, SecureBidMessage.class);
 		
 		SecureBidMessage serializedBidInfo = new SecureBidMessage(bidInfo.getSecureBidMessageSerialized());
@@ -415,14 +430,120 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				postRequest.setEntity(new StringEntity(bidJson));
 				postRequest.setHeader("Accept", "application/json");
 				postRequest.setHeader("Content-type", "application/json");
+				
+				
+				response = httpClient.execute(postRequest);
+				
+				printErrorStringWithClassName(response.getStatusLine());
+				printErrorStringWithClassName(response.getEntity());
+				
+				
+				
+				Bid bid = secureBidMessageData.getSecureBidMessageDataSignature().getBid();
+				
+				SecureReceiptMessageComponentsDataInfo secureReceiptMessageComponentsDataInfo = 
+						new SecureReceiptMessageComponentsDataInfo(bid.getBidID(), bid.getBidderUserClientID(),
+																   bid.getBidTimestamp());
 
+				secureReceiptMessageComponentsDataInfo.doSecureReceiptMessageComponentsDataInfoSerialization();
+				
+				byte[] secureReceiptMessageComponentsDataInfoSerialized = 
+						secureReceiptMessageComponentsDataInfo.getSecureReceiptMessageComponentsDataInfoSerialized();
+				
+				
+				
+				SecureReceiptMessageComponentsDataSignature secureReceiptMessageComponentsDataSignature = 
+						new SecureReceiptMessageComponentsDataSignature(secureReceiptMessageComponentsDataInfoSerialized,
+																		bid.getBidderUserClientID());
+				secureReceiptMessageComponentsDataSignature.signSecureReceiptMessageComponentsDataInfoSignature();
+				
+				
+				
+				String responseStringRepresentation = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
+				
+				SecureReceiptMessageComponentsData secureReceiptMessageComponentsData = 
+						new SecureReceiptMessageComponentsData(secureReceiptMessageComponentsDataInfo,
+															   secureReceiptMessageComponentsDataSignature,
+															   responseStringRepresentation);
+				
+				secureReceiptMessageComponentsData.doSecureReceiptMessageComponentsDataSerialization();
+				
+				SecureCommonHeader secureCommonHeader = new SecureCommonHeader(VersionNumber.VERSION_01.getVersionNumber(),
+																			   MessageType.MESSAGE_TYPE_2.getMessageType(),
+																			   System.currentTimeMillis());
+				
+				SecureReceiptMessageComponents secureReceiptMessageComponents = 
+						new SecureReceiptMessageComponents(secureCommonHeader, secureReceiptMessageComponentsData);
+				
+				secureReceiptMessageComponents.doSecureReceiptMessageComponentsSerialization();
+				secureReceiptMessageComponents.encryptSecureReceiptMessageComponents();
+				
+				SecureReceiptMessageDoSMitigation secureReceiptMessageDoSMitigation = 
+						new SecureReceiptMessageDoSMitigation(secureReceiptMessageComponents);
+				
+				secureReceiptMessageDoSMitigation.doHashOfSecureReceiptMessageDoSMitigation();
+				
+				
+				byte[] secretSymmetricKeyInBytes = secureReceiptMessageComponents
+												   .getSecretSymmetricKeyForComponentsInBytes();
+				byte[] secretHMACKeyForDoSMitigationInBytes = secureReceiptMessageDoSMitigation
+															  .getSecretHMACKeyForDoSMitigationInBytes();
+				
+				SecureCommonKeyExchange secureCommonKeyExchange = 
+						new SecureCommonKeyExchange(secretSymmetricKeyInBytes,
+													secretHMACKeyForDoSMitigationInBytes,
+													bid.getBidderUserClientID());
+				
+				secureCommonKeyExchange.buildSecureCommonKeyExchangeToSend();
+				
+				byte[] secureReceiptMessageKeyExchangeSerializedCiphered = 
+						secureCommonKeyExchange.getSecureCommonKeyExchangeSerializedCiphered();
+				
+				byte[] secureReceiptMessageKeyExchangeSerializedCipheredSigned = 
+						secureCommonKeyExchange.getSecureCommonKeyExchangeSerializedCipheredSigned();
+				
+				
+				byte[] secureReceiptMessageComponentsSerializedCiphered = 
+						secureReceiptMessageComponents.getSecureReceiptMessageComponentsSerializedCiphered();
+				
+				byte[] secureReceiptMessageDoSMitigationSerialized = 
+								secureReceiptMessageDoSMitigation.getSecureReceiptMessageComponentsHashedForDoSMitigation();
+				
+				byte[] secureReceiptMessageComponentsDataSignatureSerialized = 
+								secureReceiptMessageComponentsDataSignature
+								   		.getSecureReceiptMessageComponentsDataInfoSerializedDigitalSigned();
+				
+				SecureReceiptMessageMetaHeader secureReceiptMessageMetaHeader = 
+						new SecureReceiptMessageMetaHeader(bid.getSizeOfBidderUserClientID(),
+														   secureReceiptMessageKeyExchangeSerializedCiphered.length,
+														   secureReceiptMessageKeyExchangeSerializedCipheredSigned.length,
+														   secureReceiptMessageComponentsSerializedCiphered.length,
+														   secureReceiptMessageDoSMitigationSerialized.length,
+														   secureReceiptMessageComponentsDataInfoSerialized.length,
+														   secureReceiptMessageComponentsDataSignatureSerialized.length,
+														   responseStringRepresentation.length(),
+														   bid.getSizeOfBidderUserClientID());
+				
+				secureReceiptMessageMetaHeader.doSecureReceiptMessageMetaHeaderSerialization();
+				
+				
+				SecureReceiptMessage secureReceiptMessage = 
+						new SecureReceiptMessage(secureReceiptMessageMetaHeader,
+												 bid.getBidderUserClientID(),
+												 secureCommonKeyExchange,
+												 secureReceiptMessageComponents,
+												 secureReceiptMessageDoSMitigation);
+				
+				secureReceiptMessage.doSecureReceiptMessageSerialized();
+				
+				
+				byte[] secureReceiptMessageSerialized = secureReceiptMessage.getSecureReceiptMessageSerialized();
+				methodResult = secureReceiptMessageSerialized;
 			}
 			
 		}
-		response = httpClient.execute(postRequest);	
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
-		return response;
+		
+		return methodResult;
 	}
 
 	@Override
@@ -944,14 +1065,23 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return builder.toString();
 	}
 
-	private void sslWriteResponse(OutputStream socketOutStream, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
-		String message = response.getStatusLine().toString();
-		printErrorStringWithClassName("SENDING SOMETHING!\n" + message);
-		if(response.getEntity() != null && response.getEntity().getContentLength() != 0)
-			message = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
-		MessagePacketServerToClient envelope = new MessagePacketServerToClient(messageType, message);
-		String envelopeJson = gson.toJson(envelope);
+	private void sslWriteResponse(OutputStream socketOutStream, byte[] receiptMessage, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
 		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
+		String httpResponseMessage = null;
+		byte[] byteResponseMessage = null;
+		MessagePacketServerToClient messagePacket = null;
+		if(messageType == MessagePacketServerToClientTypes.RECEIPT && receiptMessage != null) {
+			byteResponseMessage = receiptMessage;
+			messagePacket = new MessagePacketServerToClient(messageType, gson.toJson(byteResponseMessage));
+		}
+		else {
+			httpResponseMessage = response.getStatusLine().toString();
+			if(response.getEntity() != null && response.getEntity().getContentLength() != 0)
+				httpResponseMessage = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
+			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
+		}
+
+		String envelopeJson = gson.toJson(messagePacket);
 		printWriter.print(envelopeJson + System.lineSeparator());
 		printWriter.flush();
 	}

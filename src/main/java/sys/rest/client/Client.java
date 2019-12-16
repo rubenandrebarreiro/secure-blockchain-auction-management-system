@@ -233,6 +233,8 @@ public class Client implements ClientAPI {
 								// TODO complete
 									printErrorStringWithClassName("PROOF OF WORK!!!");
 									break;
+								case RECEIPT:
+									printErrorStringWithClassName("RECEIPT!! DO SOMETHING!");
 								default:
 									break;
 								}
