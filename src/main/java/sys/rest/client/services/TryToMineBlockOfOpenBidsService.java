@@ -68,6 +68,7 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 
 	@Override
 	public void run() {
+		System.out.println("Mining service online.");
 		for(;;) {
 			try {
 				Thread.sleep(CommonUtils.TRY_TO_CLOSE_BLOCK_OF_BIDS_SERVICE_VERIFICATION_RATE_TIME);
@@ -75,250 +76,252 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 			catch (InterruptedException interruptedException) {
 				interruptedException.printStackTrace();
 			}
+			if(openBidsMap != null && !openBidsMap.isEmpty()) {
+				System.out.println("Trying to mine!");
+
+				List<Bid> openBidsToMineList = this.openBidsMap.values().stream()
+						.filter(bid -> !bid.getIsBidMined())
+						.collect(Collectors.toList());
 
 
+				int numPossibleOpenBidsToMine = openBidsToMineList.size();
 
-			List<Bid> openBidsToMineList = this.openBidsMap.values().stream()
-					.filter(bid -> !bid.getIsBidMined())
-					.collect(Collectors.toList());
+				int numChosenOpenBidsToMine = 0;
 
+				List<Bid> chosenOpenBidsToMineList = new ArrayList<Bid>();
 
-			int numPossibleOpenBidsToMine = openBidsToMineList.size();
+				Random random = new Random();
 
-			int numChosenOpenBidsToMine = 0;
+				int numOpenBidsToMine = 0;
 
-			List<Bid> chosenOpenBidsToMineList = new ArrayList<Bid>();
-
-			Random random = new Random();
-
-			int numOpenBidsToMine = 0;
-
-			while(numOpenBidsToMine == 0) {
-				numOpenBidsToMine = random.nextInt(CommonUtils.MAX_NUM_BIDS_TO_TRY_TO_MINE);
-			}
+				while(numOpenBidsToMine == 0) {
+					numOpenBidsToMine = random.nextInt(CommonUtils.MAX_NUM_BIDS_TO_TRY_TO_MINE);
+				}
 
 
-			if(numOpenBidsToMine <= numPossibleOpenBidsToMine) {
+				if(numOpenBidsToMine <= numPossibleOpenBidsToMine) {
 
-				while(numChosenOpenBidsToMine < numOpenBidsToMine) {
+					while(numChosenOpenBidsToMine < numOpenBidsToMine) {
 
-					int chosenBidToMineIndex = random.nextInt(numPossibleOpenBidsToMine);
+						int chosenBidToMineIndex = random.nextInt(numPossibleOpenBidsToMine);
 
-					Bid chosenBidToMine = openBidsToMineList.get(chosenBidToMineIndex);
+						Bid chosenBidToMine = openBidsToMineList.get(chosenBidToMineIndex);
 
-					if(!chosenOpenBidsToMineList.contains(chosenBidToMine)) {
+						if(!chosenOpenBidsToMineList.contains(chosenBidToMine)) {
 
-						chosenOpenBidsToMineList.add(chosenBidToMine);
+							chosenOpenBidsToMineList.add(chosenBidToMine);
+
+						}
+
+						numChosenOpenBidsToMine++;
 
 					}
 
-					numChosenOpenBidsToMine++;
-
 				}
 
-			}
-
-			int previousBlockID = ( this.minedBlockMap.size() - 1 );
-			int currentBlockID = ( previousBlockID + 1 );
-			
-			Block previousBlock = this.minedBlockMap.get(previousBlockID);
-			byte[] previousBlockHashed = previousBlock.getBlockSerializedHashed();
-			
-			
-			int difficultyToSolveChallenge = 0;
-			
-			switch(this.numBytesToSolveChallengeType) {
+				int previousBlockID = ( this.minedBlockMap.size() - 1 );
+				int currentBlockID = ( previousBlockID + 1 );
 				
-				case 0x01:
-					difficultyToSolveChallenge = 1;
-					break;
+				Block previousBlock = this.minedBlockMap.get(previousBlockID);
+				byte[] previousBlockHashed = previousBlock.getBlockSerializedHashed();
+				
+				
+				int difficultyToSolveChallenge = 0;
+				
+				switch(this.numBytesToSolveChallengeType) {
 					
-				case 0x02:
-					difficultyToSolveChallenge = 2;
-					break;
-					
-				case 0x03:
-					difficultyToSolveChallenge = 3;
-					break;
-					
-				case 0x04:
-					difficultyToSolveChallenge = 4;
-					break;
-					
-				default:
-					difficultyToSolveChallenge = 0;
-					break;
-					
-			}
-			
-			
-			Block blockOfOpenBidsForChallenge = new Block( currentBlockID, previousBlockHashed,
-														   ( (Bid[]) chosenOpenBidsToMineList.toArray() ),
-														   this.strategyForTryToMineBlockOfBids,
-														   difficultyToSolveChallenge );
-			
-			blockOfOpenBidsForChallenge.doBidsOfCurrentBlockToTryToMineSerialization();
-			
-			
-			try {
-				
-				blockOfOpenBidsForChallenge.startProcessToTryToSolveBlockHashChallenge();
-				blockOfOpenBidsForChallenge.tryToSolveBlockHashChallenge();
-				
-			}
-			catch (NoSuchAlgorithmException noSuchAlgorithmException) {
-				
-				noSuchAlgorithmException.printStackTrace();
-				
-			}
-			
-			String clientUserID = this.client.getClientUser().getUserPeerID();
-			
-			byte[] blockOfOpenBidsForChallengeSerializedHashed = 
-				   blockOfOpenBidsForChallenge.getBlockSerializedHashed();
-			
-			try {
-				
-				SecureProofOfWorkMessageComponentsSolvedBlockConfidential
-						secureProofOfWorkMessageComponentsSolvedBlockConfidential = 
-								new SecureProofOfWorkMessageComponentsSolvedBlockConfidential
-										(blockOfOpenBidsForChallenge, blockOfOpenBidsForChallengeSerializedHashed);
-	
-				secureProofOfWorkMessageComponentsSolvedBlockConfidential
-						.buildSecureProofOfWorkMessageComponentsSolvedBlockConfidentialToSend();
-		
-				SecureProofOfWorkMessageComponentsSolvedBlockSignature secureProofOfWorkMessageComponentsSolvedBlockSignature = 
-						new SecureProofOfWorkMessageComponentsSolvedBlockSignature
-								(secureProofOfWorkMessageComponentsSolvedBlockConfidential,
-								 clientUserID);
-				
-				secureProofOfWorkMessageComponentsSolvedBlockSignature
-						.signSecureProofOfWorkMessageComponentsSolvedBlock();
-				
-				
-				SecureProofOfWorkMessageComponentsSolvedBlock secureProofOfWorkMessageComponentsSolvedBlock =
-						new SecureProofOfWorkMessageComponentsSolvedBlock
-								(secureProofOfWorkMessageComponentsSolvedBlockConfidential,
-								 secureProofOfWorkMessageComponentsSolvedBlockSignature);
-				
-				secureProofOfWorkMessageComponentsSolvedBlock
-						.doSecureProofOfWorkMessageComponentsSolvedBlockSerialization();
-				
-				
-				SecureCommonHeader secureCommonHeader = 
-						new SecureCommonHeader(
-								VersionNumber.VERSION_01.getVersionNumber(), 
-								MessageType.MESSAGE_TYPE_3.getMessageType(),
-								System.currentTimeMillis());
-				
-				secureCommonHeader.doSecureCommonHeaderSerialization();
-				
-				
-				SecureProofOfWorkMessageComponents secureProofOfWorkMessageComponents =
-						new SecureProofOfWorkMessageComponents
-								(secureCommonHeader,
-								 secureProofOfWorkMessageComponentsSolvedBlock);
-				
-				secureProofOfWorkMessageComponents.doSecureProofOfWorkMessageComponentsSerialization();
-				
-				
-				SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation = 
-						new SecureProofOfWorkMessageDoSMitigation(secureProofOfWorkMessageComponents);
-				
-				
-				byte[] secretSymmetricKeyInBytes = secureProofOfWorkMessageComponentsSolvedBlockConfidential
-												   .getSecretSymmetricKeyForSolvedBlockConfidentialInBytes();
-				
-				byte[] secretHMACKeyForDoSMitigationInBytes = secureProofOfWorkMessageDoSMitigation
-															  .getSecretHMACKeyForDoSMitigationInBytes();
-				
-				SecureCommonKeyExchange secureProofOfWorkMessageKeyExchange = 
-						new SecureCommonKeyExchange(secretSymmetricKeyInBytes,
-													secretHMACKeyForDoSMitigationInBytes,
-												    clientUserID);
-				
-				secureProofOfWorkMessageKeyExchange.buildSecureCommonKeyExchangeToSend();
-				
-				byte[] secureBidMessageKeyExchangeSerializedCiphered = 
-						secureProofOfWorkMessageKeyExchange.getSecureCommonKeyExchangeSerializedCiphered();
-				byte[] secureBidMessageKeyExchangeSerializedCipheredSigned = 
-						secureProofOfWorkMessageKeyExchange.getSecureCommonKeyExchangeSerializedCipheredSigned();
-				
-				byte[] secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
-						secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockSerialized();
-				byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
-						secureProofOfWorkMessageDoSMitigation.getSecureProofOfWorkMessageComponentsHashedForDoSMitigation();
-				
-				byte[] secureBidMessageComponentsSolvedBlockConfidentialSerialized =
-						secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerializedAndSolvedHashedCiphered();
-				byte[] secureBidMessageComponentsSolvedBlockSignatureSerialized = 
-							secureProofOfWorkMessageComponentsSolvedBlockSignature
-									.getSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned();
-				
-				
-				byte[] blockAndBlockSolvedHashedSerialized = 
-						secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerializedAndSolvedHashed();
-				byte[] blockSerialized = secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerialized();
-				byte[] blockSolvedHashed = secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSolvedHashed();
+					case 0x01:
+						difficultyToSolveChallenge = 1;
+						break;
 						
-				SecureProofOfWorkMessageMetaHeader secureProofOfWorkMessageMetaHeader = 
-							new SecureProofOfWorkMessageMetaHeader	
-										(clientUserID.getBytes("UTF-8").length,
-										 secureBidMessageKeyExchangeSerializedCiphered.length,
-										 secureBidMessageKeyExchangeSerializedCipheredSigned.length,
-										 secureProofOfWorkMessageComponentsSolvedBlockSerialized.length,
-										 secureProofOfWorkMessageDoSMitigationSerialized.length,
-										 secureBidMessageComponentsSolvedBlockConfidentialSerialized.length,
-										 secureBidMessageComponentsSolvedBlockSignatureSerialized.length,
-									 	 blockAndBlockSolvedHashedSerialized.length,
-										 blockSerialized.length,
-										 blockSolvedHashed.length);
+					case 0x02:
+						difficultyToSolveChallenge = 2;
+						break;
+						
+					case 0x03:
+						difficultyToSolveChallenge = 3;
+						break;
+						
+					case 0x04:
+						difficultyToSolveChallenge = 4;
+						break;
+						
+					default:
+						difficultyToSolveChallenge = 0;
+						break;
+						
+				}
 				
-				secureProofOfWorkMessageMetaHeader.doSecureProofOfWorkMessageMetaHeaderSerialization();
+				
+				Block blockOfOpenBidsForChallenge = new Block( currentBlockID, previousBlockHashed,
+															   ( (Bid[]) chosenOpenBidsToMineList.toArray() ),
+															   this.strategyForTryToMineBlockOfBids,
+															   difficultyToSolveChallenge );
+				
+				blockOfOpenBidsForChallenge.doBidsOfCurrentBlockToTryToMineSerialization();
 				
 				
-				SecureProofOfWorkMessage secureProofOfWorkMessage = 
-						new SecureProofOfWorkMessage(secureProofOfWorkMessageMetaHeader, 
-													 clientUserID,
-													 secureProofOfWorkMessageKeyExchange,
-													 secureProofOfWorkMessageComponents,
-													 secureProofOfWorkMessageDoSMitigation);
+				try {
+					
+					blockOfOpenBidsForChallenge.startProcessToTryToSolveBlockHashChallenge();
+					blockOfOpenBidsForChallenge.tryToSolveBlockHashChallenge();
+					
+				}
+				catch (NoSuchAlgorithmException noSuchAlgorithmException) {
+					
+					noSuchAlgorithmException.printStackTrace();
+					
+				}
 				
-				secureProofOfWorkMessage.doSecureProofOfWorkMessageSerialized();
+				String clientUserID = this.client.getClientUser().getUserPeerID();
 				
-				String proofOfWorkInfoSerialiazed = gson.toJson(secureProofOfWorkMessage);
-				//HashMap<String,String> paramsMap = new HashMap<String, String>();
-				//paramsMap.put("auction-id", auctionID); //TODO - confirmar
-				MessagePacketClientToServer message = 
-						new MessagePacketClientToServer(MessagePacketClientToServerTypes.PROOF_WORK_SENT, 
-														null, proofOfWorkInfoSerialiazed);
-				this.client.sendMessage(message);
+				byte[] blockOfOpenBidsForChallengeSerializedHashed = 
+					   blockOfOpenBidsForChallenge.getBlockSerializedHashed();
 				
-			}
-			catch (InvalidKeyException e) {
-				e.printStackTrace();
-			}
-			catch (SignatureException e) {
-				e.printStackTrace();
-			}
-			catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			}
-			catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-			catch (NoSuchProviderException e) {
-				e.printStackTrace();
-			}
-			catch (NoSuchPaddingException e) {
-				e.printStackTrace();
-			}
-			catch (InvalidAlgorithmParameterException e) {
-				e.printStackTrace();
+				try {
+					
+					SecureProofOfWorkMessageComponentsSolvedBlockConfidential
+							secureProofOfWorkMessageComponentsSolvedBlockConfidential = 
+									new SecureProofOfWorkMessageComponentsSolvedBlockConfidential
+											(blockOfOpenBidsForChallenge, blockOfOpenBidsForChallengeSerializedHashed);
+		
+					secureProofOfWorkMessageComponentsSolvedBlockConfidential
+							.buildSecureProofOfWorkMessageComponentsSolvedBlockConfidentialToSend();
+			
+					SecureProofOfWorkMessageComponentsSolvedBlockSignature secureProofOfWorkMessageComponentsSolvedBlockSignature = 
+							new SecureProofOfWorkMessageComponentsSolvedBlockSignature
+									(secureProofOfWorkMessageComponentsSolvedBlockConfidential,
+									 clientUserID);
+					
+					secureProofOfWorkMessageComponentsSolvedBlockSignature
+							.signSecureProofOfWorkMessageComponentsSolvedBlock();
+					
+					
+					SecureProofOfWorkMessageComponentsSolvedBlock secureProofOfWorkMessageComponentsSolvedBlock =
+							new SecureProofOfWorkMessageComponentsSolvedBlock
+									(secureProofOfWorkMessageComponentsSolvedBlockConfidential,
+									 secureProofOfWorkMessageComponentsSolvedBlockSignature);
+					
+					secureProofOfWorkMessageComponentsSolvedBlock
+							.doSecureProofOfWorkMessageComponentsSolvedBlockSerialization();
+					
+					
+					SecureCommonHeader secureCommonHeader = 
+							new SecureCommonHeader(
+									VersionNumber.VERSION_01.getVersionNumber(), 
+									MessageType.MESSAGE_TYPE_3.getMessageType(),
+									System.currentTimeMillis());
+					
+					secureCommonHeader.doSecureCommonHeaderSerialization();
+					
+					
+					SecureProofOfWorkMessageComponents secureProofOfWorkMessageComponents =
+							new SecureProofOfWorkMessageComponents
+									(secureCommonHeader,
+									 secureProofOfWorkMessageComponentsSolvedBlock);
+					
+					secureProofOfWorkMessageComponents.doSecureProofOfWorkMessageComponentsSerialization();
+					
+					
+					SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation = 
+							new SecureProofOfWorkMessageDoSMitigation(secureProofOfWorkMessageComponents);
+					
+					
+					byte[] secretSymmetricKeyInBytes = secureProofOfWorkMessageComponentsSolvedBlockConfidential
+													   .getSecretSymmetricKeyForSolvedBlockConfidentialInBytes();
+					
+					byte[] secretHMACKeyForDoSMitigationInBytes = secureProofOfWorkMessageDoSMitigation
+																  .getSecretHMACKeyForDoSMitigationInBytes();
+					
+					SecureCommonKeyExchange secureProofOfWorkMessageKeyExchange = 
+							new SecureCommonKeyExchange(secretSymmetricKeyInBytes,
+														secretHMACKeyForDoSMitigationInBytes,
+													    clientUserID);
+					
+					secureProofOfWorkMessageKeyExchange.buildSecureCommonKeyExchangeToSend();
+					
+					byte[] secureBidMessageKeyExchangeSerializedCiphered = 
+							secureProofOfWorkMessageKeyExchange.getSecureCommonKeyExchangeSerializedCiphered();
+					byte[] secureBidMessageKeyExchangeSerializedCipheredSigned = 
+							secureProofOfWorkMessageKeyExchange.getSecureCommonKeyExchangeSerializedCipheredSigned();
+					
+					byte[] secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
+							secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockSerialized();
+					byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
+							secureProofOfWorkMessageDoSMitigation.getSecureProofOfWorkMessageComponentsHashedForDoSMitigation();
+					
+					byte[] secureBidMessageComponentsSolvedBlockConfidentialSerialized =
+							secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerializedAndSolvedHashedCiphered();
+					byte[] secureBidMessageComponentsSolvedBlockSignatureSerialized = 
+								secureProofOfWorkMessageComponentsSolvedBlockSignature
+										.getSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned();
+					
+					
+					byte[] blockAndBlockSolvedHashedSerialized = 
+							secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerializedAndSolvedHashed();
+					byte[] blockSerialized = secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerialized();
+					byte[] blockSolvedHashed = secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSolvedHashed();
+							
+					SecureProofOfWorkMessageMetaHeader secureProofOfWorkMessageMetaHeader = 
+								new SecureProofOfWorkMessageMetaHeader	
+											(clientUserID.getBytes("UTF-8").length,
+											 secureBidMessageKeyExchangeSerializedCiphered.length,
+											 secureBidMessageKeyExchangeSerializedCipheredSigned.length,
+											 secureProofOfWorkMessageComponentsSolvedBlockSerialized.length,
+											 secureProofOfWorkMessageDoSMitigationSerialized.length,
+											 secureBidMessageComponentsSolvedBlockConfidentialSerialized.length,
+											 secureBidMessageComponentsSolvedBlockSignatureSerialized.length,
+										 	 blockAndBlockSolvedHashedSerialized.length,
+											 blockSerialized.length,
+											 blockSolvedHashed.length);
+					
+					secureProofOfWorkMessageMetaHeader.doSecureProofOfWorkMessageMetaHeaderSerialization();
+					
+					
+					SecureProofOfWorkMessage secureProofOfWorkMessage = 
+							new SecureProofOfWorkMessage(secureProofOfWorkMessageMetaHeader, 
+														 clientUserID,
+														 secureProofOfWorkMessageKeyExchange,
+														 secureProofOfWorkMessageComponents,
+														 secureProofOfWorkMessageDoSMitigation);
+					
+					secureProofOfWorkMessage.doSecureProofOfWorkMessageSerialized();
+					
+					String proofOfWorkInfoSerialiazed = gson.toJson(secureProofOfWorkMessage);
+					//HashMap<String,String> paramsMap = new HashMap<String, String>();
+					//paramsMap.put("auction-id", auctionID); //TODO - confirmar
+					MessagePacketClientToServer message = 
+							new MessagePacketClientToServer(MessagePacketClientToServerTypes.PROOF_WORK_SENT, 
+															null, proofOfWorkInfoSerialiazed);
+					this.client.sendMessage(message);
+					
+				}
+				catch (InvalidKeyException e) {
+					e.printStackTrace();
+				}
+				catch (SignatureException e) {
+					e.printStackTrace();
+				}
+				catch (NoSuchAlgorithmException e) {
+					e.printStackTrace();
+				}
+				catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+				catch (NoSuchProviderException e) {
+					e.printStackTrace();
+				}
+				catch (NoSuchPaddingException e) {
+					e.printStackTrace();
+				}
+				catch (InvalidAlgorithmParameterException e) {
+					e.printStackTrace();
+				}
+
+				// TODO - Broadcast of ProofOfWorkMessage (made by the Server)
+				
 			}
 
-			// TODO - Broadcast of ProofOfWorkMessage (made by the Server)
-			
 		}
 	}
 }
