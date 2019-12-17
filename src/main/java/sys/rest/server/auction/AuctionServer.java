@@ -41,8 +41,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.bouncycastle.util.encoders.Base64;
-
 import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
@@ -84,6 +82,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	HttpClient httpClient;
 
+	boolean exitFlag;
+	
 	private SSLSocket responseSocket;
 	private Random random;
 	private Map<String, BlockingQueue<String>> connectedClientsMap;
@@ -93,6 +93,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	private Thread updateClientBidsService;
 
 	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, BlockingQueue<String>> connectedClientsMap2, String mutualAuth, String userName) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+		exitFlag = false;
 		this.responseSocket = responseSocket;
 		this.connectedClientsMap = connectedClientsMap2;
 		this.gson = new Gson();
@@ -105,8 +106,12 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		
 		updateClientBidsService = new Thread(){
 			public void run() {
-				System.out.println("Update client bids service is online for user " + userName + ".");
-				while(true) {
+				printStringWithClassName("Update client bids service is online for user " + userName + ".");
+				while(!exitFlag) {
+//					printErrorStringWithClassName("Current map status:");
+//					connectedClientsMap.forEach((x,y) -> {
+//						printErrorStringWithClassName(x + " " + y);
+//					});
 					try {
 						Thread.sleep(CommonUtils.TRY_TO_CLOSE_BLOCK_OF_BIDS_SERVICE_VERIFICATION_RATE_TIME);
 					} catch (InterruptedException e) {
@@ -118,7 +123,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						try {
 							while(!workQueue.isEmpty()) {
 								String string = workQueue.remove();
-								printErrorStringWithClassName("Update client bids updating for user " + userName + " with bid " + string);
+//								printStringWithClassName("Update client bids updating for user " + userName + " with bid " + string);
 								sslWriteResponse(responseSocket.getOutputStream(), string, null, MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS);
 							}
 						} catch (ParseException | IOException e) {
@@ -127,6 +132,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						}
 					}
 				}
+				printStringWithClassName("Update client bids service is going down for user " + userName + ".");
 			}
 		};
 		updateClientBidsService.start();
@@ -137,7 +143,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		HttpResponse response = null;
 		String receiptResponse = null;
 		MessagePacketServerToClientTypes messageType = null;
-		boolean exitFlag = false;
 		
 		if(mutualAuth) {
 			SSLSession session = responseSocket.getSession();
@@ -146,7 +151,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				clientID = session.getPeerPrincipal();
 				System.out.println("Client has been identified as: " + clientID);
 			} catch (SSLPeerUnverifiedException e) {
-				printErrorStringWithClassName("Error getting peer principal!\n" + e.getMessage());
+				printStringWithClassName("Error getting peer principal!\n" + e.getMessage());
 			}
 		}
 		
@@ -300,6 +305,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				}
 				else {
 					// Not supposed to get null messages Except is the client disconnects.
+					connectedClientsMap.remove(userName);
 					exitFlag = true;
 				}
 			}
@@ -396,8 +402,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -417,8 +423,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -470,8 +476,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				response = httpClient.execute(postRequest);
 				
-				printErrorStringWithClassName(response.getStatusLine());
-				printErrorStringWithClassName(response.getEntity());
+				printStringWithClassName(response.getStatusLine());
+				printStringWithClassName(response.getEntity());
 				
 				
 				
@@ -606,8 +612,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -627,8 +633,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -648,8 +654,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -670,8 +676,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -692,8 +698,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -714,8 +720,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -735,8 +741,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -756,8 +762,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -777,8 +783,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -798,8 +804,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -819,8 +825,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -840,8 +846,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -862,8 +868,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -884,8 +890,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -906,8 +912,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -927,8 +933,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -948,8 +954,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -969,8 +975,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -990,8 +996,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -1011,8 +1017,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -1032,8 +1038,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -1053,8 +1059,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
@@ -1074,8 +1080,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -1095,8 +1101,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			e.printStackTrace();
 		}
 		
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
@@ -1124,7 +1130,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
 		}
 		String messagePacketJson = gson.toJson(messagePacket);
-		printErrorStringWithClassName("Sending -> " + messagePacketJson);
+		printStringWithClassName("Sending -> " + messagePacketJson);
 		printWriter.print(messagePacketJson + System.lineSeparator());
 		printWriter.flush();
 	}
@@ -1133,8 +1139,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return url.replace(" ", URL_SPACE);
 	}
 	
-	private void printErrorStringWithClassName(Object message) {
-		System.err.println("[" + this.getClass().getCanonicalName() + "] " + 
+	private void printStringWithClassName(Object message) {
+		System.out.println("[" + this.getClass().getCanonicalName() + "] " + 
 				"Response: " + message);
 	}
 }
