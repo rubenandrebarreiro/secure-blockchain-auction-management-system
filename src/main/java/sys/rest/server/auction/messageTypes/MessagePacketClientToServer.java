@@ -12,12 +12,12 @@ public class MessagePacketClientToServer implements Serializable {
 	
 	private MessagePacketClientToServerTypes operation;
 	
-	private HashMap<String, String> paramsMap;
+	private HashMap<String, ?> paramsMap;
 	
 	private String body;
 	
 	public MessagePacketClientToServer(MessagePacketClientToServerTypes operation,
-							HashMap<String, String> paramsMap,
+							HashMap<String, ?> paramsMap,
 							String body) {
 		this.operation = operation;
 		this.paramsMap = paramsMap;
@@ -32,11 +32,11 @@ public class MessagePacketClientToServer implements Serializable {
 		this.operation = operation;
 	}
 
-	public HashMap<String, String> getParamsMap() {
+	public HashMap<String, ?> getParamsMap() {
 		return paramsMap;
 	}
 
-	public void setParamsMap(HashMap<String, String> paramsMap) {
+	public void setParamsMap(HashMap<String, ?> paramsMap) {
 		this.paramsMap = paramsMap;
 	}
 

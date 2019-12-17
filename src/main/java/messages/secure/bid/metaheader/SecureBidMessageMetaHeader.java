@@ -6,8 +6,6 @@ public class SecureBidMessageMetaHeader {
 	
 	private int sizeOfUserPeerIDSerialized;
 	
-	private int sizeOfInitialisationVector;
-	
 	private int sizeOfSecureBidMessageKeyExchangeSerializedCiphered;
 	private int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned;
 	
@@ -38,9 +36,7 @@ public class SecureBidMessageMetaHeader {
 	
 	
 	public SecureBidMessageMetaHeader(int sizeOfUserPeerIDSerialized,
-				
-									  int sizeOfInitialisationVector,
-			
+							
 									  int sizeOfSecureBidMessageKeyExchangeSerializedCiphered,
 			  						  int sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned,
 			  						  
@@ -64,8 +60,6 @@ public class SecureBidMessageMetaHeader {
 									  int sizeOfUserBankAccountNIBSerialized) {
 		
 		this.sizeOfUserPeerIDSerialized = sizeOfUserPeerIDSerialized;
-		
-		this.sizeOfInitialisationVector = sizeOfInitialisationVector;
 		
 		this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 
 				sizeOfSecureBidMessageKeyExchangeSerializedCiphered;
@@ -128,9 +122,7 @@ public class SecureBidMessageMetaHeader {
 		
 		this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered = 0;
 		this.sizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned = 0;
-		
-		this.sizeOfInitialisationVector = 0;
-		
+				
 		this.sizeOfUserPeerIDSerialized = 0;
 		
 	}
@@ -138,10 +130,6 @@ public class SecureBidMessageMetaHeader {
 	
 	public int getSizeOfUserPeerIDSerialized() {
 		return this.sizeOfUserPeerIDSerialized;
-	}
-	
-	public int getSizeOfInitialisationVector() {
-		return this.sizeOfInitialisationVector;
 	}
 	
 	public int getSizeOfSecureBidMessageKeyExchangeSerializedCiphered() {
@@ -309,8 +297,8 @@ public class SecureBidMessageMetaHeader {
 		if(!this.getIsSecureBidMessageMetaHeaderSerialized()) {
 			
 			int sizeOfSecureBidMessageMetaHeaderSerialized = ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-															   ( 16 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-															   ( 17 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+															   ( 15 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+															   ( 16 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 
 			this.secureBidMessageMetaHeaderSerialized = new byte[ sizeOfSecureBidMessageMetaHeaderSerialized ];
 
@@ -320,8 +308,6 @@ public class SecureBidMessageMetaHeader {
 			byte[] sizeOfUserPeerIDSerializedInBytes = 
 					CommonUtils.fromIntToByteArray(this.sizeOfUserPeerIDSerialized);
 			
-			byte[] sizeOfInitialisationVectorInBytes = 
-					CommonUtils.fromIntToByteArray(this.sizeOfInitialisationVector);
 			
 			byte[] sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes = 
 					CommonUtils.fromIntToByteArray(this.sizeOfSecureBidMessageKeyExchangeSerializedCiphered);
@@ -395,22 +381,7 @@ public class SecureBidMessageMetaHeader {
 			// the position corresponding to the length of the current Bid's Serialization
 			System.arraycopy(insideSeparator, 0, this.secureBidMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
 			serializationOffset += insideSeparator.length;
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(sizeOfInitialisationVectorInBytes, 0, this.secureBidMessageMetaHeaderSerialized,
-					serializationOffset, sizeOfInitialisationVectorInBytes.length);
-			serializationOffset += sizeOfUserPeerIDSerializedInBytes.length;
 
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(insideSeparator, 0, this.secureBidMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
-			serializationOffset += insideSeparator.length;
-			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -648,9 +619,7 @@ public class SecureBidMessageMetaHeader {
 		if(this.getIsSecureBidMessageMetaHeaderSerialized()) {
 		
 			byte[] sizeOfUserPeerIDSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
-			
-			byte[] sizeOfInitialisationVectorInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
-			
+						
 			byte[] sizeOfSecureBidMessageKeyExchangeSerializedCipheredInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfSecureBidMessageKeyExchangeSerializedCipheredSignedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			
@@ -702,15 +671,6 @@ public class SecureBidMessageMetaHeader {
 			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset,
 					sizeOfUserPeerIDSerializedInBytes, 0, sizeOfUserPeerIDSerializedInBytes.length);
 			serializationOffset += sizeOfUserPeerIDSerializedInBytes.length;
-
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			serializationOffset += insideSeparator.length;
-			System.arraycopy(this.secureBidMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfInitialisationVectorInBytes, 0, sizeOfInitialisationVectorInBytes.length);
-			serializationOffset += sizeOfInitialisationVectorInBytes.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,

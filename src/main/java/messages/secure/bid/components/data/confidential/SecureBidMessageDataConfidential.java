@@ -120,6 +120,8 @@ public class SecureBidMessageDataConfidential {
 		
 		this.secretSymmetricKeyForDataConfidentialInBytes = secretSymmetricKeyForDataConfidentialInBytes;
 		
+		this.initialisationVectorBytes = initialisationVectorBytes;
+		
 		this.secureBidMessageDataConfidentialSerializedCiphered = null;
 		this.isSecureBidMessageDataConfidentialSerializedCiphered = true;
 		this.sizeOfSecureBidMessageDataConfidentialSerializedCiphered = 
@@ -446,6 +448,14 @@ public class SecureBidMessageDataConfidential {
 
 	}
 	
+	
+	public void setIV(byte[] IVBytes) {
+		this.initialisationVectorBytes = IVBytes;
+	}
+	
+	public byte[] getIV() {
+		return this.initialisationVectorBytes;
+	}
 	
 	public void encryptSecureBidMessageDataConfidentialSerialized() {
 

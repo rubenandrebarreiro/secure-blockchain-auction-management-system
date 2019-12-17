@@ -35,7 +35,7 @@ public interface AuctionServerAPI {
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     public String addBidToOpenedProductAuction
-    	 (@PathParam("auction-id") String openedAuctionID, String userBidInfo)
+    	 (@PathParam("auction-id") String openedAuctionID, String userBidInfo, byte[] ivBytes)
     	   throws SQLException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException, ClientProtocolException, IOException;
 	
 	@GET

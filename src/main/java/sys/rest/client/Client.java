@@ -637,13 +637,10 @@ public class Client implements ClientAPI {
 													 currentUser.getUserHomeAddress(),
 													 currentUser.getUserBankAccountNIB());
 		
-		byte[] initialisationVectorBytes = secureBidMessageDataConfidential.getInitialisationVectorBytes();
-		
 		SecureBidMessageData secureBidMessageData = 
 				new SecureBidMessageData(secureBidMessageDataSignature,
 								         secureBidMessageDataConfidential,
-										 currentUser.getUserPeerID(),
-										 initialisationVectorBytes);
+										 currentUser.getUserPeerID());
 								
 		SecureCommonHeader secureCommonHeader = 
 				new SecureCommonHeader(VersionNumber.VERSION_01.getVersionNumber(),
@@ -668,6 +665,8 @@ public class Client implements ClientAPI {
 		byte[] secureBidMessageDataConfidentialSerializedCiphered = null;
 		byte[] secureBidMessageDataConfidentialSerializedCipheredHashed = null;
 		
+		byte[] initialisationVectorBytes = null;
+		
 		try {
 			bid.doSerialization();
 			bidSerialized = bid.getBidSerializedBytes();
@@ -677,6 +676,7 @@ public class Client implements ClientAPI {
 			secureBidMessageDataSignatureSerialized = secureBidMessageDataSignature.getBidDigitalSigned();
 			
 			secureBidMessageDataConfidential.buildSecureBidMessageDataConfidentialToSend();
+			initialisationVectorBytes = secureBidMessageDataConfidential.getIV();
 			secureBidMessageDataConfidentialSerialized = secureBidMessageDataConfidential.getSecureBidMessageDataConfidentialSerialized();
 			secureBidMessageDataConfidentialSerializedCipheredAndHashed = secureBidMessageDataConfidential.getSecureBidMessageDataConfidentialSerializedCipheredAndHashed();
 			
@@ -739,7 +739,6 @@ public class Client implements ClientAPI {
 
 		SecureBidMessageMetaHeader secureBidMessageMetaHeader = new SecureBidMessageMetaHeader(
 				currentUser.getUserPeerID().getBytes("UTF-8").length,
-				initialisationVectorBytes.length,
 				secureBidMessageKeyExchangeSerializedCiphered.length,
 				secureBidMessageKeyExchangeSerializedCipheredSigned.length,
 				secureBidMessageDataSerialized.length,
@@ -789,8 +788,9 @@ public class Client implements ClientAPI {
 		}
 		
 		String bidInfoSerialiazed = gson.toJson(bidMessage);
-		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		HashMap<String,Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("auction-id", auctionID);
+		paramsMap.put("iv", initialisationVectorBytes);
 		MessagePacketClientToServer message = new MessagePacketClientToServer(MessagePacketClientToServerTypes.ADD_BID, paramsMap, bidInfoSerialiazed);
 		sendMessage(message);
 	}

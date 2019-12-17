@@ -86,8 +86,7 @@ public class SecureBidMessageComponents {
 									  int sizeOfUserEmailSerialized,
 									  int sizeOfUserHomeAddressSerialized, 
 									  int sizeOfUserBankAccountNIBSerialized,
-									  String userPeerID,
-									  byte[] initialisationVectorBytes) {
+									  String userPeerID) {
 
 		this.secureBidMessageComponentsSerialized = secureBidMessageComponentsSerialized;
 		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
@@ -122,10 +121,7 @@ public class SecureBidMessageComponents {
 		this.sizeOfUserBankAccountNIBSerialized =
 						sizeOfUserBankAccountNIBSerialized;
 		
-		this.userPeerID = userPeerID;
-		
-		this.initialisationVectorBytes = initialisationVectorBytes;
-		
+		this.userPeerID = userPeerID;		
 	}
 	
 	
@@ -154,6 +150,9 @@ public class SecureBidMessageComponents {
 		this.isSecureBidMessageComponentsSerialized = isSecureBidMessageComponentsSerialized;
 	}
 
+	public void setIV(byte[] ivBytes) {
+		this.initialisationVectorBytes = ivBytes;
+	}
 	
 	public void doSecureBidMessageComponentsSerialization()
 		   throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,

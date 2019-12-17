@@ -55,7 +55,7 @@ public class SecureBidMessageData {
 	
 	public SecureBidMessageData(SecureBidMessageDataSignature secureBidMessageDataSignature,
 								SecureBidMessageDataConfidential secureBidMessageDataConfidential,
-								String userPeerID, byte[] initialisationVectorBytes) {
+								String userPeerID) {
 		
 		this.secureBidMessageDataSignature = secureBidMessageDataSignature;
 		this.sizeOfSecureBidMessageDataSignatureSerialized = 0;
@@ -69,7 +69,6 @@ public class SecureBidMessageData {
 		this.isSecureBidMessageDataSerialized = false;
 		
 		this.userPeerID = userPeerID;
-		this.initialisationVectorBytes = initialisationVectorBytes;
 		
 	}
 	
@@ -107,7 +106,7 @@ public class SecureBidMessageData {
 		this.sizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed = sizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed;
 		this.sizeOfSecureBidMessageDataConfidentialSerialized = sizeOfSecureBidMessageDataConfidentialSerialized;
 		this.sizeOfUserEmailSerialized = sizeOfUserEmailSerialized;
-		this.sizeOfUserHomeAddressSerialized = sizeOfUserEmailSerialized; 
+		this.sizeOfUserHomeAddressSerialized = sizeOfUserHomeAddressSerialized; 
 		this.sizeOfUserBankAccountNIBSerialized = sizeOfUserBankAccountNIBSerialized;
 		
 		this.userPeerID = userPeerID;

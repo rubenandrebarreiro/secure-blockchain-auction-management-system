@@ -148,6 +148,10 @@ public class SecureBidMessage {
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 		
+			System.arraycopy(initialisationVectorBytes, 0, this.secureBidMessageSerialized,
+					serializationOffset, initialisationVectorBytes.length);
+			serializationOffset += initialisationVectorBytes.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -164,14 +168,6 @@ public class SecureBidMessage {
 							 serializationOffset, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
 
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.initialisationVectorBytes, 0, this.secureBidMessageSerialized,
-							 serializationOffset, this.initialisationVectorBytes.length);
-			serializationOffset += this.initialisationVectorBytes.length;
-			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -209,8 +205,8 @@ public class SecureBidMessage {
 			
 			
 			int sizeOfSecureBidMessageMetaHeaderSerialized = ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-															   ( 16 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-															   ( 17 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+															   ( 15 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+															   ( 16 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 			
 			byte[] secureBidMessageMetaHeaderSerialized = new byte[ sizeOfSecureBidMessageMetaHeaderSerialized ];
 			
@@ -225,6 +221,15 @@ public class SecureBidMessage {
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 		
+			byte[] initialisationVectorInBytes = new byte[ 16 ];
+			
+			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
+					initialisationVectorInBytes,
+					0, initialisationVectorInBytes.length);
+			serializationOffset += initialisationVectorInBytes.length;
+
+			
+
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -240,11 +245,6 @@ public class SecureBidMessage {
 			int sizeOfUserPeerIDSerialized = this.secureBidMessageMetaHeader.getSizeOfUserPeerIDSerialized();
 			
 			byte[] userPeerIDSerialized = new byte[ sizeOfUserPeerIDSerialized ];
-			
-			
-			int sizeOfInitialisationVectorBytes = this.secureBidMessageMetaHeader.getSizeOfInitialisationVector();
-			
-			byte[] initialisationVectorInBytes = new byte[ sizeOfInitialisationVectorBytes ];
 			
 			
 			int sizeOfSecureBidMessageKeyExchangeSerialized = 
@@ -274,15 +274,7 @@ public class SecureBidMessage {
 			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
 					userPeerIDSerialized, 0, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
-					initialisationVectorInBytes, 0, initialisationVectorInBytes.length);
-			serializationOffset += initialisationVectorInBytes.length;
-			
+
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -382,8 +374,7 @@ public class SecureBidMessage {
 												   sizeOfUserEmailSerialized,
 												   sizeOfUserHomeAddressSerialized, 
 												   sizeOfUserBankAccountNIBSerialized,
-												   this.userPeerID,
-												   this.initialisationVectorBytes);
+												   this.userPeerID);
 						
 			this.secureBidMessageDoSMitigation = 
 					new SecureBidMessageDoSMitigation(secureBidMessageComponentsSerialized,

@@ -58,6 +58,8 @@ public class SecureCommonKeyExchange {
 	private boolean isSecureCommonKeyExchangeSerializedCipheredAndSigned;
 	
 	private String userPeerID;
+
+	private byte[] initializationBytes;
 	
 	public SecureCommonKeyExchange(byte[] secretSymmetricKeyInBytes,
 								   byte[] secretHMACKeyForDoSMitigationInBytes,
@@ -217,6 +219,10 @@ public class SecureCommonKeyExchange {
 		this.isSecureCommonKeyExchangeSerializedCipheredAndSigned = 
 				isSecureCommonKeyExchangeSerializedCipheredAndSigned;
 	
+	}
+	
+	public void setInitializationBytes(byte[] ivBytes) {
+		this.initializationBytes = ivBytes;
 	}
 	
 	public void buildSecureCommonKeyExchangeToSend() 
