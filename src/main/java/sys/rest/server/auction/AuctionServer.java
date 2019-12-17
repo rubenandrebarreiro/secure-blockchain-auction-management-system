@@ -87,13 +87,13 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	
 	private SSLSocket responseSocket;
 	private Random random;
-	private Map<String, BlockingQueue<String>> connectedClientsMap;
+	private Map<String, BlockingQueue<Bid>> connectedClientsMap;
 	private boolean mutualAuth;
 	private String userName;
 	
 	private Thread updateClientBidsService;
 
-	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, BlockingQueue<String>> connectedClientsMap, String mutualAuth, String userName) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, BlockingQueue<Bid>> connectedClientsMap, String mutualAuth, String userName) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
 		exitFlag = false;
 		this.responseSocket = responseSocket;
 		this.connectedClientsMap = connectedClientsMap;
@@ -119,11 +119,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					BlockingQueue<String> workQueue = connectedClientsMap.get(userName);
+					BlockingQueue<Bid> workQueue = connectedClientsMap.get(userName);
 					if(workQueue != null) {
 						try {
 							while(!workQueue.isEmpty()) {
-								String string = workQueue.remove();
+								String string = gson.toJson(workQueue.remove());
 //								printStringWithClassName("Update client bids updating for user " + userName + " with bid " + string);
 								sslWriteResponse(responseSocket.getOutputStream(), string, null, MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS);
 							}
@@ -597,9 +597,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				byte[] secureReceiptMessageSerialized = secureReceiptMessage.getSecureReceiptMessageSerialized();
 				// TODO Change type!
-				for (Entry<String, BlockingQueue<String>> entry : connectedClientsMap.entrySet()) {
+				for (Entry<String, BlockingQueue<Bid>> entry : connectedClientsMap.entrySet()) {
 					if(!entry.getKey().equals(userName))
-						entry.getValue().add("Hey you! Yes you, " + entry.getKey() + "! Work on this! -> " + secureBidMessageData.getSecureBidMessageDataSignature().getBid());
+						entry.getValue().add(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
 				}
 				connectedClientsMap.forEach( (x,y) -> {
 					System.out.println(x + " " + y);

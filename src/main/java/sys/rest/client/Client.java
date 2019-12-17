@@ -15,9 +15,12 @@ import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.SignatureException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
 
 import javax.crypto.NoSuchPaddingException;
@@ -27,6 +30,8 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
+import org.eclipse.jetty.util.BlockingArrayQueue;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -123,6 +128,8 @@ public class Client implements ClientAPI {
 	private InputStream inputStream;
 	private OutputStream outputStream;
 	
+	private Map<Integer, Bid> openBidsList;
+	private Map<Integer, Block> minedBlockMap;
 	
 	private TryToMineBlockOfOpenBidsService tryToMineBlockOfOpenBidsService;
 	
@@ -201,12 +208,14 @@ public class Client implements ClientAPI {
 			//		    socket.setSoTimeout(1000);
 			socket.startHandshake();
 			
+			openBidsList = new HashMap<Integer, Bid>();
+			minedBlockMap = new HashMap<Integer, Block>();
 			
 			this.tryToMineBlockOfOpenBidsService = 
 					new TryToMineBlockOfOpenBidsService(this,
 														StrategyCryptoPuzzle.STRATEGY_CRYPTO_PUZZLE_1.getStrategyUsedForCryptoPuzzle(),
 														NumBytesChallengeType.NUM_BYTES_CHALLENGE_TYPE_3.getNumBytesChallengeType(),
-														/**openBidsList**/ null, /**minedBlockMap**/ null);
+														openBidsList, minedBlockMap);
 			
 			this.tryToMineBlockOfOpenBidsServiceThread = new Thread(this.tryToMineBlockOfOpenBidsService);
 			this.tryToMineBlockOfOpenBidsServiceThread.start();
@@ -244,7 +253,7 @@ public class Client implements ClientAPI {
 									System.out.println(decodeReceipt(message));
 									break;
 								case UPDATE_CLIENT_BIDS:
-									System.out.println(updateBids(message));
+									updateBids(message);
 								default:
 									break;
 								}
@@ -1189,11 +1198,10 @@ public class Client implements ClientAPI {
 	}
 	
 	// TODO
-	private String updateBids(String message) {
-		String result = null;
-		
-		result = message;
-		
-		return result;
+	private void updateBids(String message) {
+		Bid bidToAdd = gson.fromJson(message, Bid.class);
+		// TODO CHANGE KEY!!!
+		Random r = new Random();
+		openBidsList.put(r.nextInt(), bidToAdd);
 	}
 }
