@@ -44,7 +44,6 @@ import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
 
-import main.java.api.rest.server.auction.AuctionServerAPI;
 import main.java.common.protocols.MessageType;
 import main.java.common.protocols.VersionNumber;
 import main.java.common.utils.CommonUtils;
@@ -71,7 +70,7 @@ import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClien
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClientTypes;
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketClientToServer;
 
-public class AuctionServer extends Thread implements AuctionServerAPI{
+public class AuctionServer extends Thread{
 
 	private static final String AUCTION_SERVER_REPOSITORY_ADDRESS = "http://localhost:8080/products-auctions";
 
@@ -141,7 +140,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	public void run() {
 		String arg1 = null, arg2 = null;
-		byte[] arg3 = null;
 		HttpResponse response = null;
 		String receiptResponse = null;
 		MessagePacketServerToClientTypes messageType = null;
@@ -177,8 +175,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 					case ADD_BID:
 						arg1 = (String)message.getParamsMap().get("auction-id");
 						arg2 = message.getBody();
-//						arg3 = (byte[])message.getParamsMap().get("iv");
-						receiptResponse = addBidToOpenedProductAuction(arg1, arg2, arg3);
+						receiptResponse = addBidToOpenedProductAuction(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.RECEIPT;
 						break;
 					case LIST_ALL_AUCTIONS:
@@ -319,7 +316,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		}
 	}
 
-	@Override
 	public HttpResponse createAuction(String clientAuctionInformation) {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to create a new Auction!");
@@ -410,7 +406,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse closeAuction(String openedAuctionID) throws SQLException {	
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to close an existing Auction!");
@@ -431,8 +426,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
-	public String addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo, byte[] ivBytes)
+	public String addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo)
 			throws SQLException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException, ClientProtocolException, IOException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to add bid to " + openedAuctionID + "!");
@@ -612,7 +606,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return methodResult;
 	}
 
-	@Override
 	public HttpResponse listAllProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all Auctions!");
@@ -633,7 +626,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listOpenedProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all opened Auctions!");
@@ -654,7 +646,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listClosedProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all closed Auctions!");
@@ -675,7 +666,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -697,7 +687,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listOpenedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -719,7 +708,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listClosedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -741,7 +729,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse findProductAuctionByID(String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get Auction with id " + auctionID + "!");
@@ -762,7 +749,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse findOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id " + openedAuctionID + "!");
@@ -783,7 +769,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse findClosedProductAuctionByID(String closedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id " + closedAuctionID + "!");
@@ -804,7 +789,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsOfProductAuctionByID(String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all bids from all Auction with id " + auctionID + "!");
@@ -825,7 +809,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsOfOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all bids from opened Auction with id " + openedAuctionID + "!");
@@ -846,7 +829,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsOfClosedProductAuctionByID(String closedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all bids from closed Auction with id" + closedAuctionID + "!");
@@ -867,7 +849,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientInAllProductAuctionByID(String auctionID, String bidderUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -889,7 +870,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(String openedAuctionID,
 			String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -911,7 +891,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(String closedAuctionID,
 			String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -933,7 +912,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 	
-	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientID(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all bids from " + bidderUserClientID + "!");
@@ -954,7 +932,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 	
-	@Override
 	public HttpResponse listOpenedBidsMadeByBidderUserClientID(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened bids from " + bidderUserClientID + "!");
@@ -975,7 +952,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 	
-	@Override
 	public HttpResponse listClosedBidsMadeByBidderUserClientID(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get closed bids from " + bidderUserClientID + "!");
@@ -996,7 +972,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 	
-	@Override
 	public HttpResponse checkOutcomeAllAuctions(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from all auctions where " + bidderUserClientID + " participated!");
@@ -1017,7 +992,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse checkOutcomeOpenedAuctions(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from opened auctions where " + bidderUserClientID + " participated!");
@@ -1038,7 +1012,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 	
-	@Override
 	public HttpResponse checkOutcomeClosedAuctions(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from closed auctions where " + bidderUserClientID + " participated!");
@@ -1059,7 +1032,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 	
-	@Override
 	public HttpResponse checkOutcomeAllAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from closed auctions with ID " + auctionID + "where " + bidderUserClientID + " participated!");
@@ -1080,7 +1052,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 
-	@Override
 	public HttpResponse checkOutcomeOpenedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from opened auctions with ID " + auctionID + "where " + bidderUserClientID + " participated!");
@@ -1101,7 +1072,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return response;
 	}
 	
-	@Override
 	public HttpResponse checkOutcomeClosedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from closed auctions with ID " + auctionID + "where " + bidderUserClientID + " participated!");

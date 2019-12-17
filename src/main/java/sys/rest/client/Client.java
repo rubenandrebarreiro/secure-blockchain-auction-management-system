@@ -36,7 +36,6 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 
-import main.java.api.rest.client.ClientAPI;
 import main.java.common.protocols.MessageType;
 import main.java.common.protocols.NumBytesChallengeType;
 import main.java.common.protocols.StrategyCryptoPuzzle;
@@ -67,7 +66,7 @@ import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClien
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketClientToServerTypes;
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketClientToServer;
 
-public class Client implements ClientAPI {
+public class Client {
 
 	private static final String OPEN_AUCTION = "create auction";
 	private static final String CLOSE_AUCTION = "close auction";
