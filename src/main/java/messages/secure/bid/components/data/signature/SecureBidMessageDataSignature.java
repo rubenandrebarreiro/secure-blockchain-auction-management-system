@@ -196,7 +196,7 @@ public class SecureBidMessageDataSignature {
 			this.undoSecureBidMessageDataSignatureBidSerializedAndSigned();
 			
 			if(this.checkIfSecureBidMessageDataSignatureBidSerializedSignedIsValid()) {
-				
+								
 				this.undoSerializationOfBid();
 				
 			}

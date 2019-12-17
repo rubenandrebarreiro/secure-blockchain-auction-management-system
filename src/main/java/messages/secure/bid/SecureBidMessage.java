@@ -20,6 +20,8 @@ public class SecureBidMessage {
 	
 	private String userPeerID;
 	
+	private byte[] initialisationVectorBytes;
+	
 	private SecureCommonKeyExchange secureBidMessageKeyExchange;
 	
 	private SecureBidMessageComponents secureBidMessageComponents;
@@ -33,12 +35,14 @@ public class SecureBidMessage {
 	
 	public SecureBidMessage(SecureBidMessageMetaHeader secureBidMessageMetaHeader,
 							String userPeerID,
+							byte[] initialisationVectorBytes,
 							SecureCommonKeyExchange secureBidMessageKeyExchange,
 							SecureBidMessageComponents secureBidMessageComponents,
 							SecureBidMessageDoSMitigation secureBidMessageDoSMitigation) {
 		
 		this.secureBidMessageMetaHeader = secureBidMessageMetaHeader;
 		this.userPeerID = userPeerID;
+		this.initialisationVectorBytes = initialisationVectorBytes;
 		this.secureBidMessageKeyExchange = secureBidMessageKeyExchange;
 		this.secureBidMessageComponents = secureBidMessageComponents;
 		this.secureBidMessageDoSMitigation = secureBidMessageDoSMitigation;
@@ -55,6 +59,7 @@ public class SecureBidMessage {
 		
 		this.secureBidMessageMetaHeader = null;
 		this.userPeerID = null;
+		this.initialisationVectorBytes = null;
 		this.secureBidMessageKeyExchange = null;
 		this.secureBidMessageComponents = null;
 		this.secureBidMessageDoSMitigation = null;
@@ -68,6 +73,10 @@ public class SecureBidMessage {
 	
 	public String getUserPeerID() {
 		return this.userPeerID;
+	}
+	
+	public byte[] getInitialisationVectorBytes() {
+		return this.initialisationVectorBytes;
 	}
 	
 	public SecureCommonKeyExchange getSecureBidMessageKeyExchange() {
@@ -121,6 +130,7 @@ public class SecureBidMessage {
 			
 			int sizeOfSecureBidMessageSerialized = (secureBidMessageMetaHeaderSerialized.length +
 													userPeerIDSerialized.length +
+													this.initialisationVectorBytes.length +
 												    secureBidMessageKeyExchangeSerializedCipheredAndSigned.length +
 													secureBidMessageComponentsSerialized.length +
 													secureBidMessageDoSMitigationSerialized.length);
@@ -138,6 +148,10 @@ public class SecureBidMessage {
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 		
+			System.arraycopy(initialisationVectorBytes, 0, this.secureBidMessageSerialized,
+					serializationOffset, initialisationVectorBytes.length);
+			serializationOffset += initialisationVectorBytes.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -207,6 +221,15 @@ public class SecureBidMessage {
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 		
+			byte[] initialisationVectorInBytes = new byte[ 16 ];
+			
+			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
+					initialisationVectorInBytes,
+					0, initialisationVectorInBytes.length);
+			serializationOffset += initialisationVectorInBytes.length;
+
+			
+
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -222,6 +245,7 @@ public class SecureBidMessage {
 			int sizeOfUserPeerIDSerialized = this.secureBidMessageMetaHeader.getSizeOfUserPeerIDSerialized();
 			
 			byte[] userPeerIDSerialized = new byte[ sizeOfUserPeerIDSerialized ];
+			
 			
 			int sizeOfSecureBidMessageKeyExchangeSerialized = 
 					( this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeSerializedCiphered() + 
@@ -250,7 +274,7 @@ public class SecureBidMessage {
 			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
 					userPeerIDSerialized, 0, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
-			
+
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to

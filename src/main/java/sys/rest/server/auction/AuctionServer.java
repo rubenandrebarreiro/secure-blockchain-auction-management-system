@@ -41,6 +41,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+
 import com.google.gson.Gson;
 
 import main.java.api.rest.server.auction.AuctionServerAPI;
@@ -140,6 +141,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	public void run() {
 		String arg1 = null, arg2 = null;
+		byte[] arg3 = null;
 		HttpResponse response = null;
 		String receiptResponse = null;
 		MessagePacketServerToClientTypes messageType = null;
@@ -169,13 +171,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						messageType = MessagePacketServerToClientTypes.SIMPLE_RESPONSE;
 						break;
 					case CLOSE_AUCTION:
-						response = closeAuction(message.getParamsMap().get("auction-id"));
+						response = closeAuction((String)message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.SIMPLE_RESPONSE;
 						break;
 					case ADD_BID:
-						arg1 = message.getParamsMap().get("auction-id");
+						arg1 = (String)message.getParamsMap().get("auction-id");
 						arg2 = message.getBody();
-						receiptResponse = addBidToOpenedProductAuction(arg1, arg2);
+//						arg3 = (byte[])message.getParamsMap().get("iv");
+						receiptResponse = addBidToOpenedProductAuction(arg1, arg2, arg3);
 						messageType = MessagePacketServerToClientTypes.RECEIPT;
 						break;
 					case LIST_ALL_AUCTIONS:
@@ -191,109 +194,109 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_ALL_AUCTIONS_BY_OWNER:
-						response = listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+						response = listAllProductsAuctionsByProductOwnerUserClient((String)message.getParamsMap().get("product-owner-user-client-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_AUCTIONS_BY_OWNER:
-						response = listOpenedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+						response = listOpenedProductsAuctionsByProductOwnerUserClient((String)message.getParamsMap().get("product-owner-user-client-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_AUCTIONS_BY_OWNER:
-						response = listClosedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
+						response = listClosedProductsAuctionsByProductOwnerUserClient((String)message.getParamsMap().get("product-owner-user-client-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_ALL_AUCTIONS_BY_ID:
-						response = findProductAuctionByID(message.getParamsMap().get("auction-id"));
+						response = findProductAuctionByID((String)message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_AUCTIONS_BY_ID:
-						response = findOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
+						response = findOpenedProductAuctionByID((String)message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_AUCTIONS_BY_ID:
-						response = findClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
+						response = findClosedProductAuctionByID((String)message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
-						response = listAllBidsOfProductAuctionByID(message.getParamsMap().get("auction-id"));
+						response = listAllBidsOfProductAuctionByID((String)message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
-						response = listAllBidsOfOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
+						response = listAllBidsOfOpenedProductAuctionByID((String)message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
-						response = listAllBidsOfClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
+						response = listAllBidsOfClosedProductAuctionByID((String)message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-						arg1 = message.getParamsMap().get("auction-id");
-						arg2 = message.getParamsMap().get("bidder-user-client-id");
+						arg1 = (String)message.getParamsMap().get("auction-id");
+						arg2 = (String)message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInAllProductAuctionByID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-						arg1 = message.getParamsMap().get("auction-id");
-						arg2 = message.getParamsMap().get("bidder-user-client-id");
+						arg1 = (String)message.getParamsMap().get("auction-id");
+						arg2 = (String)message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-						arg1 = message.getParamsMap().get("auction-id");
-						arg2 = message.getParamsMap().get("bidder-user-client-id");
+						arg1 = (String)message.getParamsMap().get("auction-id");
+						arg2 = (String)message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 						
 					case LIST_ALL_BIDS_BY_CLIENT_ID:
-						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientID(arg1);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_BIDS_BY_CLIENT_ID:
-						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
 						response = listOpenedBidsMadeByBidderUserClientID(arg1);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_BIDS_BY_CLIENT_ID:
-						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
 						response = listClosedBidsMadeByBidderUserClientID(arg1);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					
 					
 					case CHECK_OUTCOME_ALL_AUCTION:
-						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
 						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_OPENED_AUCTION:
-						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
 						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_CLOSED_AUCTION:
-						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
 						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					
 					
 					case CHECK_OUTCOME_ALL_AUCTION_ID:
-						arg1 = message.getParamsMap().get("bidder-user-client-id");
-						arg2 = message.getParamsMap().get("auction-id");
+						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg2 = (String)message.getParamsMap().get("auction-id");
 						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_OPENED_AUCTION_ID:
-						arg1 = message.getParamsMap().get("bidder-user-client-id");
-						arg2 = message.getParamsMap().get("auction-id");
+						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg2 = (String)message.getParamsMap().get("auction-id");
 						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_CLOSED_AUCTION_ID:
-						arg1 = message.getParamsMap().get("bidder-user-client-id");
-						arg2 = message.getParamsMap().get("auction-id");
+						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg2 = (String)message.getParamsMap().get("auction-id");
 						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;						
@@ -429,7 +432,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	}
 
 	@Override
-	public String addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo)
+	public String addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo, byte[] ivBytes)
 			throws SQLException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException, ClientProtocolException, IOException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to add bid to " + openedAuctionID + "!");
@@ -443,6 +446,11 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		
 		SecureBidMessage serializedBidInfo = new SecureBidMessage(bidInfo.getSecureBidMessageSerialized());
 		serializedBidInfo.undoSecureBidMessageSerialized();
+		byte[] initialisationVectorInBytes = new byte[16];
+		//Extract IV
+		System.arraycopy(bidInfo.getSecureBidMessageSerialized(), 0,
+				initialisationVectorInBytes,
+				0, initialisationVectorInBytes.length);
 
 		SecureBidMessageData secureBidMessageData = null;
 		SecureCommonKeyExchange secureBidMessageKeyExchange = serializedBidInfo.getSecureBidMessageKeyExchange();
@@ -455,6 +463,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						
 			if(secureBidMessageDosMitigation.checkIfHashOfSecureBidMessageDoSMitigationIsValid()) {
 				
+				secureBidMessageComponents.setIV(initialisationVectorInBytes);
 				secureBidMessageComponents.undoSecureBidMessageComponentsSerialization();
 
 				secureBidMessageData = secureBidMessageComponents.getSecureBidMessageData();
@@ -509,7 +518,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 															   responseStringRepresentation);
 				
 				secureReceiptMessageComponentsData.doSecureReceiptMessageComponentsDataSerialization();
-				
+								
 				SecureCommonHeader secureCommonHeader = new SecureCommonHeader(VersionNumber.VERSION_01.getVersionNumber(),
 																			   MessageType.MESSAGE_TYPE_2.getMessageType(),
 																			   System.currentTimeMillis());
@@ -519,6 +528,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				secureReceiptMessageComponents.doSecureReceiptMessageComponentsSerialization();
 				secureReceiptMessageComponents.encryptSecureReceiptMessageComponents();
+				
+				byte[] secureReceiptMessageComponentsCiphered = secureReceiptMessageComponents
+																.getSecureReceiptMessageComponentsSerializedCiphered();
 				
 				SecureReceiptMessageDoSMitigation secureReceiptMessageDoSMitigation = 
 						new SecureReceiptMessageDoSMitigation(secureReceiptMessageComponents);
@@ -544,10 +556,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				byte[] secureReceiptMessageKeyExchangeSerializedCipheredSigned = 
 						secureCommonKeyExchange.getSecureCommonKeyExchangeSerializedCipheredSigned();
 				
-				
-				byte[] secureReceiptMessageComponentsSerializedCiphered = 
-						secureReceiptMessageComponents.getSecureReceiptMessageComponentsSerializedCiphered();
-				
+				byte[] secureReceiptMessageComponentsDataSerialized = 
+						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataSerialized();
+
 				byte[] secureReceiptMessageDoSMitigationSerialized = 
 								secureReceiptMessageDoSMitigation.getSecureReceiptMessageComponentsHashedForDoSMitigation();
 				
@@ -555,12 +566,16 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 								secureReceiptMessageComponentsDataSignature
 								   		.getSecureReceiptMessageComponentsDataInfoSerializedDigitalSigned();
 				
+				byte[] secureReceiptMessageComponentsInitialisationVector = 
+						secureReceiptMessageComponents.getInitialisationVectorInBytes();
+				
 				SecureReceiptMessageMetaHeader secureReceiptMessageMetaHeader = 
 						new SecureReceiptMessageMetaHeader(bid.getSizeOfBidderUserClientID(),
 														   secureReceiptMessageKeyExchangeSerializedCiphered.length,
 														   secureReceiptMessageKeyExchangeSerializedCipheredSigned.length,
-														   secureReceiptMessageComponentsSerializedCiphered.length,
+														   secureReceiptMessageComponentsCiphered.length,
 														   secureReceiptMessageDoSMitigationSerialized.length,
+														   secureReceiptMessageComponentsDataSerialized.length,
 														   secureReceiptMessageComponentsDataInfoSerialized.length,
 														   secureReceiptMessageComponentsDataSignatureSerialized.length,
 														   responseStringRepresentation.length(),
@@ -572,6 +587,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				SecureReceiptMessage secureReceiptMessage = 
 						new SecureReceiptMessage(secureReceiptMessageMetaHeader,
 												 bid.getBidderUserClientID(),
+												 secureReceiptMessageComponentsInitialisationVector,
 												 secureCommonKeyExchange,
 												 secureReceiptMessageComponents,
 												 secureReceiptMessageDoSMitigation);

@@ -650,7 +650,7 @@ public class Client implements ClientAPI {
 				new SecureBidMessageDataConfidential(currentUser.getUserEmail(),
 													 currentUser.getUserHomeAddress(),
 													 currentUser.getUserBankAccountNIB());
-												
+		
 		SecureBidMessageData secureBidMessageData = 
 				new SecureBidMessageData(secureBidMessageDataSignature,
 								         secureBidMessageDataConfidential,
@@ -679,6 +679,8 @@ public class Client implements ClientAPI {
 		byte[] secureBidMessageDataConfidentialSerializedCiphered = null;
 		byte[] secureBidMessageDataConfidentialSerializedCipheredHashed = null;
 		
+		byte[] initialisationVectorBytes = null;
+		
 		try {
 			bid.doSerialization();
 			bidSerialized = bid.getBidSerializedBytes();
@@ -688,6 +690,7 @@ public class Client implements ClientAPI {
 			secureBidMessageDataSignatureSerialized = secureBidMessageDataSignature.getBidDigitalSigned();
 			
 			secureBidMessageDataConfidential.buildSecureBidMessageDataConfidentialToSend();
+			initialisationVectorBytes = secureBidMessageDataConfidential.getIV();
 			secureBidMessageDataConfidentialSerialized = secureBidMessageDataConfidential.getSecureBidMessageDataConfidentialSerialized();
 			secureBidMessageDataConfidentialSerializedCipheredAndHashed = secureBidMessageDataConfidential.getSecureBidMessageDataConfidentialSerializedCipheredAndHashed();
 			
@@ -703,7 +706,8 @@ public class Client implements ClientAPI {
 					secureCommonHeader,
 					secureBidMessageData,
 					secureBidMessageDataConfidential.getSecretSymmetricKeyForDataConfidentialInBytes(),
-					currentUser.getUserPeerID());
+					currentUser.getUserPeerID(),
+					initialisationVectorBytes);
 			
 			secureBidMessageDoSMitigation = new SecureBidMessageDoSMitigation(
 					secureBidMessageComponents);
@@ -770,6 +774,7 @@ public class Client implements ClientAPI {
 		SecureBidMessage bidMessage = new SecureBidMessage(
 				secureBidMessageMetaHeader,
 				currentUser.getUserPeerID(),
+				initialisationVectorBytes,
 				secureBidMessageKeyExchange,
 				secureBidMessageComponents,
 				secureBidMessageDoSMitigation);
@@ -797,8 +802,9 @@ public class Client implements ClientAPI {
 		}
 		
 		String bidInfoSerialiazed = gson.toJson(bidMessage);
-		HashMap<String,String> paramsMap = new HashMap<String, String>();
+		HashMap<String,Object> paramsMap = new HashMap<String, Object>();
 		paramsMap.put("auction-id", auctionID);
+		paramsMap.put("iv", initialisationVectorBytes);
 		MessagePacketClientToServer message = new MessagePacketClientToServer(MessagePacketClientToServerTypes.ADD_BID, paramsMap, bidInfoSerialiazed);
 		sendMessage(message);
 	}

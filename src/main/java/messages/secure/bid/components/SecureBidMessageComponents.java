@@ -47,10 +47,14 @@ public class SecureBidMessageComponents {
 	
 	private String userPeerID;
 	
+	private byte[] initialisationVectorBytes;
+	
+	
 	public SecureBidMessageComponents(SecureCommonHeader secureCommonHeader,
 								      SecureBidMessageData secureBidMessageData,
 								      byte[] secretSymmetricKeyForDataPersonalInBytes,
-								      String userPeerID) {
+								      String userPeerID,
+								      byte[] initialisationVectorBytes) {
 		
 		this.secureCommonHeader = secureCommonHeader;
 		
@@ -63,6 +67,8 @@ public class SecureBidMessageComponents {
 		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
 		
 		this.userPeerID = userPeerID;
+		
+		this.initialisationVectorBytes = initialisationVectorBytes;
 		
 	}
 	
@@ -115,8 +121,7 @@ public class SecureBidMessageComponents {
 		this.sizeOfUserBankAccountNIBSerialized =
 						sizeOfUserBankAccountNIBSerialized;
 		
-		this.userPeerID = userPeerID;
-		
+		this.userPeerID = userPeerID;		
 	}
 	
 	
@@ -145,6 +150,9 @@ public class SecureBidMessageComponents {
 		this.isSecureBidMessageComponentsSerialized = isSecureBidMessageComponentsSerialized;
 	}
 
+	public void setIV(byte[] ivBytes) {
+		this.initialisationVectorBytes = ivBytes;
+	}
 	
 	public void doSecureBidMessageComponentsSerialization()
 		   throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException,
@@ -264,7 +272,8 @@ public class SecureBidMessageComponents {
 																 this.sizeOfUserEmailSerialized,
 																 this.sizeOfUserHomeAddressSerialized,
 																 this.sizeOfUserBankAccountNIBSerialized,
-																 this.userPeerID);
+																 this.userPeerID,
+																 this.initialisationVectorBytes);
 			
 			this.secureBidMessageData.undoSecureBidMessageDataSerialization();
 			
