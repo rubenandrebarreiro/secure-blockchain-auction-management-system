@@ -785,7 +785,7 @@ public class SecureBidMessageDataConfidential {
 			System.arraycopy(secureBidMessageDataConfidentialSerializedCiphered,
 							 0, this.secureBidMessageDataConfidentialSerializedCipheredAndHashed,
 							 serializationOffset, secureBidMessageDataConfidentialSerializedCiphered.length);
-			serializationOffset += secureBidMessageDataConfidentialSerialized.length;
+			serializationOffset += secureBidMessageDataConfidentialSerializedCiphered.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
