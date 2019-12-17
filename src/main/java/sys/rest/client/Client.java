@@ -15,12 +15,9 @@ import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.SignatureException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Random;
 
 import javax.crypto.NoSuchPaddingException;
@@ -30,8 +27,6 @@ import javax.net.ssl.SSLSocketFactory;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
-import org.eclipse.jetty.util.BlockingArrayQueue;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -46,7 +41,6 @@ import main.java.common.protocols.MessageType;
 import main.java.common.protocols.NumBytesChallengeType;
 import main.java.common.protocols.StrategyCryptoPuzzle;
 import main.java.common.protocols.VersionNumber;
-import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.SecureBidMessage;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.components.data.SecureBidMessageData;
