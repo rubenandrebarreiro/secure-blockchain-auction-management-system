@@ -24,7 +24,6 @@ import javax.net.ssl.SSLSocket;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.jetty.util.BlockingArrayQueue;
 
-import main.java.resources.bid.Bid;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
 
@@ -42,7 +41,7 @@ public class AuctionServerEntryPoint{
 	private SSLSocket responseSocket;
 	
 	
-	private Map<String, BlockingQueue<Bid>> connectedClientsMap;
+	private Map<String, BlockingQueue<Object>> connectedClientsMap;
 	
 	
 	public static void main(String[] args) throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
@@ -102,9 +101,9 @@ public class AuctionServerEntryPoint{
 				InputStream tempInputStream = responseSocket.getInputStream();
 				BufferedReader br = new BufferedReader(new InputStreamReader(tempInputStream));
 				String userName = br.readLine();
-				connectedClientsMap.put(userName, new BlockingArrayQueue<Bid>());
+				connectedClientsMap.put(userName, new BlockingArrayQueue<Object>());
 				System.out.println("User logged in as: " + userName);
-				for (Entry<String, BlockingQueue<Bid>> string : connectedClientsMap.entrySet()) {
+				for (Entry<String, BlockingQueue<Object>> string : connectedClientsMap.entrySet()) {
 					printErrorStringWithClassName(string);
 				}
 				Thread t = new AuctionServer(serverSocket, responseSocket, connectedClientsMap, mutualAuth[0], userName);

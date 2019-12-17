@@ -49,6 +49,7 @@ import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigatio
 import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
 import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
+import main.java.messages.secure.proofwork.SecureProofOfWorkMessage;
 import main.java.messages.secure.receipt.SecureReceiptMessage;
 import main.java.messages.secure.receipt.components.SecureReceiptMessageComponents;
 import main.java.messages.secure.receipt.components.data.SecureReceiptMessageComponentsData;
@@ -225,7 +226,6 @@ public class Client {
 						inputStream = socket.getInputStream();
 						BufferedReader socketReader = new BufferedReader(new InputStreamReader(inputStream));
 						while(!exitFlag) {
-							// TODO Read and handle response
 							response = socketReader.readLine();
 							try {
 								envelope = gson.fromJson(response, MessagePacketServerToClient.class);
@@ -239,14 +239,14 @@ public class Client {
 									System.out.println(getPrettyJsonString(message));
 									break;
 								case PROOF_OF_WORK:
-								// TODO complete
-									printErrorStringWithClassName("PROOF OF WORK!!!");
+									receivedProofOfWork(message);
 									break;
 								case RECEIPT:
 									System.out.println(decodeReceipt(message));
 									break;
 								case UPDATE_CLIENT_BIDS:
 									updateBids(message);
+									break;
 								default:
 									break;
 								}
@@ -1188,6 +1188,15 @@ public class Client {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	// TODO complete and test
+	private void receivedProofOfWork(String proofOfWorkSerializedJson) {
+		printErrorStringWithClassName("PROOF OF WORK!!! -> " + proofOfWorkSerializedJson);
+		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
+		// check if trying to do work already done by this proof and stop
+		
+		// add proof to minedBlockMap?
 	}
 	
 	// TODO

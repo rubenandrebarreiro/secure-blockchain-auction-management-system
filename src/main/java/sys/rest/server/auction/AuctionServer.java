@@ -55,6 +55,7 @@ import main.java.messages.secure.bid.components.data.signature.SecureBidMessageD
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
 import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
+import main.java.messages.secure.proofwork.SecureProofOfWorkMessage;
 import main.java.messages.secure.receipt.SecureReceiptMessage;
 import main.java.messages.secure.receipt.components.SecureReceiptMessageComponents;
 import main.java.messages.secure.receipt.components.data.SecureReceiptMessageComponentsData;
@@ -86,13 +87,13 @@ public class AuctionServer extends Thread{
 	
 	private SSLSocket responseSocket;
 	private Random random;
-	private Map<String, BlockingQueue<Bid>> connectedClientsMap;
+	private Map<String, BlockingQueue<Object>> connectedClientsMap;
 	private boolean mutualAuth;
 	private String userName;
 	
 	private Thread updateClientBidsService;
 
-	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, BlockingQueue<Bid>> connectedClientsMap, String mutualAuth, String userName) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, BlockingQueue<Object>> connectedClientsMap, String mutualAuth, String userName) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
 		exitFlag = false;
 		this.responseSocket = responseSocket;
 		this.connectedClientsMap = connectedClientsMap;
@@ -118,7 +119,7 @@ public class AuctionServer extends Thread{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					BlockingQueue<Bid> workQueue = connectedClientsMap.get(userName);
+					BlockingQueue<Object> workQueue = connectedClientsMap.get(userName);
 					if(workQueue != null) {
 						try {
 							while(!workQueue.isEmpty()) {
@@ -141,7 +142,7 @@ public class AuctionServer extends Thread{
 	public void run() {
 		String arg1 = null, arg2 = null;
 		HttpResponse response = null;
-		String receiptResponse = null;
+		String responseString = null;
 		MessagePacketServerToClientTypes messageType = null;
 		
 		if(mutualAuth) {
@@ -157,7 +158,7 @@ public class AuctionServer extends Thread{
 		
 		try {
 			while(!exitFlag) {
-				receiptResponse = null;
+				responseString = null;
 				response = null;
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
 				MessagePacketClientToServer message = gson.fromJson(jsonMessage, MessagePacketClientToServer.class);
@@ -175,7 +176,7 @@ public class AuctionServer extends Thread{
 					case ADD_BID:
 						arg1 = (String)message.getParamsMap().get("auction-id");
 						arg2 = message.getBody();
-						receiptResponse = addBidToOpenedProductAuction(arg1, arg2);
+						responseString = addBidToOpenedProductAuction(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.RECEIPT;
 						break;
 					case LIST_ALL_AUCTIONS:
@@ -297,11 +298,16 @@ public class AuctionServer extends Thread{
 						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;						
-						
+					
+					case PROOF_WORK_SENT:
+						messageType = MessagePacketServerToClientTypes.PROOF_OF_WORK;
+						responseString = "";
+						handleReceivedProofOfWork(message.getBody());
+						break;
 					default:
 						break;
 					}
-					sslWriteResponse(responseSocket.getOutputStream(), receiptResponse, response, messageType);
+					sslWriteResponse(responseSocket.getOutputStream(), responseString, response, messageType);
 				}
 				else {
 					// Not supposed to get null messages Except is the client disconnects.
@@ -591,7 +597,7 @@ public class AuctionServer extends Thread{
 				
 				byte[] secureReceiptMessageSerialized = secureReceiptMessage.getSecureReceiptMessageSerialized();
 				// TODO Change type!
-				for (Entry<String, BlockingQueue<Bid>> entry : connectedClientsMap.entrySet()) {
+				for (Entry<String, BlockingQueue<Object>> entry : connectedClientsMap.entrySet()) {
 					if(!entry.getKey().equals(userName))
 						entry.getValue().add(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
 				}
@@ -1092,6 +1098,16 @@ public class AuctionServer extends Thread{
 		return response;
 	}
 	
+	// TODO Change to proof of work message!
+	private void handleReceivedProofOfWork(String proofOfWorkSerializedJson) {
+		printStringWithClassName("COMPLETE ME! (handleReceivedProofOfWork)");
+		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
+		// Validate proof. If valid, broadcast to clients.
+		connectedClientsMap.forEach((x,y) -> {
+			if(!x.equals(userName))
+				y.add(proofOfWork);
+		});
+	}
 	
 	private String sslReadRequest(InputStream socketInStream) throws IOException {
 		StringBuilder builder = new StringBuilder();
