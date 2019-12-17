@@ -1140,7 +1140,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	}
 	
 	private void printStringWithClassName(Object message) {
-		System.out.println("[" + this.getClass().getCanonicalName() + "] " + 
-				"Response: " + message);
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " + message);
 	}
 }
