@@ -76,6 +76,8 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 				interruptedException.printStackTrace();
 			}
 
+
+
 			List<Bid> openBidsToMineList = this.openBidsMap.values().stream()
 					.filter(bid -> !bid.getIsBidMined())
 					.collect(Collectors.toList());

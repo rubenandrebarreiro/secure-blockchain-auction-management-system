@@ -39,7 +39,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.bouncycastle.util.encoders.Base64;
 
 import com.google.gson.Gson;
 
@@ -476,7 +475,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 															   responseStringRepresentation);
 				
 				secureReceiptMessageComponentsData.doSecureReceiptMessageComponentsDataSerialization();
-				
+								
 				SecureCommonHeader secureCommonHeader = new SecureCommonHeader(VersionNumber.VERSION_01.getVersionNumber(),
 																			   MessageType.MESSAGE_TYPE_2.getMessageType(),
 																			   System.currentTimeMillis());
@@ -486,6 +485,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				secureReceiptMessageComponents.doSecureReceiptMessageComponentsSerialization();
 				secureReceiptMessageComponents.encryptSecureReceiptMessageComponents();
+				
+				byte[] secureReceiptMessageComponentsCiphered = secureReceiptMessageComponents
+																.getSecureReceiptMessageComponentsSerializedCiphered();
 				
 				SecureReceiptMessageDoSMitigation secureReceiptMessageDoSMitigation = 
 						new SecureReceiptMessageDoSMitigation(secureReceiptMessageComponents);
@@ -511,10 +513,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				byte[] secureReceiptMessageKeyExchangeSerializedCipheredSigned = 
 						secureCommonKeyExchange.getSecureCommonKeyExchangeSerializedCipheredSigned();
 				
-				
-				byte[] secureReceiptMessageComponentsSerializedCiphered = 
-						secureReceiptMessageComponents.getSecureReceiptMessageComponentsSerializedCiphered();
-				
+				byte[] secureReceiptMessageComponentsDataSerialized = 
+						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataSerialized();
+
 				byte[] secureReceiptMessageDoSMitigationSerialized = 
 								secureReceiptMessageDoSMitigation.getSecureReceiptMessageComponentsHashedForDoSMitigation();
 				
@@ -529,8 +530,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						new SecureReceiptMessageMetaHeader(bid.getSizeOfBidderUserClientID(),
 														   secureReceiptMessageKeyExchangeSerializedCiphered.length,
 														   secureReceiptMessageKeyExchangeSerializedCipheredSigned.length,
-														   secureReceiptMessageComponentsSerializedCiphered.length,
+														   secureReceiptMessageComponentsCiphered.length,
 														   secureReceiptMessageDoSMitigationSerialized.length,
+														   secureReceiptMessageComponentsDataSerialized.length,
 														   secureReceiptMessageComponentsDataInfoSerialized.length,
 														   secureReceiptMessageComponentsDataSignatureSerialized.length,
 														   responseStringRepresentation.length(),

@@ -9,9 +9,11 @@ public class SecureReceiptMessageMetaHeader {
 	private int sizeOfSecureReceiptMessageKeyExchangeSerializedCiphered;
 	private int sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSigned;
 	
-	private int sizeOfSecureReceiptMessageComponentsSerializedCiphered;
+	private int sizeOfSecureReceiptMessageComponentsCiphered;
 	private int sizeOfSecureReceiptMessageDoSMitigationSerialized;
 	 
+	private int sizeOfSecureReceiptMessageComponentsDataSerialized;
+	
 	private int sizeOfSecureReceiptMessageComponentsDataInfoSerialized;
 	private int sizeOfSecureReceiptMessageComponentsDataSignatureSerialized;
 	private int sizeOfSecureReceiptMessageComponentsDataResponseSerialized;
@@ -28,8 +30,9 @@ public class SecureReceiptMessageMetaHeader {
 	public SecureReceiptMessageMetaHeader(int sizeOfUserPeerIDSerialized,
 										  int sizeOfSecureReceiptMessageKeyExchangeSerializedCiphered,
 										  int sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSigned,
-										  int sizeOfSecureReceiptMessageComponentsSerializedCiphered,
+										  int sizeOfSecureReceiptMessageComponentsCiphered,
 										  int sizeOfSecureReceiptMessageDoSMitigationSerialized,
+										  int sizeOfSecureReceiptMessageComponentsDataSerialized,
 										  int sizeOfSecureReceiptMessageComponentsDataInfoSerialized,
 										  int sizeOfSecureReceiptMessageComponentsDataSignatureSerialized,
 										  int sizeOfSecureReceiptMessageComponentsDataResponseSerialized,
@@ -42,11 +45,14 @@ public class SecureReceiptMessageMetaHeader {
 		this.sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSigned = 
 				sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSigned;
 		
-		this.sizeOfSecureReceiptMessageComponentsSerializedCiphered =
-				sizeOfSecureReceiptMessageComponentsSerializedCiphered;
+		this.sizeOfSecureReceiptMessageComponentsCiphered =
+				sizeOfSecureReceiptMessageComponentsCiphered;
 		this.sizeOfSecureReceiptMessageDoSMitigationSerialized = 
 				sizeOfSecureReceiptMessageDoSMitigationSerialized;
 		 
+		this.sizeOfSecureReceiptMessageComponentsDataSerialized =
+				sizeOfSecureReceiptMessageComponentsDataSerialized;
+		
 		this.sizeOfSecureReceiptMessageComponentsDataInfoSerialized = 
 				sizeOfSecureReceiptMessageComponentsDataInfoSerialized;
 		this.sizeOfSecureReceiptMessageComponentsDataSignatureSerialized =
@@ -72,12 +78,14 @@ public class SecureReceiptMessageMetaHeader {
 		
 		this.sizeOfBidderUserClientIDSerialized = 0;
 		
+		this.sizeOfSecureReceiptMessageComponentsDataSerialized = 0;
+		
 		this.sizeOfSecureReceiptMessageComponentsDataInfoSerialized = 0;
 		this.sizeOfSecureReceiptMessageComponentsDataSignatureSerialized = 0;
 		this.sizeOfSecureReceiptMessageComponentsDataResponseSerialized = 0;
 		
 
-		this.sizeOfSecureReceiptMessageComponentsSerializedCiphered = 0;
+		this.sizeOfSecureReceiptMessageComponentsCiphered = 0;
 		this.sizeOfSecureReceiptMessageDoSMitigationSerialized = 0;
 		
 		this.sizeOfSecureReceiptMessageKeyExchangeSerializedCiphered = 0;
@@ -101,14 +109,18 @@ public class SecureReceiptMessageMetaHeader {
 		return this.sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSigned;
 	}
 	
-	public int getSizeOfSecureReceiptMessageComponentsSerializedCiphered() {
-		return this.sizeOfSecureReceiptMessageComponentsSerializedCiphered;
+	public int getSizeOfSecureReceiptMessageComponentsCiphered() {
+		return this.sizeOfSecureReceiptMessageComponentsCiphered;
 	}
 	
 	public int getSizeOfSecureReceiptMessageDoSMitigationSerialized() {
 		return this.sizeOfSecureReceiptMessageDoSMitigationSerialized;
 	}
-	 
+	
+	public int getSizeOfSecureReceiptMessageComponentsDataSerialized() {
+		return this.sizeOfSecureReceiptMessageComponentsDataSerialized;
+	}
+	
 	public int getSizeOfSecureReceiptMessageComponentsDataInfoSerialized() {
 		return this.sizeOfSecureReceiptMessageComponentsDataInfoSerialized;
 	}
@@ -150,8 +162,8 @@ public class SecureReceiptMessageMetaHeader {
 		if(!this.getIsSecureReceiptMessageMetaHeaderSerialized()) {
 			
 			int sizeOfSecureReceiptMessageMetaHeaderSerialized = ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-																   ( 8 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-																   ( 9 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+																   ( 9 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+																   ( 10 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 
 			this.secureReceiptMessageMetaHeaderSerialized = new byte[ sizeOfSecureReceiptMessageMetaHeaderSerialized ];
 
@@ -166,11 +178,14 @@ public class SecureReceiptMessageMetaHeader {
 			byte[] sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSignedInBytes = 
 					CommonUtils.fromIntToByteArray(this.sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSigned);
 			
-			byte[] sizeOfSecureReceiptMessageComponentsSerializedCipheredInBytes = 
-					CommonUtils.fromIntToByteArray(this.sizeOfSecureReceiptMessageComponentsSerializedCiphered);
+			byte[] sizeOfSecureReceiptMessageComponentsCipheredInBytes = 
+					CommonUtils.fromIntToByteArray(this.sizeOfSecureReceiptMessageComponentsCiphered);
 			byte[] sizeOfSecureReceiptMessageDoSMitigationSerializedInBytes = 
 					CommonUtils.fromIntToByteArray(this.sizeOfSecureReceiptMessageDoSMitigationSerialized);
 
+			
+			byte[] sizeOfSecureReceiptMessageComponentsDataSerializedInBytes = 
+					CommonUtils.fromIntToByteArray(this.sizeOfSecureReceiptMessageComponentsDataSerialized);
 			
 			byte[] sizeOfSecureReceiptMessageComponentsDataInfoSerializedInBytes = 
 					CommonUtils.fromIntToByteArray(this.sizeOfSecureReceiptMessageComponentsDataInfoSerialized);
@@ -222,13 +237,6 @@ public class SecureReceiptMessageMetaHeader {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(insideSeparator, 0, this.secureReceiptMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
-			serializationOffset += insideSeparator.length;
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
 			System.arraycopy(sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredInBytes, 0, this.secureReceiptMessageMetaHeaderSerialized,
 					serializationOffset, sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredInBytes.length);
 			serializationOffset += sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredInBytes.length;
@@ -259,10 +267,10 @@ public class SecureReceiptMessageMetaHeader {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(sizeOfSecureReceiptMessageComponentsSerializedCipheredInBytes, 0, this.secureReceiptMessageMetaHeaderSerialized,
-					serializationOffset, sizeOfSecureReceiptMessageComponentsSerializedCipheredInBytes.length);
-			serializationOffset += sizeOfSecureReceiptMessageComponentsSerializedCipheredInBytes.length;
-
+			System.arraycopy(sizeOfSecureReceiptMessageComponentsCipheredInBytes, 0, this.secureReceiptMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfSecureReceiptMessageComponentsCipheredInBytes.length);
+			serializationOffset += sizeOfSecureReceiptMessageComponentsCipheredInBytes.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -278,6 +286,21 @@ public class SecureReceiptMessageMetaHeader {
 					serializationOffset, sizeOfSecureReceiptMessageDoSMitigationSerializedInBytes.length);
 			serializationOffset += sizeOfSecureReceiptMessageDoSMitigationSerializedInBytes.length;
 
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(insideSeparator, 0, this.secureReceiptMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
+			serializationOffset += insideSeparator.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(sizeOfSecureReceiptMessageComponentsDataSerializedInBytes, 0, this.secureReceiptMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfSecureReceiptMessageComponentsDataSerializedInBytes.length);
+			serializationOffset += sizeOfSecureReceiptMessageComponentsDataSerializedInBytes.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -362,9 +385,10 @@ public class SecureReceiptMessageMetaHeader {
 			byte[] sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSignedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			
-			byte[] sizeOfSecureReceiptMessageComponentsSerializedCipheredInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			byte[] sizeOfSecureReceiptMessageComponentsCipheredInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfSecureReceiptMessageDoSMitigationSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 
+			byte[] sizeOfSecureReceiptMessageComponentsDataSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			
 			byte[] sizeOfSecureReceiptMessageComponentsDataInfoSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfSecureReceiptMessageComponentsDataSignatureSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
@@ -424,9 +448,9 @@ public class SecureReceiptMessageMetaHeader {
 			// the position corresponding to the length of the current Bid's Serialization
 			serializationOffset += insideSeparator.length;
 			System.arraycopy(this.secureReceiptMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfSecureReceiptMessageComponentsSerializedCipheredInBytes,
-					0, sizeOfSecureReceiptMessageComponentsSerializedCipheredInBytes.length);
-			serializationOffset += sizeOfSecureReceiptMessageComponentsSerializedCipheredInBytes.length;
+					sizeOfSecureReceiptMessageComponentsCipheredInBytes,
+					0, sizeOfSecureReceiptMessageComponentsCipheredInBytes.length);
+			serializationOffset += sizeOfSecureReceiptMessageComponentsCipheredInBytes.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -438,6 +462,17 @@ public class SecureReceiptMessageMetaHeader {
 					0, sizeOfSecureReceiptMessageDoSMitigationSerializedInBytes.length);
 			serializationOffset += sizeOfSecureReceiptMessageDoSMitigationSerializedInBytes.length;
 
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			serializationOffset += insideSeparator.length;
+			System.arraycopy(this.secureReceiptMessageMetaHeaderSerialized, serializationOffset,
+					sizeOfSecureReceiptMessageComponentsDataSerializedInBytes,
+					0, sizeOfSecureReceiptMessageComponentsDataSerializedInBytes.length);
+			serializationOffset += sizeOfSecureReceiptMessageComponentsDataSerializedInBytes.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -487,11 +522,14 @@ public class SecureReceiptMessageMetaHeader {
 			this.sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSigned = 
 					CommonUtils.fromByteArrayToInt(sizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSignedInBytes);
 			
-			this.sizeOfSecureReceiptMessageComponentsSerializedCiphered = 
-					CommonUtils.fromByteArrayToInt(sizeOfSecureReceiptMessageComponentsSerializedCipheredInBytes);
+			this.sizeOfSecureReceiptMessageComponentsCiphered = 
+					CommonUtils.fromByteArrayToInt(sizeOfSecureReceiptMessageComponentsCipheredInBytes);
 			this.sizeOfSecureReceiptMessageDoSMitigationSerialized = 
 					CommonUtils.fromByteArrayToInt(sizeOfSecureReceiptMessageDoSMitigationSerializedInBytes);
-			 
+
+			this.sizeOfSecureReceiptMessageComponentsDataSerialized = 
+					CommonUtils.fromByteArrayToInt(sizeOfSecureReceiptMessageComponentsDataSerializedInBytes);
+
 			this.sizeOfSecureReceiptMessageComponentsDataInfoSerialized = 
 					CommonUtils.fromByteArrayToInt(sizeOfSecureReceiptMessageComponentsDataInfoSerializedInBytes);
 			this.sizeOfSecureReceiptMessageComponentsDataSignatureSerialized = 
