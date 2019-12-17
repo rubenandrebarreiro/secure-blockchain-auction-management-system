@@ -130,9 +130,9 @@ public class SecureReceiptMessage {
 			byte[] secureReceiptMessageDoSMitigationSerialized = 
 					this.secureReceiptMessageDoSMitigation.getSecureReceiptMessageComponentsHashedForDoSMitigation();
 			
-			int sizeOfSecureBidMessageSerialized = (secureReceiptMessageMetaHeaderSerialized.length +
+			int sizeOfSecureBidMessageSerialized = (this.initialisationVectorInBytes.length +
+													secureReceiptMessageMetaHeaderSerialized.length +
 													userPeerIDSerialized.length +
-													this.initialisationVectorInBytes.length +
 												    secureReceiptMessageKeyExchangeSerializedCipheredAndSigned.length +
 													secureReceiptMessageComponentsSerializedCiphered.length +
 													secureReceiptMessageDoSMitigationSerialized.length);
@@ -150,6 +150,15 @@ public class SecureReceiptMessage {
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
 		
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.initialisationVectorInBytes, 0, this.secureReceiptMessageSerialized,
+							 serializationOffset, this.initialisationVectorInBytes.length);
+			serializationOffset += this.initialisationVectorInBytes.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -165,14 +174,6 @@ public class SecureReceiptMessage {
 			System.arraycopy(userPeerIDSerialized, 0, this.secureReceiptMessageSerialized,
 							 serializationOffset, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
-
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.initialisationVectorInBytes, 0, this.secureReceiptMessageSerialized,
-							 serializationOffset, this.initialisationVectorInBytes.length);
-			serializationOffset += this.initialisationVectorInBytes.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -210,8 +211,10 @@ public class SecureReceiptMessage {
 			
 			
 			int sizeOfSecureReceiptMessageMetaHeaderSerialized = ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-															   ( 9 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-															   ( 10 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+															   ( 8 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+															   ( 9 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+			
+			this.initialisationVectorInBytes = new byte[16];
 			
 			byte[] secureReceiptMessageMetaHeaderSerialized = new byte[ sizeOfSecureReceiptMessageMetaHeaderSerialized ];
 			
@@ -225,7 +228,17 @@ public class SecureReceiptMessage {
 		
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
-		
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.secureReceiptMessageSerialized, serializationOffset,
+							 this.initialisationVectorInBytes,
+							 0, this.initialisationVectorInBytes.length);
+			serializationOffset += this.initialisationVectorInBytes.length;
+			
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
@@ -241,12 +254,6 @@ public class SecureReceiptMessage {
 			int sizeOfUserPeerIDSerialized = this.secureReceiptMessageMetaHeader.getSizeOfUserPeerIDSerialized();
 			
 			byte[] userPeerIDSerialized = new byte[ sizeOfUserPeerIDSerialized ];
-			
-			
-			int sizeOfInitialisationVectorInBytes = this.secureReceiptMessageMetaHeader.getSizeOfInitialisationVector();
-			
-			byte[] initialisationVectorInBytes = new byte[ sizeOfInitialisationVectorInBytes ];
-			
 			
 			
 			int sizeOfSecureReceiptMessageKeyExchangeSerialized = 
@@ -275,14 +282,6 @@ public class SecureReceiptMessage {
 			System.arraycopy(this.secureReceiptMessageSerialized, serializationOffset,
 					userPeerIDSerialized, 0, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.secureReceiptMessageSerialized, serializationOffset,
-					initialisationVectorInBytes, 0, initialisationVectorInBytes.length);
-			serializationOffset += initialisationVectorInBytes.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
