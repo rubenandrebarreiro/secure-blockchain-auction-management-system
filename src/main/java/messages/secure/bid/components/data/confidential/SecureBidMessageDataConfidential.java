@@ -44,6 +44,8 @@ public class SecureBidMessageDataConfidential {
 	
 	private byte[] secretSymmetricKeyForDataConfidentialInBytes;
 	
+	private byte[] initialisationVectorBytes;
+	
 	
 	private byte[] secureBidMessageDataConfidentialSerializedCiphered;
 
@@ -103,13 +105,14 @@ public class SecureBidMessageDataConfidential {
 
 
 	public SecureBidMessageDataConfidential(byte[] secureBidMessageDataConfidentialSerializedCipheredAndHashed,
-										byte[] secretSymmetricKeyForDataConfidentialInBytes,
-										int sizeOfSecureBidMessageDataConfidentialSerializedCiphered,
-										int sizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed,
-										int sizeOfSecureBidMessageDataConfidentialSerialized,
-										int sizeOfUserEmailSerialized,
-										int sizeOfUserHomeAddressSerialized,
-										int sizeOfUserBankAccountNIBSerialized) {
+											byte[] secretSymmetricKeyForDataConfidentialInBytes,
+											byte[] initialisationVectorBytes,
+											int sizeOfSecureBidMessageDataConfidentialSerializedCiphered,
+											int sizeOfSecureBidMessageDataConfidentialSerializedCipheredHashed,
+											int sizeOfSecureBidMessageDataConfidentialSerialized,
+											int sizeOfUserEmailSerialized,
+											int sizeOfUserHomeAddressSerialized,
+											int sizeOfUserBankAccountNIBSerialized) {
 		
 		this.secureBidMessageDataConfidentialSerializedCipheredAndHashed = 
 				secureBidMessageDataConfidentialSerializedCipheredAndHashed;
@@ -218,7 +221,11 @@ public class SecureBidMessageDataConfidential {
 	}
 	
 	public byte[] getSecretSymmetricKeyForDataConfidentialInBytes() {
-		return secretSymmetricKeyForDataConfidentialInBytes;
+		return this.secretSymmetricKeyForDataConfidentialInBytes;
+	}
+	
+	public byte[] getInitialisationVectorBytes() {
+		return this.initialisationVectorBytes;
 	}
 	
 	public boolean getIsSecureBidMessageDataConfidentialSerializedCipheredHashedVerified() {
@@ -480,14 +487,12 @@ public class SecureBidMessageDataConfidential {
 								symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								provider );
 
-				byte[] initialisationVectorBytes = null;
-
 				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
 
 					// Algorithms that don't need IV (Initialisation Vector): ECB
 					// The parameter specifications for the IV (Initialisation Vector)	
 					System.out.println("[SecureBidMessageDataConfidential.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
-					initialisationVectorBytes = 
+					this.initialisationVectorBytes = 
 							CommonUtils.generateIV(secureBidMessageDataConfidentialSerializedSymmetricEncryptionCipher);
 
 					// Showing the randomly defined IV (Initialisation Vector)
@@ -588,9 +593,7 @@ public class SecureBidMessageDataConfidential {
 						Cipher.getInstance(String.format("%s/%s/%s",
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								           provider );
-				
-				byte[] initialisationVectorBytes = null;
-			
+							
 				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
 					
 					// Algorithms that don't need IV (Initialisation Vector): ECB
@@ -599,7 +602,7 @@ public class SecureBidMessageDataConfidential {
 					
 					// Showing the randomly defined IV (Initialisation Vector)
 					System.out.println("[SecureBidMessageDataConfidential.DECRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
+									   + CommonUtils.fromByteArrayToHexadecimalFormat(this.initialisationVectorBytes));
 					
 					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
 					secureBidMessageDataConfidentialSerializedAndHashedSymmetricEncryptionDecipher

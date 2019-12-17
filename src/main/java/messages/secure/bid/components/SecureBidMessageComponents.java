@@ -47,10 +47,14 @@ public class SecureBidMessageComponents {
 	
 	private String userPeerID;
 	
+	private byte[] initialisationVectorBytes;
+	
+	
 	public SecureBidMessageComponents(SecureCommonHeader secureCommonHeader,
 								      SecureBidMessageData secureBidMessageData,
 								      byte[] secretSymmetricKeyForDataPersonalInBytes,
-								      String userPeerID) {
+								      String userPeerID,
+								      byte[] initialisationVectorBytes) {
 		
 		this.secureCommonHeader = secureCommonHeader;
 		
@@ -63,6 +67,8 @@ public class SecureBidMessageComponents {
 		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
 		
 		this.userPeerID = userPeerID;
+		
+		this.initialisationVectorBytes = initialisationVectorBytes;
 		
 	}
 	
@@ -80,7 +86,8 @@ public class SecureBidMessageComponents {
 									  int sizeOfUserEmailSerialized,
 									  int sizeOfUserHomeAddressSerialized, 
 									  int sizeOfUserBankAccountNIBSerialized,
-									  String userPeerID) {
+									  String userPeerID,
+									  byte[] initialisationVectorBytes) {
 
 		this.secureBidMessageComponentsSerialized = secureBidMessageComponentsSerialized;
 		this.secretSymmetricKeyForDataPersonalInBytes = secretSymmetricKeyForDataPersonalInBytes;
@@ -116,6 +123,8 @@ public class SecureBidMessageComponents {
 						sizeOfUserBankAccountNIBSerialized;
 		
 		this.userPeerID = userPeerID;
+		
+		this.initialisationVectorBytes = initialisationVectorBytes;
 		
 	}
 	
@@ -264,7 +273,8 @@ public class SecureBidMessageComponents {
 																 this.sizeOfUserEmailSerialized,
 																 this.sizeOfUserHomeAddressSerialized,
 																 this.sizeOfUserBankAccountNIBSerialized,
-																 this.userPeerID);
+																 this.userPeerID,
+																 this.initialisationVectorBytes);
 			
 			this.secureBidMessageData.undoSecureBidMessageDataSerialization();
 			

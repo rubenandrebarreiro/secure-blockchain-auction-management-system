@@ -20,6 +20,8 @@ public class SecureBidMessage {
 	
 	private String userPeerID;
 	
+	private byte[] initialisationVectorBytes;
+	
 	private SecureCommonKeyExchange secureBidMessageKeyExchange;
 	
 	private SecureBidMessageComponents secureBidMessageComponents;
@@ -33,12 +35,14 @@ public class SecureBidMessage {
 	
 	public SecureBidMessage(SecureBidMessageMetaHeader secureBidMessageMetaHeader,
 							String userPeerID,
+							byte[] initialisationVectorBytes,
 							SecureCommonKeyExchange secureBidMessageKeyExchange,
 							SecureBidMessageComponents secureBidMessageComponents,
 							SecureBidMessageDoSMitigation secureBidMessageDoSMitigation) {
 		
 		this.secureBidMessageMetaHeader = secureBidMessageMetaHeader;
 		this.userPeerID = userPeerID;
+		this.initialisationVectorBytes = initialisationVectorBytes;
 		this.secureBidMessageKeyExchange = secureBidMessageKeyExchange;
 		this.secureBidMessageComponents = secureBidMessageComponents;
 		this.secureBidMessageDoSMitigation = secureBidMessageDoSMitigation;
@@ -55,6 +59,7 @@ public class SecureBidMessage {
 		
 		this.secureBidMessageMetaHeader = null;
 		this.userPeerID = null;
+		this.initialisationVectorBytes = null;
 		this.secureBidMessageKeyExchange = null;
 		this.secureBidMessageComponents = null;
 		this.secureBidMessageDoSMitigation = null;
@@ -68,6 +73,10 @@ public class SecureBidMessage {
 	
 	public String getUserPeerID() {
 		return this.userPeerID;
+	}
+	
+	public byte[] getInitialisationVectorBytes() {
+		return this.initialisationVectorBytes;
 	}
 	
 	public SecureCommonKeyExchange getSecureBidMessageKeyExchange() {
@@ -121,6 +130,7 @@ public class SecureBidMessage {
 			
 			int sizeOfSecureBidMessageSerialized = (secureBidMessageMetaHeaderSerialized.length +
 													userPeerIDSerialized.length +
+													this.initialisationVectorBytes.length +
 												    secureBidMessageKeyExchangeSerializedCipheredAndSigned.length +
 													secureBidMessageComponentsSerialized.length +
 													secureBidMessageDoSMitigationSerialized.length);
@@ -158,6 +168,14 @@ public class SecureBidMessage {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.initialisationVectorBytes, 0, this.secureBidMessageSerialized,
+							 serializationOffset, this.initialisationVectorBytes.length);
+			serializationOffset += this.initialisationVectorBytes.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
 			System.arraycopy(secureBidMessageKeyExchangeSerializedCipheredAndSigned, 0, this.secureBidMessageSerialized,
 							 serializationOffset, secureBidMessageKeyExchangeSerializedCipheredAndSigned.length);
 			serializationOffset += secureBidMessageKeyExchangeSerializedCipheredAndSigned.length;
@@ -191,8 +209,8 @@ public class SecureBidMessage {
 			
 			
 			int sizeOfSecureBidMessageMetaHeaderSerialized = ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-															   ( 15 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-															   ( 16 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+															   ( 16 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+															   ( 17 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 			
 			byte[] secureBidMessageMetaHeaderSerialized = new byte[ sizeOfSecureBidMessageMetaHeaderSerialized ];
 			
@@ -223,6 +241,12 @@ public class SecureBidMessage {
 			
 			byte[] userPeerIDSerialized = new byte[ sizeOfUserPeerIDSerialized ];
 			
+			
+			int sizeOfInitialisationVectorBytes = this.secureBidMessageMetaHeader.getSizeOfInitialisationVector();
+			
+			byte[] initialisationVectorInBytes = new byte[ sizeOfInitialisationVectorBytes ];
+			
+			
 			int sizeOfSecureBidMessageKeyExchangeSerialized = 
 					( this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeSerializedCiphered() + 
 					  this.secureBidMessageMetaHeader.getSizeOfSecureBidMessageKeyExchangeSerializedCipheredSigned() );
@@ -250,6 +274,14 @@ public class SecureBidMessage {
 			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
 					userPeerIDSerialized, 0, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.secureBidMessageSerialized, serializationOffset,
+					initialisationVectorInBytes, 0, initialisationVectorInBytes.length);
+			serializationOffset += initialisationVectorInBytes.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -350,7 +382,8 @@ public class SecureBidMessage {
 												   sizeOfUserEmailSerialized,
 												   sizeOfUserHomeAddressSerialized, 
 												   sizeOfUserBankAccountNIBSerialized,
-												   this.userPeerID);
+												   this.userPeerID,
+												   this.initialisationVectorBytes);
 						
 			this.secureBidMessageDoSMitigation = 
 					new SecureBidMessageDoSMitigation(secureBidMessageComponentsSerialized,

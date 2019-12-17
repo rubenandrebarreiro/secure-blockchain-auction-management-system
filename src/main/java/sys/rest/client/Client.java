@@ -636,11 +636,14 @@ public class Client implements ClientAPI {
 				new SecureBidMessageDataConfidential(currentUser.getUserEmail(),
 													 currentUser.getUserHomeAddress(),
 													 currentUser.getUserBankAccountNIB());
-												
+		
+		byte[] initialisationVectorBytes = secureBidMessageDataConfidential.getInitialisationVectorBytes();
+		
 		SecureBidMessageData secureBidMessageData = 
 				new SecureBidMessageData(secureBidMessageDataSignature,
 								         secureBidMessageDataConfidential,
-										 currentUser.getUserPeerID());
+										 currentUser.getUserPeerID(),
+										 initialisationVectorBytes);
 								
 		SecureCommonHeader secureCommonHeader = 
 				new SecureCommonHeader(VersionNumber.VERSION_01.getVersionNumber(),
@@ -689,7 +692,8 @@ public class Client implements ClientAPI {
 					secureCommonHeader,
 					secureBidMessageData,
 					secureBidMessageDataConfidential.getSecretSymmetricKeyForDataConfidentialInBytes(),
-					currentUser.getUserPeerID());
+					currentUser.getUserPeerID(),
+					initialisationVectorBytes);
 			
 			secureBidMessageDoSMitigation = new SecureBidMessageDoSMitigation(
 					secureBidMessageComponents);
@@ -735,6 +739,7 @@ public class Client implements ClientAPI {
 
 		SecureBidMessageMetaHeader secureBidMessageMetaHeader = new SecureBidMessageMetaHeader(
 				currentUser.getUserPeerID().getBytes("UTF-8").length,
+				initialisationVectorBytes.length,
 				secureBidMessageKeyExchangeSerializedCiphered.length,
 				secureBidMessageKeyExchangeSerializedCipheredSigned.length,
 				secureBidMessageDataSerialized.length,
@@ -756,6 +761,7 @@ public class Client implements ClientAPI {
 		SecureBidMessage bidMessage = new SecureBidMessage(
 				secureBidMessageMetaHeader,
 				currentUser.getUserPeerID(),
+				initialisationVectorBytes,
 				secureBidMessageKeyExchange,
 				secureBidMessageComponents,
 				secureBidMessageDoSMitigation);
