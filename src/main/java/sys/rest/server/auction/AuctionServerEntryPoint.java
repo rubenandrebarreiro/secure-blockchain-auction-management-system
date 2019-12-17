@@ -1,7 +1,10 @@
 package main.java.sys.rest.server.auction;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -9,6 +12,8 @@ import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.SSLContext;
@@ -17,6 +22,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.eclipse.jetty.util.BlockingArrayQueue;
 
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerKeyStoreConfigurationReader;
 import main.java.sys.rest.server.auction.configuration.utils.AuctionServerTLSConfigurationReader;
@@ -35,7 +41,7 @@ public class AuctionServerEntryPoint{
 	private SSLSocket responseSocket;
 	
 	
-	private Map<String, String> connectedClientsMap;
+	private Map<String, BlockingQueue<String>> connectedClientsMap;
 	
 	
 	public static void main(String[] args) throws UnrecoverableKeyException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
@@ -79,7 +85,7 @@ public class AuctionServerEntryPoint{
 		String[] mutualAuth = tlsConfigurationReader.getAvailableTLSAuthenticationModes();
 		// TODO Change this maybe!
 		if(mutualAuth[0].equals(TLS_CONF_CLIENT_ONLY)) {
-			printErrorStringWithClassName("Not supported");
+			printErrorStringWithClassName("Not supported! -> " + TLS_CONF_CLIENT_ONLY);
 			System.exit(1);
 		}
 		else if(mutualAuth[0].equals(TLS_CONF_MUTUAL))
@@ -92,8 +98,15 @@ public class AuctionServerEntryPoint{
 			try {
 				responseSocket = (SSLSocket) serverSocket.accept();
 				responseSocket.startHandshake();
-				connectedClientsMap.put(responseSocket.getRemoteSocketAddress().toString(),"Client IP:port");
-				Thread t = new AuctionServer(serverSocket, responseSocket, connectedClientsMap, mutualAuth[0]);
+				InputStream tempInputStream = responseSocket.getInputStream();
+				BufferedReader br = new BufferedReader(new InputStreamReader(tempInputStream));
+				String userName = br.readLine();
+				connectedClientsMap.put(userName, new BlockingArrayQueue<String>());
+				System.out.println("User logged in as: " + userName);
+				for (Entry<String, BlockingQueue<String>> string : connectedClientsMap.entrySet()) {
+					printErrorStringWithClassName(string);
+				}
+				Thread t = new AuctionServer(serverSocket, responseSocket, connectedClientsMap, mutualAuth[0], userName);
 				t.start();
 			} catch (Exception e) {
 				printErrorStringWithClassName(e.getMessage());

@@ -243,6 +243,8 @@ public class Client implements ClientAPI {
 								case RECEIPT:
 									System.out.println(decodeReceipt(message));
 									break;
+								case UPDATE_CLIENT_BIDS:
+									System.out.println(updateBids(message));
 								default:
 									break;
 								}
@@ -432,6 +434,18 @@ public class Client implements ClientAPI {
 			e.printStackTrace();
 		}
 
+		OutputStream tempOut = null;
+		try {
+			tempOut = socket.getOutputStream();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		PrintWriter printWriter = new PrintWriter(tempOut);
+
+		printWriter.print(gson.toJson(result.getUserPeerID()) + System.lineSeparator());
+		printWriter.flush();
+		
 		System.out.println("Welcome " + result.getUserPeerID());
 		System.out.println();
 		helpScreen();
@@ -1165,6 +1179,15 @@ public class Client implements ClientAPI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return result;
+	}
+	
+	// TODO
+	private String updateBids(String message) {
+		String result = null;
+		
+		result = message;
+		
 		return result;
 	}
 }

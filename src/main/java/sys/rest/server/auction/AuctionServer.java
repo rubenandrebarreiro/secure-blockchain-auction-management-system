@@ -21,7 +21,9 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -46,6 +48,7 @@ import com.google.gson.Gson;
 import main.java.api.rest.server.auction.AuctionServerAPI;
 import main.java.common.protocols.MessageType;
 import main.java.common.protocols.VersionNumber;
+import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.SecureBidMessage;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.components.data.SecureBidMessageData;
@@ -83,18 +86,50 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	private SSLSocket responseSocket;
 	private Random random;
-	private Map<String, String> connectedClientsMap;
+	private Map<String, BlockingQueue<String>> connectedClientsMap;
 	private boolean mutualAuth;
+	private String userName;
+	
+	private Thread updateClientBidsService;
 
-	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, String> connectedClientsMap, String mutualAuth) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, BlockingQueue<String>> connectedClientsMap2, String mutualAuth, String userName) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
 		this.responseSocket = responseSocket;
-		this.connectedClientsMap = connectedClientsMap;
+		this.connectedClientsMap = connectedClientsMap2;
 		this.gson = new Gson();
 		this.httpClient = HttpClients.createDefault();
 		this.random = new Random();
 		if(mutualAuth.contentEquals(AuctionServerEntryPoint.TLS_CONF_SERVER_ONLY))
 			this.mutualAuth = false;
 		else this.mutualAuth = true;		
+		this.userName = userName;
+		
+		updateClientBidsService = new Thread(){
+			public void run() {
+				System.out.println("Update client bids service is online for user " + userName + ".");
+				while(true) {
+					try {
+						Thread.sleep(CommonUtils.TRY_TO_CLOSE_BLOCK_OF_BIDS_SERVICE_VERIFICATION_RATE_TIME);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					BlockingQueue<String> workQueue = connectedClientsMap.get(userName);
+					if(workQueue != null) {
+						try {
+							while(!workQueue.isEmpty()) {
+								String string = workQueue.remove();
+								printErrorStringWithClassName("Update client bids updating for user " + userName + " with bid " + string);
+								sslWriteResponse(responseSocket.getOutputStream(), string, null, MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS);
+							}
+						} catch (ParseException | IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		};
+		updateClientBidsService.start();
 	}
 
 	public void run() {
@@ -539,6 +574,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				
 				byte[] secureReceiptMessageSerialized = secureReceiptMessage.getSecureReceiptMessageSerialized();
+				// TODO Change type!
+				for (Entry<String, BlockingQueue<String>> entry : connectedClientsMap.entrySet()) {
+					if(!entry.getKey().equals(userName))
+						entry.getValue().add("Hey you! Yes you, " + entry.getKey() + "! Work on this! -> " + secureBidMessageData.getSecureBidMessageDataSignature().getBid());
+				}
+				connectedClientsMap.forEach( (x,y) -> {
+					System.out.println(x + " " + y);
+				});
 				methodResult = java.util.Base64.getEncoder().encodeToString(secureReceiptMessageSerialized);
 			}
 			
@@ -1066,12 +1109,12 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return builder.toString();
 	}
 
-	private void sslWriteResponse(OutputStream socketOutStream, String receiptMessage, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
+	private void sslWriteResponse(OutputStream socketOutStream, String notResponseMessage, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
 		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
 		String httpResponseMessage = null;
 		MessagePacketServerToClient messagePacket = null;
-		if(messageType == MessagePacketServerToClientTypes.RECEIPT && receiptMessage != null) {
-			httpResponseMessage = receiptMessage;
+		if(notResponseMessage != null && (messageType == MessagePacketServerToClientTypes.RECEIPT || messageType == MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS)) {
+			httpResponseMessage = notResponseMessage;
 			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
 		}
 		else {
