@@ -20,6 +20,8 @@ public class SecureReceiptMessage {
 	
 	private String userPeerID;
 	
+	private byte[] initialisationVectorInBytes;
+	
 	private SecureCommonKeyExchange secureReceiptMessageKeyExchange;
 	
 	private SecureReceiptMessageComponents secureReceiptMessageComponents;
@@ -35,12 +37,14 @@ public class SecureReceiptMessage {
 	
 	public SecureReceiptMessage(SecureReceiptMessageMetaHeader secureReceiptMessageMetaHeader,
 								String userPeerID,
+								byte[] initialisationVectorInBytes,
 								SecureCommonKeyExchange secureReceiptMessageKeyExchange,
 								SecureReceiptMessageComponents secureReceiptMessageComponents,
 								SecureReceiptMessageDoSMitigation secureReceiptMessageDoSMitigation) {
 		
 		this.secureReceiptMessageMetaHeader = secureReceiptMessageMetaHeader;
 		this.userPeerID = userPeerID;
+		this.initialisationVectorInBytes = initialisationVectorInBytes;
 		this.secureReceiptMessageKeyExchange = secureReceiptMessageKeyExchange;
 		this.secureReceiptMessageComponents = secureReceiptMessageComponents;
 		this.secureReceiptMessageDoSMitigation = secureReceiptMessageDoSMitigation;
@@ -55,6 +59,7 @@ public class SecureReceiptMessage {
 		
 		this.secureReceiptMessageMetaHeader = null;
 		this.userPeerID = null;
+		this.initialisationVectorInBytes = null;
 		this.secureReceiptMessageKeyExchange = null;
 		this.secureReceiptMessageComponents = null;
 		this.secureReceiptMessageDoSMitigation = null;
@@ -67,6 +72,10 @@ public class SecureReceiptMessage {
 	
 	public String getUserPeerID() {
 		return this.userPeerID;
+	}
+	
+	public byte[] getInitialisationVectorInBytes() {
+		return this.initialisationVectorInBytes;
 	}
 	
 	public SecureCommonKeyExchange getSecureReceiptMessageKeyExchange() {
@@ -123,6 +132,7 @@ public class SecureReceiptMessage {
 			
 			int sizeOfSecureBidMessageSerialized = (secureReceiptMessageMetaHeaderSerialized.length +
 													userPeerIDSerialized.length +
+													this.initialisationVectorInBytes.length +
 												    secureReceiptMessageKeyExchangeSerializedCipheredAndSigned.length +
 													secureReceiptMessageComponentsSerializedCiphered.length +
 													secureReceiptMessageDoSMitigationSerialized.length);
@@ -160,6 +170,14 @@ public class SecureReceiptMessage {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.initialisationVectorInBytes, 0, this.secureReceiptMessageSerialized,
+							 serializationOffset, this.initialisationVectorInBytes.length);
+			serializationOffset += this.initialisationVectorInBytes.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
 			System.arraycopy(secureReceiptMessageKeyExchangeSerializedCipheredAndSigned, 0, this.secureReceiptMessageSerialized,
 							 serializationOffset, secureReceiptMessageKeyExchangeSerializedCipheredAndSigned.length);
 			serializationOffset += secureReceiptMessageKeyExchangeSerializedCipheredAndSigned.length;
@@ -192,8 +210,8 @@ public class SecureReceiptMessage {
 			
 			
 			int sizeOfSecureReceiptMessageMetaHeaderSerialized = ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-															   ( 8 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-															   ( 9 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+															   ( 9 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+															   ( 10 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 			
 			byte[] secureReceiptMessageMetaHeaderSerialized = new byte[ sizeOfSecureReceiptMessageMetaHeaderSerialized ];
 			
@@ -224,6 +242,13 @@ public class SecureReceiptMessage {
 			
 			byte[] userPeerIDSerialized = new byte[ sizeOfUserPeerIDSerialized ];
 			
+			
+			int sizeOfInitialisationVectorInBytes = this.secureReceiptMessageMetaHeader.getSizeOfInitialisationVector();
+			
+			byte[] initialisationVectorInBytes = new byte[ sizeOfInitialisationVectorInBytes ];
+			
+			
+			
 			int sizeOfSecureReceiptMessageKeyExchangeSerialized = 
 					( this.secureReceiptMessageMetaHeader.getSizeOfSecureReceiptMessageKeyExchangeSerializedCiphered() + 
 					  this.secureReceiptMessageMetaHeader.getSizeOfSecureReceiptMessageKeyExchangeSerializedCipheredSigned() );
@@ -250,6 +275,14 @@ public class SecureReceiptMessage {
 			System.arraycopy(this.secureReceiptMessageSerialized, serializationOffset,
 					userPeerIDSerialized, 0, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.secureReceiptMessageSerialized, serializationOffset,
+					initialisationVectorInBytes, 0, initialisationVectorInBytes.length);
+			serializationOffset += initialisationVectorInBytes.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
@@ -320,6 +353,7 @@ public class SecureReceiptMessage {
 			this.secureReceiptMessageComponents = 
 					new SecureReceiptMessageComponents(secureReceiptMessageComponentsSerializedCiphered,
 													   this.secureReceiptMessageKeyExchange.getSecretSymmetricKeyInBytes(),
+													   this.initialisationVectorInBytes,
 													   sizeOfSecureReceiptMessageComponentsSerializedCiphered,
 													   sizeOfSecureReceiptMessageComponentsDataInfoSerialized,
 													   sizeOfSecureReceiptMessageComponentsDataSignatureSerialized,

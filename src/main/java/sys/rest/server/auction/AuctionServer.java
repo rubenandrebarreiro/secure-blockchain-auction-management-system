@@ -514,8 +514,12 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 								secureReceiptMessageComponentsDataSignature
 								   		.getSecureReceiptMessageComponentsDataInfoSerializedDigitalSigned();
 				
+				byte[] secureReceiptMessageComponentsInitialisationVector = 
+						secureReceiptMessageComponents.getInitialisationVectorInBytes();
+				
 				SecureReceiptMessageMetaHeader secureReceiptMessageMetaHeader = 
 						new SecureReceiptMessageMetaHeader(bid.getSizeOfBidderUserClientID(),
+														   secureReceiptMessageComponentsInitialisationVector.length,
 														   secureReceiptMessageKeyExchangeSerializedCiphered.length,
 														   secureReceiptMessageKeyExchangeSerializedCipheredSigned.length,
 														   secureReceiptMessageComponentsSerializedCiphered.length,
@@ -531,6 +535,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				SecureReceiptMessage secureReceiptMessage = 
 						new SecureReceiptMessage(secureReceiptMessageMetaHeader,
 												 bid.getBidderUserClientID(),
+												 secureReceiptMessageComponentsInitialisationVector,
 												 secureCommonKeyExchange,
 												 secureReceiptMessageComponents,
 												 secureReceiptMessageDoSMitigation);

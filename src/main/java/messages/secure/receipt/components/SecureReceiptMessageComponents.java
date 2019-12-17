@@ -51,6 +51,8 @@ public class SecureReceiptMessageComponents {
 	
 	private byte[] secretSymmetricKeyForComponentsInBytes;
 	
+	private byte[] initialisationVectorInBytes;
+	
 	
 	private byte[] secureReceiptMessageComponentsSerializedCiphered;
 	
@@ -81,6 +83,11 @@ public class SecureReceiptMessageComponents {
 		
 		this.secureReceiptMessageComponentsSerialized = null;
 		this.isSecureReceiptMessageComponentsSerialized = false;
+
+		
+		this.secretSymmetricKeyForComponentsInBytes = null;
+		this.initialisationVectorInBytes = null;
+
 		
 		this.secureReceiptMessageComponentsSerializedCiphered = null;
 		this.isSecureReceiptMessageComponentsSerializedCiphered = false;
@@ -92,6 +99,7 @@ public class SecureReceiptMessageComponents {
 	
 	public SecureReceiptMessageComponents(byte[] secureReceiptMessageComponentsSerializedCiphered,
 										  byte[] secretSymmetricKeyForComponentsInBytes,
+										  byte[] initialisationVectorInBytes,
 										  int sizeOfSecureReceiptMessageComponentsDataSerialized,
 										  int sizeOfSecureReceiptMessageComponentsDataInfoSerialized,
 										  int sizeOfSecureReceiptMessageComponentsDataSignatureSerialized,
@@ -105,6 +113,7 @@ public class SecureReceiptMessageComponents {
 		this.isSecureReceiptMessageComponentsSerializedCiphered = true;
 		
 		this.secretSymmetricKeyForComponentsInBytes = secretSymmetricKeyForComponentsInBytes;
+		this.initialisationVectorInBytes = initialisationVectorInBytes;
 		
 		this.secureReceiptMessageComponentsSerialized = null;
 		this.isSecureReceiptMessageComponentsSerialized = true;
@@ -194,6 +203,11 @@ public class SecureReceiptMessageComponents {
 	public byte[] getSecretSymmetricKeyForComponentsInBytes() {
 		return this.secretSymmetricKeyForComponentsInBytes;
 	}
+	
+	public byte[] getInitialisationVectorInBytes() {
+		return this.initialisationVectorInBytes;
+	}
+	
 	
 	public byte[] getSecureReceiptMessageComponentsSerializedCiphered() {
 		return this.secureReceiptMessageComponentsSerializedCiphered;
@@ -387,21 +401,19 @@ public class SecureReceiptMessageComponents {
 								symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								provider );
 
-				byte[] initialisationVectorBytes = null;
-
 				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
 
 					// Algorithms that don't need IV (Initialisation Vector): ECB
 					// The parameter specifications for the IV (Initialisation Vector)	
 					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
-					initialisationVectorBytes = 
+					this.initialisationVectorInBytes = 
 							CommonUtils.generateIV(secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher);
 
 					// Showing the randomly defined IV (Initialisation Vector)
 					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
-							+ CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
+							+ CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorInBytes));
 
-					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
+					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorInBytes);
 					
 					secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher
 							.init(Cipher.ENCRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
@@ -495,9 +507,7 @@ public class SecureReceiptMessageComponents {
 						Cipher.getInstance(String.format("%s/%s/%s",
 										   symmetricEncryptionAlgorithm, symmetricEncryptionMode, symmetricEncryptionPadding), 
 								           provider );
-				
-				byte[] initialisationVectorBytes = null;
-			
+							
 				if(CommonUtils.blockModeRequiresIV(symmetricEncryptionMode)) {
 					
 					// Algorithms that don't need IV (Initialisation Vector): ECB
@@ -506,9 +516,9 @@ public class SecureReceiptMessageComponents {
 					
 					// Showing the randomly defined IV (Initialisation Vector)
 					System.out.println("[SecureReceiptMessageComponents.DECRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
+									   + CommonUtils.fromByteArrayToHexadecimalFormat(this.initialisationVectorInBytes));
 					
-					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
+					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(this.initialisationVectorInBytes);
 					secureReceiptMessageComponentsSerializedSymmetricEncryptionDecipher
 						.init(Cipher.DECRYPT_MODE, secretKeySpecifications, initializationVectorParameterSpecifications);
 				}
