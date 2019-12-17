@@ -92,10 +92,10 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 	
 	private Thread updateClientBidsService;
 
-	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, BlockingQueue<String>> connectedClientsMap2, String mutualAuth, String userName) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, BlockingQueue<String>> connectedClientsMap, String mutualAuth, String userName) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
 		exitFlag = false;
 		this.responseSocket = responseSocket;
-		this.connectedClientsMap = connectedClientsMap2;
+		this.connectedClientsMap = connectedClientsMap;
 		this.gson = new Gson();
 		this.httpClient = HttpClients.createDefault();
 		this.random = new Random();
