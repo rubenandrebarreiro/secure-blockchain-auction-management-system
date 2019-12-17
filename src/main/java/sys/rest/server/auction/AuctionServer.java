@@ -80,9 +80,9 @@ public class AuctionServer extends Thread{
 
 	private Gson gson;
 
-	HttpClient httpClient;
+	private HttpClient httpClient;
 
-	boolean exitFlag;
+	private boolean exitFlag;
 	
 	private SSLSocket responseSocket;
 	private Random random;
