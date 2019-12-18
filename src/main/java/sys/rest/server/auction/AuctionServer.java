@@ -20,11 +20,16 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -44,6 +49,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import main.java.common.protocols.MessageType;
 import main.java.common.protocols.VersionNumber;
@@ -617,7 +623,7 @@ public class AuctionServer extends Thread{
 		return methodResult;
 	}
 
-	public HttpResponse listAllProductsAuctions() throws SQLException {
+	public HttpResponse listAllProductsAuctions() throws SQLException, JsonSyntaxException, ParseException, IOException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all Auctions!");
 		
@@ -634,6 +640,13 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		Auction[] auctionArray = gson.fromJson(EntityUtils.toString(response.getEntity()), Auction[].class);
+		List<Auction> auctionList = new ArrayList<Auction>(Arrays.asList(auctionArray));
+		
+		String newEntity = gson.toJson(removeBids(auctionList));
+		EntityUtils.updateEntity(response, new StringEntity(newEntity));
+		
 		return response;
 	}
 
@@ -1148,5 +1161,32 @@ public class AuctionServer extends Thread{
 	
 	private void printStringWithClassName(Object message) {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " + message);
+	}
+	
+	private List<Auction> removeBids(List<Auction> auctionsWithBids){
+		List<Auction> result = null;
+		
+		List<Auction> openedResult = new ArrayList<Auction>(auctionsWithBids.size());
+		List<Auction> closedResult = new ArrayList<Auction>(auctionsWithBids.size());
+		
+		for (Auction auction : auctionsWithBids) {
+			if(auction.verifyIfAuctionIsOpen()) {
+				auction.setAuctionBids(new HashMap<Long, Bid>());
+				openedResult.add(auction);
+			}
+			else {
+				auction.getAuctionBidsMade().forEach((x,y) -> {
+					// Do not pollute client with this unnecessary information.
+					y.setBidSerializedBytes(new byte[0]);
+				});
+				closedResult.add(auction);
+			}
+		}
+
+		result = new ArrayList<Auction>(auctionsWithBids.size());
+		result.addAll(openedResult);
+		result.addAll(closedResult);
+		
+		return result;
 	}
 }
