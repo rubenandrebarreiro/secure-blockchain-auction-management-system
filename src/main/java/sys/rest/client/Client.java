@@ -1176,7 +1176,6 @@ public class Client {
 	
 	// TODO complete and test
 	private void receivedProofOfWork(String proofOfWorkSerializedJson) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-		printErrorStringWithClassName("PROOF OF WORK!!! -> " + proofOfWorkSerializedJson);
 		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
 		proofOfWork.undoSecureProofOfWorkMessageSerialized();
 		
@@ -1226,10 +1225,8 @@ public class Client {
 		// add proof to minedBlockMap?
 	}
 	
-	// TODO
 	private void updateBids(String message) {
 		Bid bidToAdd = gson.fromJson(message, Bid.class);
-		Random r = new Random();
 		openBidsList.put(bidToAdd.getBidID(), bidToAdd);
 	}
 }
