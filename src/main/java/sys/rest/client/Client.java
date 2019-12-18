@@ -51,6 +51,11 @@ import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
 import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.messages.secure.proofwork.SecureProofOfWorkMessage;
+import main.java.messages.secure.proofwork.components.SecureProofOfWorkMessageComponents;
+import main.java.messages.secure.proofwork.components.solvedblock.SecureProofOfWorkMessageComponentsSolvedBlock;
+import main.java.messages.secure.proofwork.components.solvedblock.info.SecureProofOfWorkMessageComponentsSolvedBlockInfo;
+import main.java.messages.secure.proofwork.components.solvedblock.signature.SecureProofOfWorkMessageComponentsSolvedBlockSignature;
+import main.java.messages.secure.proofwork.dos.mitigation.SecureProofOfWorkMessageDoSMitigation;
 import main.java.messages.secure.receipt.SecureReceiptMessage;
 import main.java.messages.secure.receipt.components.SecureReceiptMessageComponents;
 import main.java.messages.secure.receipt.components.data.SecureReceiptMessageComponentsData;
@@ -240,7 +245,6 @@ public class Client {
 									System.out.println(getPrettyJsonString(message));
 									break;
 								case PROOF_OF_WORK:
-									System.err.println("OIIII!");
 									receivedProofOfWork(message);
 									break;
 								case RECEIPT:
@@ -1171,10 +1175,53 @@ public class Client {
 	}
 	
 	// TODO complete and test
-	private void receivedProofOfWork(String proofOfWorkSerializedJson) {
+	private void receivedProofOfWork(String proofOfWorkSerializedJson) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		printErrorStringWithClassName("PROOF OF WORK!!! -> " + proofOfWorkSerializedJson);
 		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
+		proofOfWork.undoSecureProofOfWorkMessageSerialized();
+		
+		SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation = 
+				proofOfWork.getSecureProofOfWorkMessageDoSMitigation();
+		
+		if(!secureProofOfWorkMessageDoSMitigation.checkIfHashOfSecureProofOfWorkMessageDoSMitigationIsValid()) {
+			// TODO error
+		}
+		else {
+			SecureProofOfWorkMessageComponents secureProofOfWorkMessageComponents = 
+					proofOfWork.getSecureProofOfWorkMessageComponents();
+			
+			secureProofOfWorkMessageComponents.decryptSecureProofOfWorkMessageComponents();
+			secureProofOfWorkMessageComponents.undoSecureProofOfWorkMessageComponentsSerialization();
+			
+			SecureProofOfWorkMessageComponentsSolvedBlock secureProofOfWorkMessageComponentsSolvedBlock = 
+					secureProofOfWorkMessageComponents.getSecureProofOfWorkMessageComponentsSolvedBlock();
+						
+			secureProofOfWorkMessageComponentsSolvedBlock.undoSecureProofOfWorkMessageSolvedBlockSerialization();
+			SecureProofOfWorkMessageComponentsSolvedBlockSignature secureProofOfWorkMessageComponentsSolvedBlockSignature = 
+					secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockSignature();
+			
+			if(!secureProofOfWorkMessageComponentsSolvedBlockSignature.checkIfProofOfWorkMessageComponentsSolvedBlockDigitalSignedIsValid()) {
+				// TODO signature not valid
+			}
+			else {
+				SecureProofOfWorkMessageComponentsSolvedBlockInfo secureProofOfWorkMessageComponentsSolvedBlockInfo = 
+						secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockInfo();
+				
+				secureProofOfWorkMessageComponentsSolvedBlockInfo.undoBlockSerializedAndSolvedHashed();
+				
+				
+				if(!secureProofOfWorkMessageComponentsSolvedBlockInfo.checkIfBlockSolvedHashedIsValid()) {
+					// TODO challenge not valid
+				}
+				else {
+					System.out.println("CENAS ISTO ESTA BOM");
+				}
+			}
+		}
+		
 		// check if trying to do work already done by this proof and stop
+		
+		
 		
 		// add proof to minedBlockMap?
 	}
