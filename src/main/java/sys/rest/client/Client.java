@@ -804,9 +804,8 @@ public class Client {
 		}
 		
 		String bidInfoSerialiazed = gson.toJson(bidMessage);
-		HashMap<String,Object> paramsMap = new HashMap<String, Object>();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
-		paramsMap.put("iv", initialisationVectorBytes);
 		MessagePacketClientToServer message = new MessagePacketClientToServer(MessagePacketClientToServerTypes.ADD_BID, paramsMap, bidInfoSerialiazed);
 		sendMessage(message);
 	}
