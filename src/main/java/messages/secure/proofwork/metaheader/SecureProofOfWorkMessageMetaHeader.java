@@ -471,51 +471,9 @@ public class SecureProofOfWorkMessageMetaHeader {
 			// the position corresponding to the length of the current ProofOfWork's Serialization
 			serializationOffset += insideSeparator.length;
 			System.arraycopy(this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSignedInBytes,
-					0, sizeOfSecureProofOfWorkMessageSolvedBlockSignatureSerializedInBytes.length);
-			serializationOffset += sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSignedInBytes.length;
-						
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current ProofOfWork serialized,
-			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
-			// the position corresponding to the length of the current ProofOfWork's Serialization
-			serializationOffset += insideSeparator.length;
-			System.arraycopy(this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerializedInBytes,
-					0, sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerializedInBytes.length);
-			serializationOffset += sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerializedInBytes.length;
-			
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current ProofOfWork serialized,
-			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
-			// the position corresponding to the length of the current ProofOfWork's Serialization
-			serializationOffset += insideSeparator.length;
-			System.arraycopy(this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset,
 					sizeOfSecureProofOfWorkMessageSolvedBlockSignatureSerializedInBytes,
 					0, sizeOfSecureProofOfWorkMessageSolvedBlockSignatureSerializedInBytes.length);
 			serializationOffset += sizeOfSecureProofOfWorkMessageSolvedBlockSignatureSerializedInBytes.length;
-			
-			
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current ProofOfWork serialized,
-			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
-			// the position corresponding to the length of the current ProofOfWork's Serialization
-			serializationOffset += insideSeparator.length;
-			System.arraycopy(this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSignedInBytes,
-					0, sizeOfSecureProofOfWorkMessageSolvedBlockSignatureSerializedInBytes.length);
-			serializationOffset += sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSignedInBytes.length;
-						
-			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current ProofOfWork serialized,
-			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
-			// the position corresponding to the length of the current ProofOfWork's Serialization
-			serializationOffset += insideSeparator.length;
-			System.arraycopy(this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerializedInBytes,
-					0, sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerializedInBytes.length);
-			serializationOffset += sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerializedInBytes.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current ProofOfWork serialized,

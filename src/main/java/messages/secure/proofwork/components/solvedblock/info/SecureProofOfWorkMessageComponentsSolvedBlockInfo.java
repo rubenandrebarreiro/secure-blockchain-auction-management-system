@@ -225,6 +225,6 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
 			this.setIsBlockSerializedAndSolvedHashed(false);
 			
 		}
-		
 	}
+	
 }
