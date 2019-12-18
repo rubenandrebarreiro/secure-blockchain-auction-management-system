@@ -25,8 +25,6 @@ public class User {
 	
 	private boolean isSolvingChallenge;
 	
-	// TODO - confirmar
-	private MerkleTree blockchainHashesMerkleTree;
 	
 	
 	public User() {
@@ -51,7 +49,6 @@ public class User {
 		
 		this.isSolvingChallenge = false;
 		
-		this.blockchainHashesMerkleTree = new MerkleTree(); // TODO - ver como usar merkle tree
 	}
 	
 	

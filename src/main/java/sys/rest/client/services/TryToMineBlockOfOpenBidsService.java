@@ -43,7 +43,7 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 
 	private byte numBytesToSolveChallengeType;
 	
-	private Map<Integer, Bid> openBidsMap;
+	private Map<Long, Bid> openBidsMap;
 	
 	private Map<Integer, Block> minedBlockMap;
 
@@ -53,7 +53,7 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 	public TryToMineBlockOfOpenBidsService(Client client,
 										   byte strategyForTryToMineBlockOfBids,
 										   byte numBytesToSolveChallengeType,
-										   Map<Integer, Bid> openBidsList,
+										   Map<Long, Bid> openBidsList,
 										   Map<Integer, Block> minedBlockMap) {
 		
 		this.client = client;
@@ -354,6 +354,11 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 							new MessagePacketClientToServer(MessagePacketClientToServerTypes.PROOF_WORK_SENT, 
 															null, proofOfWorkInfoSerialiazed);
 					this.client.sendMessage(message);
+					
+					for (Bid b : openBidsToMineList) {
+						this.openBidsMap.remove(b.getBidID());
+						this.minedBlockMap.put(blockOfOpenBidsForChallenge.getBlockID(), blockOfOpenBidsForChallenge);
+					}
 					
 				}
 				catch (InvalidKeyException e) {

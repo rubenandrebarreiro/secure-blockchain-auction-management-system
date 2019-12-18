@@ -1146,12 +1146,9 @@ public class AuctionServer extends Thread{
 		return response;
 	}
 	
-	// TODO Change to proof of work message!
 	private void handleReceivedProofOfWork(String proofOfWorkSerializedJson) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, UnsupportedEncodingException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException {
-		printStringWithClassName("COMPLETE ME! (handleReceivedProofOfWork)");
 		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
 		
-//TODO		
 		proofOfWork.undoSecureProofOfWorkMessageSerialized();
 		
 		SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation = 

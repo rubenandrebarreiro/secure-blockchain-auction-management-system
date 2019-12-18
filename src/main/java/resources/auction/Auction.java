@@ -8,6 +8,7 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import main.java.blockchain.structure.MerkleTree;
 import main.java.resources.bid.Bid;
 
 @DatabaseTable(tableName = "auctions")
@@ -34,6 +35,10 @@ public class Auction {
 	
 	@DatabaseField(dataType = DataType.SERIALIZABLE) 
 	private HashMap<String, Integer> numAuctionBidsForEachUserClient;
+	
+	// TODO - confirmar
+	private MerkleTree blockchainHashesMerkleTree;
+
 	
 	public Auction() {
 		// TODO Auto-generated constructor stub
@@ -150,7 +155,7 @@ public class Auction {
 		this.auctionTimestampStart = System.currentTimeMillis();
 
 		this.auctionBidsMade = new HashMap<Long, Bid>();
-
+		this.blockchainHashesMerkleTree = new MerkleTree();
 		this.auctionIsOpen = true;
 
 		this.productID = productID;

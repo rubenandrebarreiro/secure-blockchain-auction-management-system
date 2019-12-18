@@ -128,7 +128,7 @@ public class Client {
 	private InputStream inputStream;
 	private OutputStream outputStream;
 	
-	private Map<Integer, Bid> openBidsList;
+	private Map<Long, Bid> openBidsList;
 	private Map<Integer, Block> minedBlockMap;
 	
 	private TryToMineBlockOfOpenBidsService tryToMineBlockOfOpenBidsService;
@@ -208,7 +208,7 @@ public class Client {
 			//		    socket.setSoTimeout(1000);
 			socket.startHandshake();
 			
-			openBidsList = new ConcurrentHashMap<Integer, Bid>();
+			openBidsList = new ConcurrentHashMap<Long, Bid>();
 			minedBlockMap = new ConcurrentHashMap<Integer, Block>();
 			
 			this.tryToMineBlockOfOpenBidsService = 
@@ -1229,8 +1229,7 @@ public class Client {
 	// TODO
 	private void updateBids(String message) {
 		Bid bidToAdd = gson.fromJson(message, Bid.class);
-		// TODO CHANGE KEY!!!
 		Random r = new Random();
-		openBidsList.put(r.nextInt(), bidToAdd);
+		openBidsList.put(bidToAdd.getBidID(), bidToAdd);
 	}
 }
