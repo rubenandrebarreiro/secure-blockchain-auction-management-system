@@ -1216,29 +1216,21 @@ public class AuctionServer extends Thread{
 			printStringWithClassName("Error getting auction array from JSON!");
 		}
 		List<Auction> auctionsWithBids = new ArrayList<Auction>(Arrays.asList(auctionArray));
-		
-		List<Auction> result = null;
-		
-		List<Auction> openedResult = new ArrayList<Auction>(auctionsWithBids.size());
-		List<Auction> closedResult = new ArrayList<Auction>(auctionsWithBids.size());
-		
+		List<Auction> result = new ArrayList<Auction>(auctionsWithBids.size());
+
 		for (Auction auction : auctionsWithBids) {
 			if(auction.verifyIfAuctionIsOpen()) {
 				auction.setAuctionBids(new HashMap<Long, Bid>());
-				openedResult.add(auction);
+				result.add(auction);
 			}
 			else {
 				auction.getAuctionBidsMade().forEach((x,y) -> {
 					// Do not pollute client with this unnecessary information.
 					y.setBidSerializedBytes(new byte[0]);
 				});
-				closedResult.add(auction);
+				result.add(auction);
 			}
 		}
-
-		result = new ArrayList<Auction>(auctionsWithBids.size());
-		result.addAll(openedResult);
-		result.addAll(closedResult);
 		
 		String newEntity = gson.toJson(result);
 		try {
