@@ -121,8 +121,7 @@ public class AuctionServer extends Thread{
 					try {
 						Thread.sleep(CommonUtils.TRY_TO_CLOSE_BLOCK_OF_BIDS_SERVICE_VERIFICATION_RATE_TIME);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						printStringWithClassName("Error! Update client bids service could not sleep!");
 					}
 					BlockingQueue<Object> workQueue = connectedClientsMap.get(userName);
 					if(workQueue != null) {
@@ -133,8 +132,7 @@ public class AuctionServer extends Thread{
 								sslWriteResponse(responseSocket.getOutputStream(), string, null, MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS);
 							}
 						} catch (ParseException | IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							printStringWithClassName("Error! Update client bids service had trouble adding work to queue!");
 						}
 					}
 				}
@@ -321,8 +319,7 @@ public class AuctionServer extends Thread{
 				}
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
-			e.getMessage();
+			printStringWithClassName("Error! Catastrophic failure on server thread!");
 			e.printStackTrace();
 		}
 	}
@@ -402,14 +399,9 @@ public class AuctionServer extends Thread{
 			postRequest.setHeader("Content-type", "application/json");
 			response = httpClient.execute(postRequest);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! UnsupportedEnconding for string entity!");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -428,8 +420,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(putRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -632,8 +623,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -655,8 +645,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -678,8 +667,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -702,8 +690,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -726,8 +713,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -750,8 +736,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -773,8 +758,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -796,8 +780,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -819,8 +802,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -842,8 +824,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -865,8 +846,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -888,8 +868,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -912,8 +891,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -936,8 +914,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -960,8 +937,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -983,8 +959,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -1006,8 +981,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -1029,8 +1003,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -1052,8 +1025,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -1072,8 +1044,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -1092,8 +1063,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -1112,8 +1082,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -1132,8 +1101,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
 		printStringWithClassName(response.getStatusLine());
@@ -1152,8 +1120,7 @@ public class AuctionServer extends Thread{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 		
 		printStringWithClassName(response.getStatusLine());
