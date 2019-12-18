@@ -244,8 +244,8 @@ public class SecureProofOfWorkMessage {
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
-			System.arraycopy(secureProofOfWorkMessageMetaHeaderSerialized, 0, this.secureProofOfWorkMessageSerialized,
-							 serializationOffset, secureProofOfWorkMessageMetaHeaderSerialized.length);
+			System.arraycopy(this.secureProofOfWorkMessageSerialized, serializationOffset, secureProofOfWorkMessageMetaHeaderSerialized,
+					0, secureProofOfWorkMessageMetaHeaderSerialized.length);
 			serializationOffset += secureProofOfWorkMessageMetaHeaderSerialized.length;
 		
 			

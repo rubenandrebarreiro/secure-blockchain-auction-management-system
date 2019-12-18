@@ -1,5 +1,10 @@
 package main.java.messages.secure.proofwork.components.solvedblock.info;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
+import org.bouncycastle.util.Arrays;
+
 import main.java.resources.block.Block;
 
 public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
@@ -225,6 +230,27 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
 			this.setIsBlockSerializedAndSolvedHashed(false);
 			
 		}
+		
+	}
+	
+	public boolean checkIfBlockSolvedHashedIsValid() throws NoSuchAlgorithmException {
+		
+		boolean isPossibleToCheckIfBlockSolvedHashedIsValid =
+				( this.isBlockSerialized && this.isBlockSolvedHashed && 
+						!this.isBlockSerializedAndSolvedHashed );
+				
+			
+		if(isPossibleToCheckIfBlockSolvedHashedIsValid) {
+			
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			byte[] blockSolvedHashedToCompare = messageDigest.digest(this.blockSerialized);
+			
+			
+			return Arrays.areEqual(blockSolvedHashedToCompare, this.blockSolvedHashed);
+			
+		}
+		
+		return false;
 		
 	}
 }

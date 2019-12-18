@@ -61,6 +61,11 @@ import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigatio
 import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.messages.secure.proofwork.SecureProofOfWorkMessage;
+import main.java.messages.secure.proofwork.components.SecureProofOfWorkMessageComponents;
+import main.java.messages.secure.proofwork.components.solvedblock.SecureProofOfWorkMessageComponentsSolvedBlock;
+import main.java.messages.secure.proofwork.components.solvedblock.info.SecureProofOfWorkMessageComponentsSolvedBlockInfo;
+import main.java.messages.secure.proofwork.components.solvedblock.signature.SecureProofOfWorkMessageComponentsSolvedBlockSignature;
+import main.java.messages.secure.proofwork.dos.mitigation.SecureProofOfWorkMessageDoSMitigation;
 import main.java.messages.secure.receipt.SecureReceiptMessage;
 import main.java.messages.secure.receipt.components.SecureReceiptMessageComponents;
 import main.java.messages.secure.receipt.components.data.SecureReceiptMessageComponentsData;
@@ -1135,11 +1140,59 @@ public class AuctionServer extends Thread{
 	}
 	
 	// TODO Change to proof of work message!
-	private void handleReceivedProofOfWork(String proofOfWorkSerializedJson) {
+	private void handleReceivedProofOfWork(String proofOfWorkSerializedJson) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 		printStringWithClassName("COMPLETE ME! (handleReceivedProofOfWork)");
 		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
 		
 //TODO		
+		proofOfWork.undoSecureProofOfWorkMessageSerialized();
+		
+		SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation = 
+				proofOfWork.getSecureProofOfWorkMessageDoSMitigation();
+		
+		if(!secureProofOfWorkMessageDoSMitigation.checkIfHashOfSecureProofOfWorkMessageDoSMitigationIsValid()) {
+			// TODO error
+		}
+		else {
+			SecureProofOfWorkMessageComponents secureProofOfWorkMessageComponents = 
+					proofOfWork.getSecureProofOfWorkMessageComponents();
+			
+			secureProofOfWorkMessageComponents.decryptSecureProofOfWorkMessageComponents();
+			secureProofOfWorkMessageComponents.undoSecureProofOfWorkMessageComponentsSerialization();
+			
+			SecureProofOfWorkMessageComponentsSolvedBlock secureProofOfWorkMessageComponentsSolvedBlock = 
+					secureProofOfWorkMessageComponents.getSecureProofOfWorkMessageComponentsSolvedBlock();
+			
+			secureProofOfWorkMessageComponentsSolvedBlock.undoSecureProofOfWorkMessageSolvedBlockSerialization();
+			
+			SecureProofOfWorkMessageComponentsSolvedBlockSignature secureProofOfWorkMessageComponentsSolvedBlockSignature = 
+					secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockSignature();
+			
+			if(!secureProofOfWorkMessageComponentsSolvedBlockSignature.checkIfProofOfWorkMessageComponentsSolvedBlockDigitalSignedIsValid()) {
+				// TODO signature not valid
+			}
+			else {
+				SecureProofOfWorkMessageComponentsSolvedBlockInfo secureProofOfWorkMessageComponentsSolvedBlockInfo = 
+						secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockInfo();
+				
+				secureProofOfWorkMessageComponentsSolvedBlockInfo.undoBlockSerializedAndSolvedHashed();
+				
+				
+				if(!secureProofOfWorkMessageComponentsSolvedBlockInfo.checkIfBlockSolvedHashedIsValid()) {
+					// TODO challenge not valid
+				}
+				else {
+					// TODO broadcast
+				}
+				
+			}
+			
+			
+			
+			
+			
+		}
+		
 		// Validate proof. If valid, broadcast to clients.
 		connectedClientsMap.forEach((x,y) -> {
 			if(!x.equals(userName))
