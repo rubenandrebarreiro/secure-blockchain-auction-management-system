@@ -1131,49 +1131,49 @@ public class Client {
 	}
 	
 	private String decodeReceipt(String toDecode){
-		String result = "COMPLETE ME (THE RECEIPT DECODE) PLS!!!";
+		String result = null;
 		byte[] secureReceiptMessageSerialized = Base64.getDecoder().decode(toDecode);
-		
+
 		try {
 			SecureReceiptMessage secureReceiptMessage = 
 					new SecureReceiptMessage(secureReceiptMessageSerialized);
-			
+
 			secureReceiptMessage.undoSecureReceiptMessageSerialized();
-			
+
 			SecureReceiptMessageDoSMitigation secureReceiptMessageDoSMitigation =
 					secureReceiptMessage.getSecureReceiptMessageDoSMitigation();
-			
+
 			if(!secureReceiptMessageDoSMitigation.checkIfHashOfSecureReceiptMessageDoSMitigationIsValid()) {
-				System.out.println("OH NOES!");
+				printErrorStringWithClassName("Received receipt has an invalid signature! Dismissing...");
 			}
 			else {
 				SecureReceiptMessageComponents secureReceiptMessageComponents = 
 						secureReceiptMessage.getSecureReceiptMessageComponents();
-				
+
 				secureReceiptMessageComponents.decryptSecureReceiptMessageComponents();
 				secureReceiptMessageComponents.undoSecureReceiptMessageComponentsSerialization();
-				
+
 				SecureCommonHeader secureCommonHeader = secureReceiptMessageComponents.getSecureCommonHeader();
-				
+
 				// TODO - verificar header
-				
-				
-				
+
+
+
 				SecureReceiptMessageComponentsData secureReceiptMessageComponentsData = 
 						secureReceiptMessageComponents.getSecureReceiptMessageComponentsData();
-				
+
 				SecureReceiptMessageComponentsDataInfo secureReceiptMessageComponentsDataInfo = 
 						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataInfo();
-				
+
 				secureReceiptMessageComponentsDataInfo.undoSecureReceiptMessageComponentsDataInfoSerialization();
-				
+
 				SecureReceiptMessageComponentsDataSignature secureReceiptMessageComponentsDataSignature = 
 						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataSignature();
-				
+
 				String secureReceiptMessageComponentsDataResponse = 
 						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataResponse();
-				
-				
+
+
 				if(!secureReceiptMessageComponentsDataSignature.checkIfSecureReceiptMessageComponentsDataInfoDigitalSignedIsValid()) {
 					//TODO error
 					result = "ERROR";
@@ -1181,11 +1181,12 @@ public class Client {
 				else {
 					result =  secureReceiptMessageComponentsDataResponse;
 				}
-				
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		return result;
 	}
 	

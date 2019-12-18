@@ -596,14 +596,18 @@ public class AuctionServer extends Thread{
 				
 				
 				byte[] secureReceiptMessageSerialized = secureReceiptMessage.getSecureReceiptMessageSerialized();
-				// TODO Change type!
-				for (Entry<String, BlockingQueue<Object>> entry : connectedClientsMap.entrySet()) {
-					if(!entry.getKey().equals(userName))
-						entry.getValue().add(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
+
+				// If create bid was successful, add bid to send to other clients queue
+				if(response.getStatusLine().getStatusCode() == 202) {
+					for (Entry<String, BlockingQueue<Object>> entry : connectedClientsMap.entrySet()) {
+						if(!entry.getKey().equals(userName))
+							entry.getValue().add(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
+					}
+					connectedClientsMap.forEach( (x,y) -> {
+						System.out.println(x + " " + y);
+					});
 				}
-				connectedClientsMap.forEach( (x,y) -> {
-					System.out.println(x + " " + y);
-				});
+
 				methodResult = java.util.Base64.getEncoder().encodeToString(secureReceiptMessageSerialized);
 			}
 			
@@ -1132,7 +1136,7 @@ public class AuctionServer extends Thread{
 			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
 		}
 		String messagePacketJson = gson.toJson(messagePacket);
-		printStringWithClassName("Sending -> " + messagePacketJson);
+//		printStringWithClassName("Sending -> " + messagePacketJson);
 		printWriter.print(messagePacketJson + System.lineSeparator());
 		printWriter.flush();
 	}
