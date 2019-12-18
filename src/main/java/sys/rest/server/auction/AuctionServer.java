@@ -20,6 +20,7 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -608,7 +609,7 @@ public class AuctionServer extends Thread{
 //					});
 				}
 
-				methodResult = java.util.Base64.getEncoder().encodeToString(secureReceiptMessageSerialized);
+				methodResult = Base64.getEncoder().encodeToString(secureReceiptMessageSerialized);
 			}
 			
 		}
