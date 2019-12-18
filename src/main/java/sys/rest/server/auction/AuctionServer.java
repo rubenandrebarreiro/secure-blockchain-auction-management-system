@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
-import java.util.stream.Collectors;
-
 import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLServerSocket;
@@ -640,12 +638,8 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
-		
-		Auction[] auctionArray = gson.fromJson(EntityUtils.toString(response.getEntity()), Auction[].class);
-		List<Auction> auctionList = new ArrayList<Auction>(Arrays.asList(auctionArray));
-		
-		String newEntity = gson.toJson(removeBids(auctionList));
-		EntityUtils.updateEntity(response, new StringEntity(newEntity));
+
+		removeBids(response);
 		
 		return response;
 	}
@@ -667,6 +661,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -687,6 +684,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -708,6 +708,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -729,6 +732,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -750,6 +756,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -770,6 +779,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -790,6 +802,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -810,6 +825,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -830,6 +848,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -850,6 +871,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -870,6 +894,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -891,6 +918,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -912,6 +942,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
@@ -933,6 +966,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 	
@@ -953,6 +989,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 	
@@ -973,6 +1012,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 	
@@ -993,6 +1035,9 @@ public class AuctionServer extends Thread{
 
 		printStringWithClassName(response.getStatusLine());
 		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 	
@@ -1163,7 +1208,15 @@ public class AuctionServer extends Thread{
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " + message);
 	}
 	
-	private List<Auction> removeBids(List<Auction> auctionsWithBids){
+	private void removeBids(HttpResponse response){
+		Auction[] auctionArray = null;
+		try {
+			auctionArray = gson.fromJson(EntityUtils.toString(response.getEntity()), Auction[].class);
+		} catch (JsonSyntaxException | ParseException | IOException e) {
+			printStringWithClassName("Error getting auction array from JSON!");
+		}
+		List<Auction> auctionsWithBids = new ArrayList<Auction>(Arrays.asList(auctionArray));
+		
 		List<Auction> result = null;
 		
 		List<Auction> openedResult = new ArrayList<Auction>(auctionsWithBids.size());
@@ -1187,6 +1240,11 @@ public class AuctionServer extends Thread{
 		result.addAll(openedResult);
 		result.addAll(closedResult);
 		
-		return result;
+		String newEntity = gson.toJson(result);
+		try {
+			EntityUtils.updateEntity(response, new StringEntity(newEntity));
+		} catch (IOException e) {
+			printStringWithClassName("Error setting new entity!");
+		}
 	}
 }
