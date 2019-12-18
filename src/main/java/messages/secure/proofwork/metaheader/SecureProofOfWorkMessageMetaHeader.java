@@ -9,8 +9,11 @@ public class SecureProofOfWorkMessageMetaHeader {
 	private int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered;
 	private int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned;
 	
-	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
+	private int sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered;
+
 	private int sizeOfSecureProofOfWorkMessageDoSMitigationSerialized;
+	
+	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
 	
 	private int sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized;
 	private int sizeOfSecureProofOfWorkMessageSolvedBlockSignatureSerialized;
@@ -30,9 +33,11 @@ public class SecureProofOfWorkMessageMetaHeader {
 											  int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered,
 											  int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned,
 											  
-											  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized,
+											  int sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered,
 											  int sizeOfSecureProofOfWorkMessageDoSMitigationSerialized,
-											  
+
+											  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized,
+
 											  int sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized,
 											  int sizeOfSecureProofOfWorkMessageSolvedBlockSignatureSerialized,
 											  
@@ -48,10 +53,13 @@ public class SecureProofOfWorkMessageMetaHeader {
 		this.sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned = 
 					sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned;
 		
-		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized = 
-					sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
+		this.sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered = 
+				sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered;
 		this.sizeOfSecureProofOfWorkMessageDoSMitigationSerialized = 
 					sizeOfSecureProofOfWorkMessageDoSMitigationSerialized;
+		
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized =
+				sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
 		
 		this.sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized = 
 					sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized;
@@ -105,14 +113,18 @@ public class SecureProofOfWorkMessageMetaHeader {
 		return this.sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned;
 	}
 
-	public int getSizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized() {
-		return this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
+	public int getSizeOfSecureProofOfWorkMessageComponentsSerializedCiphered() {
+		return sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered;
 	}
 	
 	public int getSizeOfSecureProofOfWorkMessageDoSMitigationSerialized() {
 		return this.sizeOfSecureProofOfWorkMessageDoSMitigationSerialized;
 	}
-	  
+
+	public int getSizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized() {
+		return this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
+	}
+	
 	public int getSizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized() {
 		return this.sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized;
 	}
@@ -155,8 +167,8 @@ public class SecureProofOfWorkMessageMetaHeader {
 			
 			int sizeOfSecureProofOfWorkMessageMetaHeaderSerialized = 
 										 ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-										   ( 9 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-										   ( 10 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+										   ( 10 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+										   ( 11 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 								
 			this.secureProofOfWorkMessageMetaHeaderSerialized = 
 					new byte[ sizeOfSecureProofOfWorkMessageMetaHeaderSerialized ];
@@ -172,10 +184,14 @@ public class SecureProofOfWorkMessageMetaHeader {
 			byte[] sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSignedInBytes = 
 					CommonUtils.fromIntToByteArray(this.sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned);
 			
-			byte[] sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes =
-					CommonUtils.fromIntToByteArray(this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized);
+			byte[] sizeOfSecureProofOfWorkMessageComponentsSerializedCipheredInBytes =
+					CommonUtils.fromIntToByteArray(this.sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered);
 			byte[] sizeOfSecureProofOfWorkMessageDoSMitigationSerializedInBytes =
 					CommonUtils.fromIntToByteArray(this.sizeOfSecureProofOfWorkMessageDoSMitigationSerialized);
+
+			byte[] sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes =
+					CommonUtils.fromIntToByteArray(this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized);
+
 			
 			byte[] sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerializedInBytes =
 					CommonUtils.fromIntToByteArray(this.sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized);
@@ -256,9 +272,9 @@ public class SecureProofOfWorkMessageMetaHeader {
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
-			System.arraycopy(sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes, 0, this.secureProofOfWorkMessageMetaHeaderSerialized,
-					serializationOffset, sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes.length);
-			serializationOffset += sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes.length;
+			System.arraycopy(sizeOfSecureProofOfWorkMessageComponentsSerializedCipheredInBytes, 0, this.secureProofOfWorkMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfSecureProofOfWorkMessageComponentsSerializedCipheredInBytes.length);
+			serializationOffset += sizeOfSecureProofOfWorkMessageComponentsSerializedCipheredInBytes.length;
 
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current ProofOfWork serialized,
@@ -274,7 +290,22 @@ public class SecureProofOfWorkMessageMetaHeader {
 			System.arraycopy(sizeOfSecureProofOfWorkMessageDoSMitigationSerializedInBytes, 0, this.secureProofOfWorkMessageMetaHeaderSerialized,
 					serializationOffset, sizeOfSecureProofOfWorkMessageDoSMitigationSerializedInBytes.length);
 			serializationOffset += sizeOfSecureProofOfWorkMessageDoSMitigationSerializedInBytes.length;
-
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(insideSeparator, 0, this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
+			serializationOffset += insideSeparator.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes, 0, this.secureProofOfWorkMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes.length);
+			serializationOffset += sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
@@ -374,9 +405,13 @@ public class SecureProofOfWorkMessageMetaHeader {
 			byte[] sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSignedInBytes = 
 												new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			
-			byte[] sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes = 
+			byte[] sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedCipheredInBytes = 
 						new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfSecureProofOfWorkMessageDoSMitigationSerializedInBytes = 
+						new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
+			
+
+			byte[] sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes = 
 						new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			
 			byte[] sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerializedInBytes = 
@@ -439,10 +474,9 @@ public class SecureProofOfWorkMessageMetaHeader {
 			// the position corresponding to the length of the current ProofOfWork's Serialization
 			serializationOffset += insideSeparator.length;
 			System.arraycopy(this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset,
-					sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes,
-					0, sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes.length);
-			serializationOffset += sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes.length;
-			
+					sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedCipheredInBytes,
+					0, sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedCipheredInBytes.length);
+			serializationOffset += sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedCipheredInBytes.length;
 					
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current ProofOfWork serialized,
@@ -453,7 +487,17 @@ public class SecureProofOfWorkMessageMetaHeader {
 					sizeOfSecureProofOfWorkMessageDoSMitigationSerializedInBytes,
 					0, sizeOfSecureProofOfWorkMessageDoSMitigationSerializedInBytes.length);
 			serializationOffset += sizeOfSecureProofOfWorkMessageDoSMitigationSerializedInBytes.length;
-						
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			serializationOffset += insideSeparator.length;
+			System.arraycopy(this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset,
+					sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes,
+					0, sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes.length);
+			serializationOffset += sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes.length;
+			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
@@ -515,10 +559,13 @@ public class SecureProofOfWorkMessageMetaHeader {
 					CommonUtils.fromByteArrayToInt(sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSignedInBytes);
 			
 			
-			this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized = 
-					CommonUtils.fromByteArrayToInt(sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes);
+			this.sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered = 
+					CommonUtils.fromByteArrayToInt(sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedCipheredInBytes);
 			this.sizeOfSecureProofOfWorkMessageDoSMitigationSerialized = 
 					CommonUtils.fromByteArrayToInt(sizeOfSecureProofOfWorkMessageDoSMitigationSerializedInBytes);
+			
+			this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized = 
+					CommonUtils.fromByteArrayToInt(sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerializedInBytes);
 			
 			this.sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized = 
 					CommonUtils.fromByteArrayToInt(sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerializedInBytes);

@@ -1162,9 +1162,8 @@ public class AuctionServer extends Thread{
 			
 			SecureProofOfWorkMessageComponentsSolvedBlock secureProofOfWorkMessageComponentsSolvedBlock = 
 					secureProofOfWorkMessageComponents.getSecureProofOfWorkMessageComponentsSolvedBlock();
-			
+						
 			secureProofOfWorkMessageComponentsSolvedBlock.undoSecureProofOfWorkMessageSolvedBlockSerialization();
-			
 			SecureProofOfWorkMessageComponentsSolvedBlockSignature secureProofOfWorkMessageComponentsSolvedBlockSignature = 
 					secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockSignature();
 			

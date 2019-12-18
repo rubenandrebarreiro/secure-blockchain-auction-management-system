@@ -65,6 +65,8 @@ public class SecureProofOfWorkMessageComponents {
 	private boolean isSecureProofOfWorkMessageComponentsSerializedCiphered;
 	
 	
+	private String userPeerID;
+	
 	
 	public SecureProofOfWorkMessageComponents(SecureCommonHeader secureCommonHeader,
 											  SecureProofOfWorkMessageComponentsSolvedBlock 
@@ -118,7 +120,8 @@ public class SecureProofOfWorkMessageComponents {
 								  			  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
 								  			  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
 								  			  int sizeOfBlockSerialized,
-								  			  int sizeOfBlockSolvedHashedSerialized) {
+								  			  int sizeOfBlockSolvedHashedSerialized,
+								  			  String userPeerID) {
 		
 		this.secureProofOfWorkMessageComponentsSerializedCiphered = 
 					secureProofOfWorkMessageComponentsSerializedCiphered;
@@ -146,12 +149,19 @@ public class SecureProofOfWorkMessageComponents {
 				sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;		
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockSerialized = true;
 				
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+				sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;		
+		
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized = 
+				sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized;		
 		
 		this.secureCommonHeader = null;
 		this.secureProofOfWorkMessageComponentsSolvedBlock = null;
 		
 		this.sizeOfBlockSerialized = sizeOfBlockSerialized;
 		this.sizeOfBlockSolvedHashedSerialized = sizeOfBlockSolvedHashedSerialized;
+		
+		this.userPeerID = userPeerID;
 		
 	}
 
@@ -374,7 +384,8 @@ public class SecureProofOfWorkMessageComponents {
 							 this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
 							 this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
 							 this.sizeOfBlockSerialized,
-							 this.sizeOfBlockSolvedHashedSerialized);
+							 this.sizeOfBlockSolvedHashedSerialized,
+							 this.userPeerID);
 			
 			secureProofOfWorkMessageComponentsSolvedBlock.undoSecureProofOfWorkMessageSolvedBlockSerialization();
 			
@@ -517,7 +528,7 @@ public class SecureProofOfWorkMessageComponents {
 				
 				String symmetricEncryptionAlgorithm = "AES";
 				String symmetricEncryptionMode = "CBC";
-		 	    String symmetricEncryptionPadding = "NoPadding";
+		 	    String symmetricEncryptionPadding = "PKCS7Padding";
 				
 				
 				// Set the Secret Key and its specifications,

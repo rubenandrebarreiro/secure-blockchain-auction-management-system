@@ -123,8 +123,8 @@ public class SecureProofOfWorkMessage {
 
 				
 			this.secureProofOfWorkMessageComponents.doSecureProofOfWorkMessageComponentsSerialization();
-			byte[] secureProofOfWorkMessageComponentsSerialized = 
-					this.secureProofOfWorkMessageComponents.getSecureProofOfWorkMessageComponentsSerialized();
+			byte[] secureProofOfWorkMessageComponentsSerializedCiphered = 
+					this.secureProofOfWorkMessageComponents.getSecureProofOfWorkMessageComponentsSerializedCiphered();
 					
 			this.secureProofOfWorkMessageDoSMitigation.doHashOfSecureProofOfWorkMessageDoSMitigation();
 			byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
@@ -134,7 +134,7 @@ public class SecureProofOfWorkMessage {
 													secureProofOfWorkMessageMetaHeaderSerialized.length +
 													userPeerIDSerialized.length +
 												    secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned.length +
-													secureProofOfWorkMessageComponentsSerialized.length +
+													secureProofOfWorkMessageComponentsSerializedCiphered.length +
 													secureProofOfWorkMessageDoSMitigationSerialized.length);
 
 			this.secureProofOfWorkMessageSerialized = new byte[sizeOfSecureProofOfWorkMessageSerialized];
@@ -186,9 +186,9 @@ public class SecureProofOfWorkMessage {
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
-			System.arraycopy(secureProofOfWorkMessageComponentsSerialized, 0, this.secureProofOfWorkMessageSerialized,
-							 serializationOffset, secureProofOfWorkMessageComponentsSerialized.length);
-			serializationOffset += secureProofOfWorkMessageComponentsSerialized.length;
+			System.arraycopy(secureProofOfWorkMessageComponentsSerializedCiphered, 0, this.secureProofOfWorkMessageSerialized,
+							 serializationOffset, secureProofOfWorkMessageComponentsSerializedCiphered.length);
+			serializationOffset += secureProofOfWorkMessageComponentsSerializedCiphered.length;
 		
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current ProofOfWork serialized,
@@ -210,8 +210,8 @@ public class SecureProofOfWorkMessage {
 			
 			int sizeOfSecureProofOfWorkMessageMetaHeaderSerialized = 
 										 ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-										   ( 9 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-										   ( 10 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+										   ( 10 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+										   ( 11 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 			
 			byte[] secureProofOfWorkMessageMetaHeaderSerialized = 
 					new byte[ sizeOfSecureProofOfWorkMessageMetaHeaderSerialized ];
@@ -267,9 +267,8 @@ public class SecureProofOfWorkMessage {
 			
 			
 			int sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered = 
-					( CommonUtils.COMMON_HEADER_LENGTH +
-					  this.secureProofOfWorkMessageMetaHeader
-					  	  .getSizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized() );
+					this.secureProofOfWorkMessageMetaHeader
+					  	  .getSizeOfSecureProofOfWorkMessageComponentsSerializedCiphered();
 			
 			byte[] secureProofOfWorkMessageComponentsSerializedCiphered = 
 					new byte[ sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered ];
@@ -286,7 +285,7 @@ public class SecureProofOfWorkMessage {
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
-			System.arraycopy(userPeerIDSerialized, serializationOffset, this.secureProofOfWorkMessageSerialized,
+			System.arraycopy(this.secureProofOfWorkMessageSerialized, serializationOffset, userPeerIDSerialized,
 							 0, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
 
@@ -294,7 +293,7 @@ public class SecureProofOfWorkMessage {
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
-			System.arraycopy(secureProofOfWorkMessageKeyExchangeSerialized, serializationOffset, this.secureProofOfWorkMessageSerialized,
+			System.arraycopy(this.secureProofOfWorkMessageSerialized, serializationOffset, secureProofOfWorkMessageKeyExchangeSerialized,
 							 0, secureProofOfWorkMessageKeyExchangeSerialized.length);
 			serializationOffset += secureProofOfWorkMessageKeyExchangeSerialized.length;
 			
@@ -302,7 +301,7 @@ public class SecureProofOfWorkMessage {
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
-			System.arraycopy(secureProofOfWorkMessageComponentsSerializedCiphered, serializationOffset, this.secureProofOfWorkMessageSerialized,
+			System.arraycopy(this.secureProofOfWorkMessageSerialized, serializationOffset, secureProofOfWorkMessageComponentsSerializedCiphered,
 							 0, secureProofOfWorkMessageComponentsSerializedCiphered.length);
 			serializationOffset += secureProofOfWorkMessageComponentsSerializedCiphered.length;
 		
@@ -310,7 +309,7 @@ public class SecureProofOfWorkMessage {
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
-			System.arraycopy(secureProofOfWorkMessageDoSMitigationSerialized, serializationOffset, this.secureProofOfWorkMessageSerialized,
+			System.arraycopy(this.secureProofOfWorkMessageSerialized, serializationOffset, secureProofOfWorkMessageDoSMitigationSerialized,
 							 0, secureProofOfWorkMessageDoSMitigationSerialized.length);
 			
 			
@@ -366,7 +365,8 @@ public class SecureProofOfWorkMessage {
 														   sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
 														   sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
 														   sizeOfBlockSerialized,
-														   sizeOfBlockSolvedHashedSerialized);
+														   sizeOfBlockSolvedHashedSerialized,
+														   userPeerID);
 			
 			this.secureProofOfWorkMessageDoSMitigation =
 					new SecureProofOfWorkMessageDoSMitigation

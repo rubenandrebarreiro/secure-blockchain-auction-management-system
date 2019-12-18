@@ -23,7 +23,7 @@ public class SecureProofOfWorkMessageDoSMitigation {
 
 	private SecureProofOfWorkMessageComponents secureProofOfWorkMessageComponents;
 	
-	private byte[] secureProofOfWorkMessageComponentsSerialized;
+	private byte[] secureProofOfWorkMessageComponentsSerializedCiphered;
 	
 	private byte[] secureProofOfWorkMessageComponentsHashedForDoSMitigation;
 	
@@ -43,7 +43,7 @@ public class SecureProofOfWorkMessageDoSMitigation {
 		
 		this.secureProofOfWorkMessageComponents = secureProofOfWorkMessageComponents;
 		
-		this.secureProofOfWorkMessageComponentsSerialized = null;
+		this.secureProofOfWorkMessageComponentsSerializedCiphered = null;
 		
 		this.secureProofOfWorkMessageComponentsHashedForDoSMitigation = null;
 		
@@ -54,13 +54,13 @@ public class SecureProofOfWorkMessageDoSMitigation {
 	}
 	
 	
-	public SecureProofOfWorkMessageDoSMitigation(byte[] secureProofOfWorkMessageComponentsSerialized,
+	public SecureProofOfWorkMessageDoSMitigation(byte[] secureProofOfWorkMessageComponentsSerializedCiphered,
 												 byte[] secureProofOfWorkMessageComponentsHashedForDoSMitigation,
 									             byte[] secretHMACKeyForDoSMitigationInBytes) {
 		
 		this.secureProofOfWorkMessageComponents = null;
 		
-		this.secureProofOfWorkMessageComponentsSerialized = secureProofOfWorkMessageComponentsSerialized;
+		this.secureProofOfWorkMessageComponentsSerializedCiphered = secureProofOfWorkMessageComponentsSerializedCiphered;
 		
 		this.secureProofOfWorkMessageComponentsHashedForDoSMitigation = 
 				secureProofOfWorkMessageComponentsHashedForDoSMitigation;
@@ -82,8 +82,8 @@ public class SecureProofOfWorkMessageDoSMitigation {
 		return this.secureProofOfWorkMessageComponents;
 	}
 	
-	public byte[] getSecureProofOfWorkMessageComponentsSerialized() {
-		return this.secureProofOfWorkMessageComponentsSerialized;
+	public byte[] getSecureProofOfWorkMessageComponentsSerializedCiphered() {
+		return this.secureProofOfWorkMessageComponentsSerializedCiphered;
 	}
 	
 	public byte[] getSecureProofOfWorkMessageComponentsHashedForDoSMitigation() {
@@ -147,9 +147,9 @@ public class SecureProofOfWorkMessageDoSMitigation {
 			
 			this.secureProofOfWorkMessageComponents
 				.doSecureProofOfWorkMessageComponentsSerialization();
-			this.secureProofOfWorkMessageComponentsSerialized = 
+			this.secureProofOfWorkMessageComponentsSerializedCiphered = 
 					this.secureProofOfWorkMessageComponents
-						.getSecureProofOfWorkMessageComponentsSerialized();
+						.getSecureProofOfWorkMessageComponentsSerializedCiphered();
 			
 			// Starts the MAC Hash process over the Secure MessageComponents serialized (applying the HMAC or CMAC operation),
 			// before the sending of the final concatenation of it with Secure MessageComponents serialized
@@ -162,7 +162,7 @@ public class SecureProofOfWorkMessageDoSMitigation {
 				SecretKeySpec keySpec = new SecretKeySpec(this.secretHMACKeyForDoSMitigationInBytes, "HMacSHA256");
 				// The configuration, initialization and update of the MAC Hash process
 				mac.init(keySpec);
-				mac.update(this.secureProofOfWorkMessageComponentsSerialized);
+				mac.update(this.secureProofOfWorkMessageComponentsSerializedCiphered);
 				
 				// Performs the final operation of MAC Hash process over the Secure MessageComponents serialized
 				// (applying the HMAC or CMAC operation)
@@ -191,7 +191,7 @@ public class SecureProofOfWorkMessageDoSMitigation {
 		if(this.isSecureProofOfWorkMessageComponentsHashedForDoSMitigation) {
 			
 			byte[] secureProofOfWorkMessageComponentsSerializedHashedToCompare = 
-				   this.secureProofOfWorkMessageComponentsSerialized;
+				   this.secureProofOfWorkMessageComponentsSerializedCiphered;
 			
 			// Starts the MAC Hash process over the Secure MessageComponents serialized received (applying the HMAC or CMAC operation),
 			// comparing it with Secure MessageComponents serialized hashed received (the MAC Hash process related to the Fast Secure MessageComponents Check)

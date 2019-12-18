@@ -42,6 +42,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
 	
 	
+	private String userPeerID;
+	
 	
 	public SecureProofOfWorkMessageComponentsSolvedBlock
 	      (SecureProofOfWorkMessageComponentsSolvedBlockInfo secureProofOfWorkMessageComponentsSolvedBlockInfo,
@@ -83,7 +85,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	       int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
 	       int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
 	       int sizeOfBlockSerialized,
-		   int sizeOfBlockSolvedHashedSerialized) {
+		   int sizeOfBlockSolvedHashedSerialized,
+		   String userPeerID) {
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
 				secureProofOfWorkMessageComponentsSolvedBlockSerialized;
@@ -109,6 +112,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 		this.secureProofOfWorkMessageComponentsSolvedBlockInfo = null;
 		this.secureProofOfWorkMessageComponentsSolvedBlockSignature = null;
 
+		this.userPeerID = userPeerID;
 		
 	}
 	
@@ -266,6 +270,16 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 							 this.secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
 					         0, this.secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized.length);
 			
+			
+			this.secureProofOfWorkMessageComponentsSolvedBlockInfo = 
+					new SecureProofOfWorkMessageComponentsSolvedBlockInfo
+						(secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
+						 this.sizeOfBlockSerialized, this.sizeOfBlockSolvedHashedSerialized);
+			
+			this.secureProofOfWorkMessageComponentsSolvedBlockSignature =
+					new SecureProofOfWorkMessageComponentsSolvedBlockSignature
+					    (secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
+  			    		 secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized, this.userPeerID);
 			
 			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockSerialized(false);
 			

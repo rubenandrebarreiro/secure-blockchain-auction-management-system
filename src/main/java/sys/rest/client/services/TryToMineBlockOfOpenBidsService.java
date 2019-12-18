@@ -296,10 +296,13 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 					byte[] secureBidMessageKeyExchangeSerializedCipheredSigned = 
 							secureProofOfWorkMessageKeyExchange.getSecureCommonKeyExchangeSerializedCipheredSigned();
 					
-					byte[] secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
-							secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockSerialized();
+					byte[] secureProofOfWorkMessageComponentsSerializedCiphered = 
+							secureProofOfWorkMessageComponents.getSecureProofOfWorkMessageComponentsSerializedCiphered();
 					byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
 							secureProofOfWorkMessageDoSMitigation.getSecureProofOfWorkMessageComponentsHashedForDoSMitigation();
+
+					byte[] secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
+							secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockSerialized();
 					
 					byte[] secureBidMessageComponentsSolvedBlockInfoSerialized =
 							secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSerializedAndSolvedHashed();
@@ -318,8 +321,9 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 											(clientUserID.getBytes("UTF-8").length,
 											 secureBidMessageKeyExchangeSerializedCiphered.length,
 											 secureBidMessageKeyExchangeSerializedCipheredSigned.length,
-											 secureProofOfWorkMessageComponentsSolvedBlockSerialized.length,
+											 secureProofOfWorkMessageComponentsSerializedCiphered.length,
 											 secureProofOfWorkMessageDoSMitigationSerialized.length,
+											 secureProofOfWorkMessageComponentsSolvedBlockSerialized.length,
 											 secureBidMessageComponentsSolvedBlockInfoSerialized.length,
 											 secureBidMessageComponentsSolvedBlockSignatureSerialized.length,
 										 	 blockAndBlockSolvedHashedSerialized.length,
