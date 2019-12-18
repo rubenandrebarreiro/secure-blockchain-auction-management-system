@@ -390,9 +390,7 @@ public class Client {
 					case CHECK_OUTCOME_CLOSED_AUCTION_ID:
 						checkOutcomeClosedAuctionsByAuctionID(); //TODO confirmar
 						break;
-					
-					// VALIDATE RECEIPT
-					
+										
 					case HELP:
 						helpScreen();
 						break;
