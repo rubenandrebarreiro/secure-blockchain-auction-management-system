@@ -542,9 +542,9 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				
 				SecureReceiptMessage secureReceiptMessage = 
-						new SecureReceiptMessage(secureReceiptMessageMetaHeader,
+						new SecureReceiptMessage(secureReceiptMessageComponentsInitialisationVector,
+												 secureReceiptMessageMetaHeader,
 												 bid.getBidderUserClientID(),
-												 secureReceiptMessageComponentsInitialisationVector,
 												 secureCommonKeyExchange,
 												 secureReceiptMessageComponents,
 												 secureReceiptMessageDoSMitigation);

@@ -35,16 +35,16 @@ public class SecureReceiptMessage {
 	private boolean isSecureReceiptMessageSerialized;
 	
 	
-	public SecureReceiptMessage(SecureReceiptMessageMetaHeader secureReceiptMessageMetaHeader,
+	public SecureReceiptMessage(byte[] initialisationVectorInBytes,
+								SecureReceiptMessageMetaHeader secureReceiptMessageMetaHeader,
 								String userPeerID,
-								byte[] initialisationVectorInBytes,
 								SecureCommonKeyExchange secureReceiptMessageKeyExchange,
 								SecureReceiptMessageComponents secureReceiptMessageComponents,
 								SecureReceiptMessageDoSMitigation secureReceiptMessageDoSMitigation) {
-		
+
+		this.initialisationVectorInBytes = initialisationVectorInBytes;
 		this.secureReceiptMessageMetaHeader = secureReceiptMessageMetaHeader;
 		this.userPeerID = userPeerID;
-		this.initialisationVectorInBytes = initialisationVectorInBytes;
 		this.secureReceiptMessageKeyExchange = secureReceiptMessageKeyExchange;
 		this.secureReceiptMessageComponents = secureReceiptMessageComponents;
 		this.secureReceiptMessageDoSMitigation = secureReceiptMessageDoSMitigation;
@@ -56,14 +56,18 @@ public class SecureReceiptMessage {
 		
 		this.secureReceiptMessageSerialized = secureReceiptMessageSerialized;
 		this.isSecureReceiptMessageSerialized = true;
-		
+
+		this.initialisationVectorInBytes = null;
 		this.secureReceiptMessageMetaHeader = null;
 		this.userPeerID = null;
-		this.initialisationVectorInBytes = null;
 		this.secureReceiptMessageKeyExchange = null;
 		this.secureReceiptMessageComponents = null;
 		this.secureReceiptMessageDoSMitigation = null;
 		
+	}
+	
+	public byte[] getInitialisationVectorInBytes() {
+		return this.initialisationVectorInBytes;
 	}
 	
 	public SecureReceiptMessageMetaHeader getSecureReceiptMessageMetaHeader() {
@@ -72,10 +76,6 @@ public class SecureReceiptMessage {
 	
 	public String getUserPeerID() {
 		return this.userPeerID;
-	}
-	
-	public byte[] getInitialisationVectorInBytes() {
-		return this.initialisationVectorInBytes;
 	}
 	
 	public SecureCommonKeyExchange getSecureReceiptMessageKeyExchange() {

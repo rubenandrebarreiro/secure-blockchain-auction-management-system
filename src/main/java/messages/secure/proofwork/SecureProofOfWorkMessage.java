@@ -16,6 +16,8 @@ import main.java.messages.secure.proofwork.metaheader.SecureProofOfWorkMessageMe
 
 public class SecureProofOfWorkMessage {
 	
+	private byte[] initialisationVector;
+	
 	private SecureProofOfWorkMessageMetaHeader secureProofOfWorkMessageMetaHeader;
 	
 	private String userPeerID;
@@ -32,12 +34,14 @@ public class SecureProofOfWorkMessage {
 	
 	
 	
-	public SecureProofOfWorkMessage(SecureProofOfWorkMessageMetaHeader secureProofOfWorkMessageMetaHeader,
+	public SecureProofOfWorkMessage(byte[] initialisationVector,
+									SecureProofOfWorkMessageMetaHeader secureProofOfWorkMessageMetaHeader,
 									String userPeerID,
 									SecureCommonKeyExchange secureProofOfWorkMessageKeyExchange,
 									SecureProofOfWorkMessageComponents secureProofOfWorkMessageComponents,
 									SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation) {
 
+		this.initialisationVector = initialisationVector;
 		this.secureProofOfWorkMessageMetaHeader = secureProofOfWorkMessageMetaHeader;
 		this.userPeerID = userPeerID;
 		this.secureProofOfWorkMessageKeyExchange = secureProofOfWorkMessageKeyExchange;
@@ -55,12 +59,17 @@ public class SecureProofOfWorkMessage {
 		this.secureProofOfWorkMessageSerialized = secureProofOfWorkMessageSerialized;
 		this.isSecureProofOfWorkMessageSerialized = true;
 		
+		this.initialisationVector = null;
 		this.secureProofOfWorkMessageMetaHeader = null;
 		this.userPeerID = null;
 		this.secureProofOfWorkMessageKeyExchange = null;
 		this.secureProofOfWorkMessageComponents = null;
 		this.secureProofOfWorkMessageDoSMitigation = null;
 		
+	}
+	
+	public byte[] getInitialisationVector() {
+		return this.initialisationVector;
 	}
 	
 	public SecureProofOfWorkMessageMetaHeader getSecureProofOfWorkMessageMetaHeader() {
@@ -139,7 +148,15 @@ public class SecureProofOfWorkMessage {
 		
 			// The offset related to fulfilment of the serialization process
 			int serializationOffset = 0;
-		
+	
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.initialisationVector, 0, this.secureProofOfWorkMessageSerialized,
+							 serializationOffset, this.initialisationVector.length);
+			serializationOffset += this.initialisationVector.length;
+	
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to

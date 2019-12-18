@@ -8,30 +8,30 @@ import java.security.Signature;
 import java.security.SignatureException;
 
 import main.java.common.utils.CommonUtils;
-import main.java.messages.secure.proofwork.components.solvedblock.confidential.SecureProofOfWorkMessageComponentsSolvedBlockConfidential;
+import main.java.messages.secure.proofwork.components.solvedblock.info.SecureProofOfWorkMessageComponentsSolvedBlockInfo;
 
 public class SecureProofOfWorkMessageComponentsSolvedBlockSignature {
 	
 	
-	private SecureProofOfWorkMessageComponentsSolvedBlockConfidential 
-			secureProofOfWorkMessageComponentsSolvedBlockConfidential;
+	private SecureProofOfWorkMessageComponentsSolvedBlockInfo 
+			secureProofOfWorkMessageComponentsSolvedBlockInfo;
 	
 	
-	private byte[] secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
+	private byte[] secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	
-	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
+	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	
-	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
-	
-	
-	private byte[] secureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned;
-	
-	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned;
+	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	
 	
-	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedVerified;
+	private byte[] secureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned;
 	
-	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid;
+	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned;
+	
+	
+	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified;
+	
+	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid;
 	
 	
 	
@@ -39,125 +39,125 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockSignature {
 	
 	
 	public SecureProofOfWorkMessageComponentsSolvedBlockSignature
-		  (SecureProofOfWorkMessageComponentsSolvedBlockConfidential secureProofOfWorkMessageComponentsSolvedBlockConfidential,
+		  (SecureProofOfWorkMessageComponentsSolvedBlockInfo secureProofOfWorkMessageComponentsSolvedBlockInfo,
 		   String userPeerID) {
 		
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidential = secureProofOfWorkMessageComponentsSolvedBlockConfidential;
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfo = secureProofOfWorkMessageComponentsSolvedBlockInfo;
 		
 		
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidential.buildSecureProofOfWorkMessageComponentsSolvedBlockConfidentialToSend();
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfo.doBlockSerializedAndSolvedHashed();;
 		
 		
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-			 secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerializedAndSolvedHashedCiphered();
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+			 secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSerializedAndSolvedHashed();
 		
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = true;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = true;
 		
-		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-				this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized.length;
-		
-		
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned = null;
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned = false;
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+				this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized.length;
 		
 		
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedVerified = false;
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid = false;
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned = null;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned = false;
+		
+		
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified = false;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid = false;
 		
 	}
 	
 	
 	public SecureProofOfWorkMessageComponentsSolvedBlockSignature
-		  (byte[] secureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned,
-		   byte[] secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized,
+		  (byte[] secureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned,
+		   byte[] secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
 		   String userPeerID) {
 	
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned = 
-				secureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned;
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned = true;
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned = 
+				secureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned = true;
 		
 		
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-				secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = true;
-		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-				secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized.length;
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+				secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = true;
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+				secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized.length;
 		
 		
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidential = null;
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfo = null;
 		
 		
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedVerified = false;
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid = false;
-		
-	}
-	
-	
-	
-	
-	public SecureProofOfWorkMessageComponentsSolvedBlockConfidential getSecureProofOfWorkMessageComponentsSolvedBlockConfidential() {
-		return this.secureProofOfWorkMessageComponentsSolvedBlockConfidential;
-	}
-	
-	
-	public byte[] getSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized() {
-		return this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
-	}
-	
-	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized() {
-		return this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
-	}
-	
-	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized
-	       (boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized) {
-		
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-				isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified = false;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid = false;
 		
 	}
 	
-	public int getSizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized() {
-		return this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
+	
+	
+	
+	public SecureProofOfWorkMessageComponentsSolvedBlockInfo getSecureProofOfWorkMessageComponentsSolvedBlockInfo() {
+		return this.secureProofOfWorkMessageComponentsSolvedBlockInfo;
 	}
 	
 	
-	public byte[] getSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned() {
-		return this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned;
+	public byte[] getSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized() {
+		return this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	}
 	
-	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned() {
-		return this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned;
+	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized() {
+		return this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	}
 	
-	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned
-		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned) {
+	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized
+	       (boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized) {
 		
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned = 
-				isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned;
-	
-	}
-	
-	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedVerified() {
-		return this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedVerified;
-	}
-	
-	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedVerified
-		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedVerified) {
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+				isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 		
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedVerified = 
-				isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedVerified;
-	
 	}
 	
-	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid() {
-		return this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid;
+	public int getSizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized() {
+		return this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	}
 	
-	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid
-		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid) {
+	
+	public byte[] getSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned() {
+		return this.secureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned;
+	}
+	
+	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned() {
+		return this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned;
+	}
+	
+	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned
+		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned) {
 		
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid = 
-				isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned = 
+				isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned;
+	
+	}
+	
+	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified() {
+		return this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified;
+	}
+	
+	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified
+		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified) {
+		
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified = 
+				isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified;
+	
+	}
+	
+	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid() {
+		return this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid;
+	}
+	
+	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid
+		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid) {
+		
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid = 
+				isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid;
 	
 	}
 	
@@ -166,23 +166,23 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockSignature {
 	public void signSecureProofOfWorkMessageComponentsSolvedBlock()
 		   throws SignatureException, InvalidKeyException, NoSuchAlgorithmException {
 
-		if(!this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned) {
+		if(!this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned) {
 
-			Signature secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature = 
+			Signature secureProofOfWorkMessageComponentsSolvedBlockDataInfoSerializedSignature = 
 					  Signature.getInstance("SHA256withRSA");
 			
 			PrivateKey userClientPrivateKey = CommonUtils.readKeysFromKeystore(this.userPeerID).getPrivate(); //TODO Private Key to Sign contained in the KeyStore of the User
 			
-			secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature.initSign(userClientPrivateKey);
+			secureProofOfWorkMessageComponentsSolvedBlockDataInfoSerializedSignature.initSign(userClientPrivateKey);
 			
-			secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature
-				.update(this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized);
+			secureProofOfWorkMessageComponentsSolvedBlockDataInfoSerializedSignature
+				.update(this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized);
 			
-			this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned = 
-					secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature.sign();
+			this.secureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned = 
+					secureProofOfWorkMessageComponentsSolvedBlockDataInfoSerializedSignature.sign();
 			
 			
-			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned(true);			
+			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned(true);			
 		}
 		
 	}
@@ -191,24 +191,24 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockSignature {
 	public boolean checkIfProofOfWorkMessageComponentsSolvedBlockDigitalSignedIsValid()
 		   throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 			
-		if(this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned) {
+		if(this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned) {
 
-			Signature secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature = 
+			Signature secureProofOfWorkMessageComponentsSolvedBlockDataInfoSerializedSignature = 
 					Signature.getInstance("SHA256withRSA");
 
 			PublicKey userClientPublicKey = CommonUtils.readCertificate(userPeerID).getPublicKey(); //TODO Public Key or Certificate of the User contained in the Server 
 
-			secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature.initVerify(userClientPublicKey);
+			secureProofOfWorkMessageComponentsSolvedBlockDataInfoSerializedSignature.initVerify(userClientPublicKey);
 
-			secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature
-				.update(this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized);
+			secureProofOfWorkMessageComponentsSolvedBlockDataInfoSerializedSignature
+				.update(this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized);
 
-			this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid = 
-					secureProofOfWorkMessageComponentsSolvedBlockDataConfidentialSerializedSignature
-					.verify(this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned);
+			this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid = 
+					secureProofOfWorkMessageComponentsSolvedBlockDataInfoSerializedSignature
+					.verify(this.secureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned);
 
 
-			if(this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid) {
+			if(this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid) {
 
 				System.out.println("Valid Signature!!!");
 
@@ -219,11 +219,11 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockSignature {
 
 			}
 
-			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid(true);
-			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned(false);
+			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid(true);
+			this.setIsSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned(false);
 
 
-			return this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSignedValid;
+			return this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid;
 
 		}
 

@@ -4,23 +4,23 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 
-import main.java.messages.secure.proofwork.components.solvedblock.confidential.SecureProofOfWorkMessageComponentsSolvedBlockConfidential;
+import main.java.messages.secure.proofwork.components.solvedblock.info.SecureProofOfWorkMessageComponentsSolvedBlockInfo;
 import main.java.messages.secure.proofwork.components.solvedblock.signature.SecureProofOfWorkMessageComponentsSolvedBlockSignature;
 
 public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	
-	private SecureProofOfWorkMessageComponentsSolvedBlockConfidential 
-			secureProofOfWorkMessageComponentsSolvedBlockConfidential;
+	private SecureProofOfWorkMessageComponentsSolvedBlockInfo 
+			secureProofOfWorkMessageComponentsSolvedBlockInfo;
 	
 	private SecureProofOfWorkMessageComponentsSolvedBlockSignature 
 			secureProofOfWorkMessageComponentsSolvedBlockSignature;
 	
 	
-	private byte[] secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
+	private byte[] secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	
-	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
+	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	
-	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
+	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	
 
 	private byte[] secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized;
@@ -39,26 +39,26 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	
 	
 	public SecureProofOfWorkMessageComponentsSolvedBlock
-	      (SecureProofOfWorkMessageComponentsSolvedBlockConfidential secureProofOfWorkMessageComponentsSolvedBlockConfidential,
+	      (SecureProofOfWorkMessageComponentsSolvedBlockInfo secureProofOfWorkMessageComponentsSolvedBlockInfo,
 		   SecureProofOfWorkMessageComponentsSolvedBlockSignature secureProofOfWorkMessageComponentsSolvedBlockSignature)
 		   throws InvalidKeyException, SignatureException, NoSuchAlgorithmException {
 		
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidential = secureProofOfWorkMessageComponentsSolvedBlockConfidential;
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfo = secureProofOfWorkMessageComponentsSolvedBlockInfo;
 		this.secureProofOfWorkMessageComponentsSolvedBlockSignature = secureProofOfWorkMessageComponentsSolvedBlockSignature;
 
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidential
-			.buildSecureProofOfWorkMessageComponentsSolvedBlockConfidentialToSend();
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-				this.secureProofOfWorkMessageComponentsSolvedBlockConfidential
-					.getBlockSerializedAndSolvedHashedCiphered();
-		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-				this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized.length;
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = true;
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfo
+			.doBlockSerializedAndSolvedHashed();
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+				this.secureProofOfWorkMessageComponentsSolvedBlockInfo
+					.getBlockSerializedAndSolvedHashed();
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+				this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized.length;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = true;
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockSignature.signSecureProofOfWorkMessageComponentsSolvedBlock();
 		this.secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized = 
 				this.secureProofOfWorkMessageComponentsSolvedBlockSignature
-				    .getSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned();
+				    .getSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned();
 		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized = 
 				secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized.length;
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized = true;
@@ -72,7 +72,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	
 	public SecureProofOfWorkMessageComponentsSolvedBlock
 	      (byte[] secureProofOfWorkMessageComponentsSolvedBlockSerialized,
-	       int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized,
+	       int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
 	       int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized) {
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
@@ -82,10 +82,10 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockSerialized = true;
 		
 		
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = null;
-		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-				sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = true;
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = null;
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+				sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = true;
 		
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized = null;
@@ -94,17 +94,17 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized = true;
 
 		
-		this.secureProofOfWorkMessageComponentsSolvedBlockConfidential = null;
+		this.secureProofOfWorkMessageComponentsSolvedBlockInfo = null;
 		this.secureProofOfWorkMessageComponentsSolvedBlockSignature = null;
 
 		
 	}
 	
 	
-	public SecureProofOfWorkMessageComponentsSolvedBlockConfidential 
-		   getSecureProofOfWorkMessageComponentsSolvedBlockConfidential() {
+	public SecureProofOfWorkMessageComponentsSolvedBlockInfo 
+		   getSecureProofOfWorkMessageComponentsSolvedBlockInfo() {
 		
-		return this.secureProofOfWorkMessageComponentsSolvedBlockConfidential;
+		return this.secureProofOfWorkMessageComponentsSolvedBlockInfo;
 	
 	}
 	
@@ -115,15 +115,15 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	
 	}
 	
-	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized() {
-		return this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
+	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized() {
+		return this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	}
 	
-	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized
-		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized) {
+	public void setIsSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized
+		  (boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized) {
 		
-		this.isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-				isSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized;
+		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+				isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	
 	}
 	
@@ -163,7 +163,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 		if(!this.isSecureProofOfWorkMessageComponentsSolvedBlockSerialized) {
 			
 			this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized = 
-					( this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized + 
+					( this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized + 
 					  this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized );
 			
 			this.secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
@@ -185,9 +185,9 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
-			System.arraycopy(this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized, 0,
+			System.arraycopy(this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized, 0,
 							 this.secureProofOfWorkMessageComponentsSolvedBlockSerialized,
-							 serializationOffset, this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized.length);
+							 serializationOffset, this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized.length);
 			serializationOffset += this.secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized.length;
 			
 			// Fills the byte array of the Block's Serialization with
@@ -209,8 +209,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 		
 		if(this.isSecureProofOfWorkMessageComponentsSolvedBlockSerialized) {
 			
-			this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized = 
-					new byte[ this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized ];
+			this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+					new byte[ this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized ];
 			
 			this.secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized = 
 					new byte[ this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized ];
@@ -232,9 +232,9 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(this.secureProofOfWorkMessageComponentsSolvedBlockSerialized, serializationOffset,
-							 this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized,
-							 0, this.secureProofOfWorkMessageComponentsSolvedBlockConfidentialSerialized.length);
-			serializationOffset += this.secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized.length;
+							 this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
+							 0, this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized.length);
+			serializationOffset += this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current ProofOfWork serialized,

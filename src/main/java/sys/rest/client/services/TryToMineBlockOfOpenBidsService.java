@@ -24,7 +24,7 @@ import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
 import main.java.messages.secure.proofwork.SecureProofOfWorkMessage;
 import main.java.messages.secure.proofwork.components.SecureProofOfWorkMessageComponents;
 import main.java.messages.secure.proofwork.components.solvedblock.SecureProofOfWorkMessageComponentsSolvedBlock;
-import main.java.messages.secure.proofwork.components.solvedblock.confidential.SecureProofOfWorkMessageComponentsSolvedBlockConfidential;
+import main.java.messages.secure.proofwork.components.solvedblock.info.SecureProofOfWorkMessageComponentsSolvedBlockInfo;
 import main.java.messages.secure.proofwork.components.solvedblock.signature.SecureProofOfWorkMessageComponentsSolvedBlockSignature;
 import main.java.messages.secure.proofwork.dos.mitigation.SecureProofOfWorkMessageDoSMitigation;
 import main.java.messages.secure.proofwork.metaheader.SecureProofOfWorkMessageMetaHeader;
@@ -180,17 +180,17 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 				
 				try {
 					
-					SecureProofOfWorkMessageComponentsSolvedBlockConfidential
-							secureProofOfWorkMessageComponentsSolvedBlockConfidential = 
-									new SecureProofOfWorkMessageComponentsSolvedBlockConfidential
+					SecureProofOfWorkMessageComponentsSolvedBlockInfo
+							secureProofOfWorkMessageComponentsSolvedBlockInfo = 
+									new SecureProofOfWorkMessageComponentsSolvedBlockInfo
 											(blockOfOpenBidsForChallenge, blockOfOpenBidsForChallengeSerializedHashed);
 		
-					secureProofOfWorkMessageComponentsSolvedBlockConfidential
-							.buildSecureProofOfWorkMessageComponentsSolvedBlockConfidentialToSend();
+					secureProofOfWorkMessageComponentsSolvedBlockInfo
+							.doBlockSerializedAndSolvedHashed();
 			
 					SecureProofOfWorkMessageComponentsSolvedBlockSignature secureProofOfWorkMessageComponentsSolvedBlockSignature = 
 							new SecureProofOfWorkMessageComponentsSolvedBlockSignature
-									(secureProofOfWorkMessageComponentsSolvedBlockConfidential,
+									(secureProofOfWorkMessageComponentsSolvedBlockInfo,
 									 clientUserID);
 					
 					secureProofOfWorkMessageComponentsSolvedBlockSignature
@@ -199,7 +199,7 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 					
 					SecureProofOfWorkMessageComponentsSolvedBlock secureProofOfWorkMessageComponentsSolvedBlock =
 							new SecureProofOfWorkMessageComponentsSolvedBlock
-									(secureProofOfWorkMessageComponentsSolvedBlockConfidential,
+									(secureProofOfWorkMessageComponentsSolvedBlockInfo,
 									 secureProofOfWorkMessageComponentsSolvedBlockSignature);
 					
 					secureProofOfWorkMessageComponentsSolvedBlock
@@ -226,9 +226,10 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 					SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation = 
 							new SecureProofOfWorkMessageDoSMitigation(secureProofOfWorkMessageComponents);
 					
+					byte[] initialisationVectorInBytes = secureProofOfWorkMessageComponents.getInitialisationVector();
 					
-					byte[] secretSymmetricKeyInBytes = secureProofOfWorkMessageComponentsSolvedBlockConfidential
-													   .getSecretSymmetricKeyForSolvedBlockConfidentialInBytes();
+					byte[] secretSymmetricKeyInBytes = secureProofOfWorkMessageComponents
+													   .getSecretSymmetricKeyForProofOfWorkMessageComponentsInBytes();
 					
 					byte[] secretHMACKeyForDoSMitigationInBytes = secureProofOfWorkMessageDoSMitigation
 																  .getSecretHMACKeyForDoSMitigationInBytes();
@@ -250,17 +251,17 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 					byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
 							secureProofOfWorkMessageDoSMitigation.getSecureProofOfWorkMessageComponentsHashedForDoSMitigation();
 					
-					byte[] secureBidMessageComponentsSolvedBlockConfidentialSerialized =
-							secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerializedAndSolvedHashedCiphered();
+					byte[] secureBidMessageComponentsSolvedBlockInfoSerialized =
+							secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSerializedAndSolvedHashed();
 					byte[] secureBidMessageComponentsSolvedBlockSignatureSerialized = 
 								secureProofOfWorkMessageComponentsSolvedBlockSignature
-										.getSecureProofOfWorkMessageComponentsSolvedBlockConfidentialDigitalSigned();
+										.getSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned();
 					
 					
 					byte[] blockAndBlockSolvedHashedSerialized = 
-							secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerializedAndSolvedHashed();
-					byte[] blockSerialized = secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSerialized();
-					byte[] blockSolvedHashed = secureProofOfWorkMessageComponentsSolvedBlockConfidential.getBlockSolvedHashed();
+							secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSerializedAndSolvedHashed();
+					byte[] blockSerialized = secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSerialized();
+					byte[] blockSolvedHashed = secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSolvedHashed();
 							
 					SecureProofOfWorkMessageMetaHeader secureProofOfWorkMessageMetaHeader = 
 								new SecureProofOfWorkMessageMetaHeader	
@@ -269,7 +270,7 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 											 secureBidMessageKeyExchangeSerializedCipheredSigned.length,
 											 secureProofOfWorkMessageComponentsSolvedBlockSerialized.length,
 											 secureProofOfWorkMessageDoSMitigationSerialized.length,
-											 secureBidMessageComponentsSolvedBlockConfidentialSerialized.length,
+											 secureBidMessageComponentsSolvedBlockInfoSerialized.length,
 											 secureBidMessageComponentsSolvedBlockSignatureSerialized.length,
 										 	 blockAndBlockSolvedHashedSerialized.length,
 											 blockSerialized.length,
@@ -279,7 +280,8 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 					
 					
 					SecureProofOfWorkMessage secureProofOfWorkMessage = 
-							new SecureProofOfWorkMessage(secureProofOfWorkMessageMetaHeader, 
+							new SecureProofOfWorkMessage(initialisationVectorInBytes,
+														 secureProofOfWorkMessageMetaHeader, 
 														 clientUserID,
 														 secureProofOfWorkMessageKeyExchange,
 														 secureProofOfWorkMessageComponents,
