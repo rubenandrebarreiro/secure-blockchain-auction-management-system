@@ -501,13 +501,13 @@ public class SecureBidMessageDataConfidential {
 
 					// Algorithms that don't need IV (Initialisation Vector): ECB
 					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureBidMessageDataConfidential.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
+//					System.out.println("[SecureBidMessageDataConfidential.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
 					this.initialisationVectorBytes = 
 							CommonUtils.generateIV(secureBidMessageDataConfidentialSerializedSymmetricEncryptionCipher);
 
 					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageDataConfidential.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
-							+ CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
+//					System.out.println("[SecureBidMessageDataConfidential.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
+//							+ CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorBytes));
 
 					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
 					
@@ -519,7 +519,7 @@ public class SecureBidMessageDataConfidential {
 
 					// Algorithms that need IV (Initialisation Vector)
 					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageDataConfidential.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
+//					System.out.println("[SecureBidMessageDataConfidential.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
 
 					secureBidMessageDataConfidentialSerializedSymmetricEncryptionCipher
 					.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
@@ -608,11 +608,11 @@ public class SecureBidMessageDataConfidential {
 					
 					// Algorithms that don't need IV (Initialisation Vector): ECB
 					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureBidMessageDataConfidential.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
+//					System.out.println("[SecureBidMessageDataConfidential.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
 					
 					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageDataConfidential.DECRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(this.initialisationVectorBytes));
+//					System.out.println("[SecureBidMessageDataConfidential.DECRYPT] - IV (Initialisation Vector) is:\n- " 
+//									   + CommonUtils.fromByteArrayToHexadecimalFormat(this.initialisationVectorBytes));
 					
 					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorBytes);
 					secureBidMessageDataConfidentialSerializedAndHashedSymmetricEncryptionDecipher
@@ -622,7 +622,7 @@ public class SecureBidMessageDataConfidential {
 					
 					// Algorithms that need IV (Initialisation Vector)
 					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureBidMessageDataConfidential.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
+//					System.out.println("[SecureBidMessageDataConfidential.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
 					
 					secureBidMessageDataConfidentialSerializedAndHashedSymmetricEncryptionDecipher
 						.init(Cipher.DECRYPT_MODE, secretKeySpecifications);

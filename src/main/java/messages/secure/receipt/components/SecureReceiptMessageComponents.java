@@ -405,13 +405,13 @@ public class SecureReceiptMessageComponents {
 
 					// Algorithms that don't need IV (Initialisation Vector): ECB
 					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
+//					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
 					this.initialisationVectorInBytes = 
 							CommonUtils.generateIV(secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher);
 
 					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
-							+ CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorInBytes));
+//					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] - IV (Initialisation Vector) is:\n- " 
+//							+ CommonUtils.fromByteArrayToHexadecimalFormat(initialisationVectorInBytes));
 
 					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(initialisationVectorInBytes);
 					
@@ -423,7 +423,7 @@ public class SecureReceiptMessageComponents {
 
 					// Algorithms that need IV (Initialisation Vector)
 					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
+//					System.out.println("[SecureReceiptMessageComponents.ENCRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
 
 					secureReceiptMessageComponentsSerializedSymmetricEncryptionCipher
 							.init(Cipher.ENCRYPT_MODE, secretKeySpecifications);
@@ -512,11 +512,11 @@ public class SecureReceiptMessageComponents {
 					
 					// Algorithms that don't need IV (Initialisation Vector): ECB
 					// The parameter specifications for the IV (Initialisation Vector)	
-					System.out.println("[SecureReceiptMessageComponents.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
+//					System.out.println("[SecureReceiptMessageComponents.DECRYPT] Cipher's Block Mode needs IV (Initialisation Vector)!!!");
 					
 					// Showing the randomly defined IV (Initialisation Vector)
-					System.out.println("[SecureReceiptMessageComponents.DECRYPT] - IV (Initialisation Vector) is:\n- " 
-									   + CommonUtils.fromByteArrayToHexadecimalFormat(this.initialisationVectorInBytes));
+//					System.out.println("[SecureReceiptMessageComponents.DECRYPT] - IV (Initialisation Vector) is:\n- " 
+//									   + CommonUtils.fromByteArrayToHexadecimalFormat(this.initialisationVectorInBytes));
 					
 					IvParameterSpec initializationVectorParameterSpecifications = new IvParameterSpec(this.initialisationVectorInBytes);
 					secureReceiptMessageComponentsSerializedSymmetricEncryptionDecipher
@@ -526,7 +526,7 @@ public class SecureReceiptMessageComponents {
 					
 					// Algorithms that need IV (Initialisation Vector)
 					// The parameter specifications for the IV (Initialisation Vector)
-					System.out.println("[SecureReceiptMessageComponents.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
+//					System.out.println("[SecureReceiptMessageComponents.DECRYPT] Cipher's Block Mode doesn't needs IV (Initialisation Vector)!!!");
 					
 					secureReceiptMessageComponentsSerializedSymmetricEncryptionDecipher
 						.init(Cipher.DECRYPT_MODE, secretKeySpecifications);

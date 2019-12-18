@@ -300,12 +300,12 @@ public class SecureBidMessageDataSignature {
 
 			if(this.isBidSerializedDigitalSignedValid) {
 
-				System.out.println("Valid Signature!!!");
+//				System.out.println("Valid Signature!!!");
 
 			}
 			else {
 
-				System.out.println("Invalid Signature!!!");
+//				System.out.println("Invalid Signature!!!");
 
 			}
 

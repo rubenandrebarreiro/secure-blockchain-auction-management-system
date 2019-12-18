@@ -173,12 +173,12 @@ public class SecureReceiptMessageComponentsDataSignature {
 
 			if(this.isSecureReceiptMessageComponentsDataInfoDigitalSignedValid) {
 
-				System.out.println("Valid Signature!!!");
+//				System.out.println("Valid Signature!!!");
 
 			}
 			else {
 
-				System.out.println("Invalid Signature!!!");
+//				System.out.println("Invalid Signature!!!");
 
 			}
 

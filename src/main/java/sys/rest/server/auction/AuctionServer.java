@@ -477,7 +477,6 @@ public class AuctionServer extends Thread{
 				
 				
 				String bidJson = gson.toJson(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
-				System.err.println("Bid is: " + secureBidMessageData.getSecureBidMessageDataSignature().getBid());
 				postRequest.setEntity(new StringEntity(bidJson));
 				postRequest.setHeader("Accept", "application/json");
 				postRequest.setHeader("Content-type", "application/json");
@@ -603,9 +602,10 @@ public class AuctionServer extends Thread{
 						if(!entry.getKey().equals(userName))
 							entry.getValue().add(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
 					}
-					connectedClientsMap.forEach( (x,y) -> {
-						System.out.println(x + " " + y);
-					});
+//					printStringWithClassName("Bids to send to: ");
+//					connectedClientsMap.forEach( (x,y) -> {
+//						System.out.println(x + " " + y);
+//					});
 				}
 
 				methodResult = java.util.Base64.getEncoder().encodeToString(secureReceiptMessageSerialized);
