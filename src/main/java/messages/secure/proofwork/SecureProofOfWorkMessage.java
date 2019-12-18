@@ -130,14 +130,14 @@ public class SecureProofOfWorkMessage {
 			byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
 					this.secureProofOfWorkMessageDoSMitigation.getSecureProofOfWorkMessageComponentsHashedForDoSMitigation();
 			
-			int sizeOfSecureBidMessageSerialized = (initialisationVector.length +
+			int sizeOfSecureProofOfWorkMessageSerialized = (initialisationVector.length +
 													secureProofOfWorkMessageMetaHeaderSerialized.length +
 													userPeerIDSerialized.length +
 												    secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned.length +
 													secureProofOfWorkMessageComponentsSerialized.length +
 													secureProofOfWorkMessageDoSMitigationSerialized.length);
 
-			this.secureProofOfWorkMessageSerialized = new byte[sizeOfSecureBidMessageSerialized];
+			this.secureProofOfWorkMessageSerialized = new byte[sizeOfSecureProofOfWorkMessageSerialized];
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -151,49 +151,49 @@ public class SecureProofOfWorkMessage {
 			int serializationOffset = 0;
 	
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(this.initialisationVector, 0, this.secureProofOfWorkMessageSerialized,
 							 serializationOffset, this.initialisationVector.length);
 			serializationOffset += this.initialisationVector.length;
 	
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(secureProofOfWorkMessageMetaHeaderSerialized, 0, this.secureProofOfWorkMessageSerialized,
 							 serializationOffset, secureProofOfWorkMessageMetaHeaderSerialized.length);
 			serializationOffset += secureProofOfWorkMessageMetaHeaderSerialized.length;
 		
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(userPeerIDSerialized, 0, this.secureProofOfWorkMessageSerialized,
 							 serializationOffset, userPeerIDSerialized.length);
 			serializationOffset += userPeerIDSerialized.length;
 
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned, 0, this.secureProofOfWorkMessageSerialized,
 							 serializationOffset, secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned.length);
 			serializationOffset += secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned.length;
 			
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(secureProofOfWorkMessageComponentsSerialized, 0, this.secureProofOfWorkMessageSerialized,
 							 serializationOffset, secureProofOfWorkMessageComponentsSerialized.length);
 			serializationOffset += secureProofOfWorkMessageComponentsSerialized.length;
 		
 			// Fills the byte array of the Block's Serialization with
-			// the correspondent bytes from the current Bid serialized,
-			// From the position corresponding to the length of the previous Bid's Serialization to
-			// the position corresponding to the length of the current Bid's Serialization
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(secureProofOfWorkMessageDoSMitigationSerialized, 0, this.secureProofOfWorkMessageSerialized,
 							 serializationOffset, secureProofOfWorkMessageDoSMitigationSerialized.length);
 			
@@ -202,5 +202,182 @@ public class SecureProofOfWorkMessage {
 			
 		}
 		
+	}
+	
+	public void undoSecureProofOfWorkMessageSerialized() {
+				
+		if(this.isSecureProofOfWorkMessageSerialized) {
+			
+			int sizeOfSecureProofOfWorkMessageMetaHeaderSerialized = 
+										 ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
+										   ( 9 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+										   ( 10 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+			
+			byte[] secureProofOfWorkMessageMetaHeaderSerialized = 
+					new byte[ sizeOfSecureProofOfWorkMessageMetaHeaderSerialized ];
+			
+						
+			// Operations to Fill a Byte Array, with the following parameters:
+			// 1) src - The source of the array to be copied
+			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
+			// 3) dest - The destination of the array to be copied
+			// 4) destPos - The position of the array where will be placed the new copy,
+			//              representing the first element where new data will be placed
+			// 5) length - The length of the data to be copied from the source array to the destination array
+		
+			// The offset related to fulfilment of the serialization process
+			int serializationOffset = 0;
+			
+			byte[] initialisationVectorInBytes = new byte[ 16 ];
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(this.secureProofOfWorkMessageSerialized, serializationOffset,
+							 initialisationVectorInBytes,
+							 0, initialisationVectorInBytes.length);
+			serializationOffset += initialisationVectorInBytes.length;
+	
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(secureProofOfWorkMessageMetaHeaderSerialized, 0, this.secureProofOfWorkMessageSerialized,
+							 serializationOffset, secureProofOfWorkMessageMetaHeaderSerialized.length);
+			serializationOffset += secureProofOfWorkMessageMetaHeaderSerialized.length;
+		
+			
+			this.secureProofOfWorkMessageMetaHeader = 
+					new SecureProofOfWorkMessageMetaHeader(secureProofOfWorkMessageMetaHeaderSerialized);
+			this.secureProofOfWorkMessageMetaHeader.undoSecureProofOfWorkMessageMetaHeaderSerialization();
+			
+			
+			int sizeOfUserPeerIDSerialized = this.secureProofOfWorkMessageMetaHeader.getSizeOfUserPeerIDSerialized();
+			byte[] userPeerIDSerialized = new byte[ sizeOfUserPeerIDSerialized ];
+			
+			int sizeOfSecureProofOfWorkMessageKeyExchangeSerialized = 
+					( this.secureProofOfWorkMessageMetaHeader
+						  .getSizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered() + 
+					  this.secureProofOfWorkMessageMetaHeader
+					  	  .getSizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned() );
+			
+			byte[] secureProofOfWorkMessageKeyExchangeSerialized = new byte[ sizeOfSecureProofOfWorkMessageKeyExchangeSerialized ];
+			
+			
+			int sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered = 
+					( CommonUtils.COMMON_HEADER_LENGTH +
+					  this.secureProofOfWorkMessageMetaHeader
+					  	  .getSizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized() );
+			
+			byte[] secureProofOfWorkMessageComponentsSerializedCiphered = 
+					new byte[ sizeOfSecureProofOfWorkMessageComponentsSerializedCiphered ];
+			
+			int sizeOfSecureProofOfWorkMessageDoSMitigationSerialized = 
+					this.secureProofOfWorkMessageMetaHeader.getSizeOfSecureProofOfWorkMessageDoSMitigationSerialized();
+			byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
+					new byte[ sizeOfSecureProofOfWorkMessageDoSMitigationSerialized ];
+			
+			
+			
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(userPeerIDSerialized, serializationOffset, this.secureProofOfWorkMessageSerialized,
+							 0, userPeerIDSerialized.length);
+			serializationOffset += userPeerIDSerialized.length;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(secureProofOfWorkMessageKeyExchangeSerialized, serializationOffset, this.secureProofOfWorkMessageSerialized,
+							 0, secureProofOfWorkMessageKeyExchangeSerialized.length);
+			serializationOffset += secureProofOfWorkMessageKeyExchangeSerialized.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(secureProofOfWorkMessageComponentsSerializedCiphered, serializationOffset, this.secureProofOfWorkMessageSerialized,
+							 0, secureProofOfWorkMessageComponentsSerializedCiphered.length);
+			serializationOffset += secureProofOfWorkMessageComponentsSerializedCiphered.length;
+		
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(secureProofOfWorkMessageDoSMitigationSerialized, serializationOffset, this.secureProofOfWorkMessageSerialized,
+							 0, secureProofOfWorkMessageDoSMitigationSerialized.length);
+			
+			
+			int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered = 
+					this.secureProofOfWorkMessageMetaHeader.getSizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered();
+			int sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned = 
+					this.secureProofOfWorkMessageMetaHeader.getSizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned();
+			
+			
+			int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized = 
+					this.secureProofOfWorkMessageMetaHeader.getSizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized();
+			  
+			int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized = 
+					this.secureProofOfWorkMessageMetaHeader.getSizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized();
+			
+			int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized = 
+					this.secureProofOfWorkMessageMetaHeader.getSizeOfSecureProofOfWorkMessageSolvedBlockSignatureSerialized();
+			
+			int sizeOfBlockSerialized = this.secureProofOfWorkMessageMetaHeader.getSizeOfBlockSerialized();
+			
+			int sizeOfBlockSolvedHashedSerialized = 
+					this.secureProofOfWorkMessageMetaHeader.getSizeOfBlockSolvedHashedSerialized();
+			
+			
+			
+			this.userPeerID = CommonUtils.fromByteArrayToString(userPeerIDSerialized);
+			
+			this.secureProofOfWorkMessageKeyExchange = 
+					new SecureCommonKeyExchange(secureProofOfWorkMessageKeyExchangeSerialized,
+												sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCiphered,
+												sizeOfSecureProofOfWorkMessageKeyExchangeSerializedCipheredSigned,
+												userPeerID);
+		
+			try {
+				this.secureProofOfWorkMessageKeyExchange.buildSecureCommonKeyExchangeReceived();
+			} catch (InvalidKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SignatureException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+			
+			this.secureProofOfWorkMessageComponents = 
+					new SecureProofOfWorkMessageComponents(secureProofOfWorkMessageComponentsSerializedCiphered,
+														   initialisationVectorInBytes,
+														   this.secureProofOfWorkMessageKeyExchange.getSecretSymmetricKeyInBytes(),
+														   sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized,
+														   sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
+														   sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
+														   sizeOfBlockSerialized,
+														   sizeOfBlockSolvedHashedSerialized);
+			
+			this.secureProofOfWorkMessageDoSMitigation =
+					new SecureProofOfWorkMessageDoSMitigation
+							(secureProofOfWorkMessageComponentsSerializedCiphered,
+							 secureProofOfWorkMessageDoSMitigationSerialized,
+							 this.secureProofOfWorkMessageKeyExchange.getSecretHMACKeyForDoSMitigationInBytes());
+			
+			
+			
+			this.setIsSecureProofOfWorkMessageSerialized(false);
+			
+		}
 	}
 }
