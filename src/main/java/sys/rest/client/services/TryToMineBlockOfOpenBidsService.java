@@ -3,6 +3,7 @@ package main.java.sys.rest.client.services;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
@@ -119,11 +120,41 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 
 				}
 
-				int previousBlockID = ( this.minedBlockMap.size() - 1 );
-				int currentBlockID = ( previousBlockID + 1 );
 				
-				Block previousBlock = this.minedBlockMap.get(previousBlockID);
-				byte[] previousBlockHashed = previousBlock.getBlockSerializedHashed();
+				int previousBlockID = 0;
+				int currentBlockID = 0;
+				
+				byte[] previousBlockHashed = null;
+				
+				if(this.minedBlockMap.isEmpty()) {
+					
+					previousBlockID = -1;
+					currentBlockID = 0;
+					
+					byte[] randomByteArray = new byte[32];
+				    new Random().nextBytes(randomByteArray);
+				    
+				    MessageDigest messageDigest = null;
+					
+				    try {
+						messageDigest = MessageDigest.getInstance("SHA-256");
+					}
+					catch (NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					}
+					
+				    previousBlockHashed = messageDigest.digest(randomByteArray);
+					
+				}
+				else {
+					
+					previousBlockID = ( this.minedBlockMap.size() - 1 );
+					currentBlockID = ( previousBlockID + 1 );
+					
+					Block previousBlock = this.minedBlockMap.get(previousBlockID);
+					previousBlockHashed = previousBlock.getBlockSerializedHashed();
+					
+				}
 				
 				
 				int difficultyToSolveChallenge = 0;
