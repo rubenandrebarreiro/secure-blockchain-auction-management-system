@@ -126,10 +126,16 @@ public class AuctionServer extends Thread{
 					BlockingQueue<Object> workQueue = connectedClientsMap.get(userName);
 					if(workQueue != null) {
 						try {
+							MessagePacketServerToClientTypes messageType;
 							while(!workQueue.isEmpty()) {
-								String string = gson.toJson(workQueue.remove());
+								Object work = workQueue.remove();
+								String string = gson.toJson(work);
 //								printStringWithClassName("Update client bids updating for user " + userName + " with bid " + string);
-								sslWriteResponse(responseSocket.getOutputStream(), string, null, MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS);
+								if(work instanceof SecureProofOfWorkMessage)
+									messageType = MessagePacketServerToClientTypes.PROOF_OF_WORK;
+								else
+									messageType = MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS;
+								sslWriteResponse(responseSocket.getOutputStream(), string, null, messageType);
 							}
 						} catch (ParseException | IOException e) {
 							printStringWithClassName("Error! Update client bids service had trouble adding work to queue!");
@@ -303,8 +309,8 @@ public class AuctionServer extends Thread{
 						break;						
 					
 					case PROOF_WORK_SENT:
-						messageType = MessagePacketServerToClientTypes.PROOF_OF_WORK;
-						responseString = "";
+						messageType = MessagePacketServerToClientTypes.NONE;
+						printStringWithClassName("Server received proof of work from user " + userName + "!");
 						handleReceivedProofOfWork(message.getBody());
 						break;
 					default:
@@ -1132,6 +1138,8 @@ public class AuctionServer extends Thread{
 	private void handleReceivedProofOfWork(String proofOfWorkSerializedJson) {
 		printStringWithClassName("COMPLETE ME! (handleReceivedProofOfWork)");
 		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
+		
+//TODO		
 		// Validate proof. If valid, broadcast to clients.
 		connectedClientsMap.forEach((x,y) -> {
 			if(!x.equals(userName))
@@ -1148,23 +1156,25 @@ public class AuctionServer extends Thread{
 	}
 
 	private void sslWriteResponse(OutputStream socketOutStream, String notResponseMessage, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
-		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
-		String httpResponseMessage = null;
-		MessagePacketServerToClient messagePacket = null;
-		if(notResponseMessage != null && (messageType == MessagePacketServerToClientTypes.RECEIPT || messageType == MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS)) {
-			httpResponseMessage = notResponseMessage;
-			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
+		if(messageType != MessagePacketServerToClientTypes.NONE) {
+			PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
+			String httpResponseMessage = null;
+			MessagePacketServerToClient messagePacket = null;
+			if(notResponseMessage != null && (messageType == MessagePacketServerToClientTypes.RECEIPT || messageType == MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS || messageType == MessagePacketServerToClientTypes.PROOF_OF_WORK)) {
+				httpResponseMessage = notResponseMessage;
+				messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
+			}
+			else {
+				httpResponseMessage = response.getStatusLine().toString();
+				if(response.getEntity() != null && response.getEntity().getContentLength() != 0)
+					httpResponseMessage = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
+				messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
+			}
+			String messagePacketJson = gson.toJson(messagePacket);
+//			printStringWithClassName("Sending -> " + messagePacketJson);
+			printWriter.print(messagePacketJson + System.lineSeparator());
+			printWriter.flush();
 		}
-		else {
-			httpResponseMessage = response.getStatusLine().toString();
-			if(response.getEntity() != null && response.getEntity().getContentLength() != 0)
-				httpResponseMessage = EntityUtils.toString(response.getEntity(), Charset.forName("UTF-8"));
-			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
-		}
-		String messagePacketJson = gson.toJson(messagePacket);
-//		printStringWithClassName("Sending -> " + messagePacketJson);
-		printWriter.print(messagePacketJson + System.lineSeparator());
-		printWriter.flush();
 	}
 	
 	private String removeSpaceFromURL(String url) {

@@ -161,7 +161,7 @@ public class CommonUtils {
 	/**
 	 * The Maximum Number of Bids to Try to Mine
 	 */
-	public static final int MAX_NUM_BIDS_TO_TRY_TO_MINE = 10;
+	public static final int MAX_NUM_BIDS_TO_TRY_TO_MINE = 5;
 	
 	/**
 	 * The Timeout for triggering the event of Cleaning/Removing old Random Nonces

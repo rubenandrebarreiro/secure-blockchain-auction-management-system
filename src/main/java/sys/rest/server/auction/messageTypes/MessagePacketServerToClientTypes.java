@@ -5,5 +5,6 @@ public enum MessagePacketServerToClientTypes {
 	COMPLEX_RESPONSE,
 	PROOF_OF_WORK,
 	RECEIPT,
-	UPDATE_CLIENT_BIDS;
+	UPDATE_CLIENT_BIDS,
+	NONE;
 }

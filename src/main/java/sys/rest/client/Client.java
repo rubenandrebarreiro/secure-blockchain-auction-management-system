@@ -19,6 +19,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLContext;
@@ -202,8 +203,8 @@ public class Client {
 			//		    socket.setSoTimeout(1000);
 			socket.startHandshake();
 			
-			openBidsList = new HashMap<Integer, Bid>();
-			minedBlockMap = new HashMap<Integer, Block>();
+			openBidsList = new ConcurrentHashMap<Integer, Bid>();
+			minedBlockMap = new ConcurrentHashMap<Integer, Block>();
 			
 			this.tryToMineBlockOfOpenBidsService = 
 					new TryToMineBlockOfOpenBidsService(this,

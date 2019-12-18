@@ -210,7 +210,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 			System.arraycopy(this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized, 0,
 							 this.secureProofOfWorkMessageComponentsSolvedBlockSerialized,
 							 serializationOffset, this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized.length);
-			serializationOffset += this.secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized.length;
+			serializationOffset += this.secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized.length;
 			
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current ProofOfWork serialized,

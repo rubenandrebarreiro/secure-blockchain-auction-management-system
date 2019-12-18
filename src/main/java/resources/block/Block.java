@@ -235,12 +235,12 @@ public class Block {
 
 				bidToMine.doSerialization();
 				
-				if(this.blockSerialized == null) {
+				if(this.bidsOfCurrentBlockToTryToMineSerialized == null) {
 					
 					this.bidsOfCurrentBlockToTryToMineSerialized = bidToMine.getBidSerializedBytes();
 					
 					newSizeOfBidsOfCurrentBlockToTryToMineSerialized = this.bidsOfCurrentBlockToTryToMineSerialized.length;
-					
+						
 				}
 				else {
 					
@@ -250,7 +250,8 @@ public class Block {
 					
 					newSizeOfBidsOfCurrentBlockToTryToMineSerialized = ( this.bidsOfCurrentBlockToTryToMineSerialized.length + sizeOfSerializedBid );
 					
-					this.blockSerialized = Arrays.copyOf(this.blockSerialized, newSizeOfBidsOfCurrentBlockToTryToMineSerialized);
+					this.bidsOfCurrentBlockToTryToMineSerialized = 
+							Arrays.copyOf(this.bidsOfCurrentBlockToTryToMineSerialized, newSizeOfBidsOfCurrentBlockToTryToMineSerialized);
 					
 					// Fills the byte array of the Block's Serialization with
 					// the correspondent bytes from the current Bid serialized,
@@ -292,6 +293,8 @@ public class Block {
 										   CommonUtils.LENGTH_256_BITS_IN_BYTES +
 										   this.sizeOfBidsOfCurrentBlockToTryToMineSerialized );
 									
+			this.blockSerialized = new byte[sizeOfBlockSerialized];
+			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
 			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
@@ -307,8 +310,8 @@ public class Block {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(blockIDSerialized, serializationOffset,
-					         this.blockSerialized, 0,
+			System.arraycopy(blockIDSerialized, 0,
+					         this.blockSerialized, serializationOffset,
 					         blockIDSerialized.length);
 			serializationOffset += blockIDSerialized.length;
 
@@ -316,8 +319,8 @@ public class Block {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.previousBlockHashed, serializationOffset,
-							 this.blockSerialized, 0,
+			System.arraycopy(this.previousBlockHashed, 0,
+							 this.blockSerialized, serializationOffset,
 							 this.previousBlockHashed.length);
 			serializationOffset += this.previousBlockHashed.length;
 			
@@ -325,8 +328,8 @@ public class Block {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(this.bidsOfCurrentBlockToTryToMineSerialized, serializationOffset,
-							 this.blockSerialized, 0,
+			System.arraycopy(this.bidsOfCurrentBlockToTryToMineSerialized, 0,
+							 this.blockSerialized, serializationOffset,
 							 this.bidsOfCurrentBlockToTryToMineSerialized.length);
 			serializationOffset += this.bidsOfCurrentBlockToTryToMineSerialized.length;
 			
@@ -334,9 +337,12 @@ public class Block {
 			// the correspondent bytes from the current Bid serialized,
 			// From the position corresponding to the length of the previous Bid's Serialization to
 			// the position corresponding to the length of the current Bid's Serialization
-			System.arraycopy(nonceSerialized, serializationOffset,
-					         this.blockSerialized, 0,
+			System.arraycopy(nonceSerialized, 0,
+					         this.blockSerialized, serializationOffset,
 					         nonceSerialized.length);
+		
+			
+			this.setIsBlockSerialized(true);
 			
 		}
 	}
@@ -368,9 +374,11 @@ public class Block {
 			
 			byte[] challengeTarget = new byte[ this.numBytesToSolveChallengeDifficultyType ]; 
 			
-			while( !Arrays.copyOfRange(this.blockSerializedHashed, 0, this.numBytesToSolveChallengeDifficultyType)
-						  .equals(challengeTarget) ) {
-			
+			while( !Arrays.equals
+					(Arrays.copyOfRange(this.blockSerializedHashed,
+							            0, this.numBytesToSolveChallengeDifficultyType),
+					challengeTarget) ) {
+				
 				this.startProcessToTryToSolveBlockHashChallenge();
 				
 			}
