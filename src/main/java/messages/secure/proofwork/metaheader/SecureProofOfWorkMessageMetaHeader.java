@@ -22,6 +22,7 @@ public class SecureProofOfWorkMessageMetaHeader {
 	private int sizeOfBlockSerialized;
 	private int sizeOfBlockSolvedHashedSerialized;
 	
+	private int sizeOfBidsOfCurrentBlockToTryToMineSerialized;
 	
 	private byte[] secureProofOfWorkMessageMetaHeaderSerialized;
 	
@@ -43,7 +44,9 @@ public class SecureProofOfWorkMessageMetaHeader {
 											  
 											  int sizeOfBlockAndBlockSolvedHashedSerialized,
 											  int sizeOfBlockSerialized,
-											  int sizeOfBlockSolvedHashedSerialized) {
+											  int sizeOfBlockSolvedHashedSerialized,
+											  
+											  int sizeOfBidsOfCurrentBlockToTryToMineSerialized) {
 		
 		
 		this.sizeOfUserPeerIDSerialized = sizeOfUserPeerIDSerialized;
@@ -70,6 +73,8 @@ public class SecureProofOfWorkMessageMetaHeader {
 		this.sizeOfBlockSerialized = sizeOfBlockSerialized;
 		this.sizeOfBlockSolvedHashedSerialized = sizeOfBlockSolvedHashedSerialized;
 		
+		this.sizeOfBidsOfCurrentBlockToTryToMineSerialized = 
+				sizeOfBidsOfCurrentBlockToTryToMineSerialized;
 		
 		this.secureProofOfWorkMessageMetaHeaderSerialized = null;
 		
@@ -86,6 +91,8 @@ public class SecureProofOfWorkMessageMetaHeader {
 		this.sizeOfBlockAndBlockSolvedHashedSerialized = 0;
 		this.sizeOfBlockSerialized = 0;
 		this.sizeOfBlockSolvedHashedSerialized = 0;
+		
+		this.sizeOfBidsOfCurrentBlockToTryToMineSerialized = 0;
 		
 		this.sizeOfSecureProofOfWorkMessageSolvedBlockInfoSerialized = 0;
 		this.sizeOfSecureProofOfWorkMessageSolvedBlockSignatureSerialized = 0;
@@ -145,6 +152,10 @@ public class SecureProofOfWorkMessageMetaHeader {
 		return this.sizeOfBlockSolvedHashedSerialized;
 	}
 	
+	public int getSizeOfBidsOfCurrentBlockToTryToMineSerialized() {
+		return this.sizeOfBidsOfCurrentBlockToTryToMineSerialized;
+	}
+	
 	public byte[] getSecureProofOfWorkMessageMetaHeaderSerialized() {
 		return this.secureProofOfWorkMessageMetaHeaderSerialized;
 	}
@@ -167,8 +178,8 @@ public class SecureProofOfWorkMessageMetaHeader {
 			
 			int sizeOfSecureProofOfWorkMessageMetaHeaderSerialized = 
 										 ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-										   ( 10 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-										   ( 11 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+										   ( 11 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+										   ( 12 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 								
 			this.secureProofOfWorkMessageMetaHeaderSerialized = 
 					new byte[ sizeOfSecureProofOfWorkMessageMetaHeaderSerialized ];
@@ -204,6 +215,10 @@ public class SecureProofOfWorkMessageMetaHeader {
 					CommonUtils.fromIntToByteArray(sizeOfBlockSerialized);
 			byte[] sizeOfBlockSolvedHashedSerializedInBytes = 
 					CommonUtils.fromIntToByteArray(sizeOfBlockSolvedHashedSerialized);
+			
+			byte[] sizeOfBidsOfCurrentBlockToTryToMineSerializedInBytes = 
+					CommonUtils.fromIntToByteArray(sizeOfBidsOfCurrentBlockToTryToMineSerialized);
+			
 			
 			// Operations to Fill a Byte Array, with the following parameters:
 			// 1) src - The source of the array to be copied
@@ -381,12 +396,29 @@ public class SecureProofOfWorkMessageMetaHeader {
 					serializationOffset, sizeOfBlockSolvedHashedSerializedInBytes.length);
 			serializationOffset += sizeOfBlockSolvedHashedSerializedInBytes.length;
 
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(insideSeparator, 0, this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset, insideSeparator.length);
+			serializationOffset += insideSeparator.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			System.arraycopy(sizeOfBidsOfCurrentBlockToTryToMineSerializedInBytes, 0, this.secureProofOfWorkMessageMetaHeaderSerialized,
+					serializationOffset, sizeOfBidsOfCurrentBlockToTryToMineSerializedInBytes.length);
+			serializationOffset += sizeOfBidsOfCurrentBlockToTryToMineSerializedInBytes.length;
+
+
 			// Fills the byte array of the Block's Serialization with
 			// the correspondent bytes from the current ProofOfWork serialized,
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(outsideSeparator, 0, this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset, outsideSeparator.length);
-
+			
 
 			this.setIsSecureProofOfWorkMessageMetaHeaderSerialized(true);
 			
@@ -423,6 +455,7 @@ public class SecureProofOfWorkMessageMetaHeader {
 			byte[] sizeOfBlockSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			byte[] sizeOfBlockSolvedHashedSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			
+			byte[] sizeOfBidsOfCurrentBlockToTryToMineSerializedInBytes = new byte[CommonUtils.INTEGER_IN_BYTES_LENGTH];
 			
 			byte[] outsideSeparator = new byte[] { ( (byte) 0x00 ), ( (byte) 0x00 ) };
 			byte[] insideSeparator = new byte[] { ( (byte) 0x00 ) };
@@ -549,6 +582,16 @@ public class SecureProofOfWorkMessageMetaHeader {
 					0, sizeOfBlockSolvedHashedSerializedInBytes.length);
 			serializationOffset += sizeOfBlockSolvedHashedSerializedInBytes.length;
 			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current ProofOfWork serialized,
+			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
+			// the position corresponding to the length of the current ProofOfWork's Serialization
+			serializationOffset += insideSeparator.length;
+			System.arraycopy(this.secureProofOfWorkMessageMetaHeaderSerialized, serializationOffset,
+					sizeOfBidsOfCurrentBlockToTryToMineSerializedInBytes,
+					0, sizeOfBidsOfCurrentBlockToTryToMineSerializedInBytes.length);
+			serializationOffset += sizeOfBidsOfCurrentBlockToTryToMineSerializedInBytes.length;
+			
 			
 			this.sizeOfUserPeerIDSerialized = 
 					CommonUtils.fromByteArrayToInt(sizeOfUserPeerIDSerializedInBytes);
@@ -580,6 +623,7 @@ public class SecureProofOfWorkMessageMetaHeader {
 
 			this.sizeOfBlockSolvedHashedSerialized = CommonUtils.fromByteArrayToInt(sizeOfBlockSolvedHashedSerializedInBytes);
 			
+			this.sizeOfBidsOfCurrentBlockToTryToMineSerialized = CommonUtils.fromByteArrayToInt(sizeOfBidsOfCurrentBlockToTryToMineSerializedInBytes);
 			
 			
 			this.setIsSecureProofOfWorkMessageMetaHeaderSerialized(false);

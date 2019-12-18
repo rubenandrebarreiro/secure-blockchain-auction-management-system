@@ -210,8 +210,8 @@ public class SecureProofOfWorkMessage {
 			
 			int sizeOfSecureProofOfWorkMessageMetaHeaderSerialized = 
 										 ( ( 2 * CommonUtils.META_HEADER_OUTSIDE_SEPARATORS_LENGTH) +
-										   ( 10 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
-										   ( 11 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
+										   ( 11 * CommonUtils.META_HEADER_INSIDE_SEPARATORS_LENGTH) +
+										   ( 12 * CommonUtils.INTEGER_IN_BYTES_LENGTH ) );
 			
 			byte[] secureProofOfWorkMessageMetaHeaderSerialized = 
 					new byte[ sizeOfSecureProofOfWorkMessageMetaHeaderSerialized ];
@@ -333,7 +333,8 @@ public class SecureProofOfWorkMessage {
 			int sizeOfBlockSolvedHashedSerialized = 
 					this.secureProofOfWorkMessageMetaHeader.getSizeOfBlockSolvedHashedSerialized();
 			
-			
+			int sizeOfBidsOfCurrentBlockToTryToMineSerialized =
+					this.secureProofOfWorkMessageMetaHeader.getSizeOfBidsOfCurrentBlockToTryToMineSerialized();
 			
 			this.userPeerID = CommonUtils.fromByteArrayToString(userPeerIDSerialized);
 			
@@ -366,6 +367,7 @@ public class SecureProofOfWorkMessage {
 														   sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
 														   sizeOfBlockSerialized,
 														   sizeOfBlockSolvedHashedSerialized,
+														   sizeOfBidsOfCurrentBlockToTryToMineSerialized,
 														   userPeerID);
 			
 			this.secureProofOfWorkMessageDoSMitigation =

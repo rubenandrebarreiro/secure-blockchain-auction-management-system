@@ -32,6 +32,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
 	
 	private boolean isBlockSerializedAndSolvedHashed;	
 	
+	private int sizeOfBidsOfCurrentBlockToTryToMineSerialized;
+	
 	
 	public SecureProofOfWorkMessageComponentsSolvedBlockInfo(Block block, byte[] blockSolvedHashed) {
 		
@@ -58,20 +60,23 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
 	}
 	
 	public SecureProofOfWorkMessageComponentsSolvedBlockInfo(byte[] blockSerializedAndSolvedHashed,
+															 int sizeOfBlockSerialized,
 															 int sizeOfBlockSolvedHashed,
-															 int sizeOfBlockSerialized) {
+															 int sizeOfBidsOfCurrentBlockToTryToMineSerialized) {
 		
 		this.blockSerializedAndSolvedHashed = blockSerializedAndSolvedHashed;
 		this.sizeOfBlockSerializedAndSolvedHashed = blockSerializedAndSolvedHashed.length;
 		this.isBlockSerializedAndSolvedHashed = true;
 		
+		this.blockSerialized = null;
+		this.sizeOfBlockSerialized = sizeOfBlockSerialized;
+		this.isBlockSerialized = true;
+		
 		this.blockSolvedHashed = null;
 		this.sizeOfBlockSolvedHashed = sizeOfBlockSolvedHashed;
 		this.isBlockSolvedHashed = true;
 		
-		this.blockSerialized = null;
-		this.sizeOfBlockSerialized = sizeOfBlockSerialized;
-		this.isBlockSerialized = true;
+		this.sizeOfBidsOfCurrentBlockToTryToMineSerialized = sizeOfBidsOfCurrentBlockToTryToMineSerialized;
 		
 		this.block = null;
 		
@@ -134,6 +139,10 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
 		this.isBlockSerializedAndSolvedHashed = isBlockSerializedAndSolvedHashed;
 	}
 	
+	
+	public int getSizeOfBidsOfCurrentBlockToTryToMineSerialized() {
+		return this.sizeOfBidsOfCurrentBlockToTryToMineSerialized;
+	}
 	
 	public void doBlockSerializedAndSolvedHashed() {
 		
@@ -224,7 +233,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
 			// From the position corresponding to the length of the previous ProofOfWork's Serialization to
 			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(this.blockSerializedAndSolvedHashed, serializationOffset,
-					         this.blockSolvedHashed, 0, this.blockSerialized.length);
+					         this.blockSolvedHashed, 0, this.blockSolvedHashed.length);
 			
 			
 			this.setIsBlockSerializedAndSolvedHashed(false);

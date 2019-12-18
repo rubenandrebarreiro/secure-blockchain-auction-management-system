@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import javax.crypto.NoSuchPaddingException;
@@ -66,6 +67,7 @@ import main.java.messages.secure.proofwork.components.solvedblock.SecureProofOfW
 import main.java.messages.secure.proofwork.components.solvedblock.info.SecureProofOfWorkMessageComponentsSolvedBlockInfo;
 import main.java.messages.secure.proofwork.components.solvedblock.signature.SecureProofOfWorkMessageComponentsSolvedBlockSignature;
 import main.java.messages.secure.proofwork.dos.mitigation.SecureProofOfWorkMessageDoSMitigation;
+import main.java.messages.secure.proofwork.metaheader.SecureProofOfWorkMessageMetaHeader;
 import main.java.messages.secure.receipt.SecureReceiptMessage;
 import main.java.messages.secure.receipt.components.SecureReceiptMessageComponents;
 import main.java.messages.secure.receipt.components.data.SecureReceiptMessageComponentsData;
@@ -75,6 +77,7 @@ import main.java.messages.secure.receipt.dos.mitigation.SecureReceiptMessageDoSM
 import main.java.messages.secure.receipt.metaheader.SecureReceiptMessageMetaHeader;
 import main.java.resources.auction.Auction;
 import main.java.resources.bid.Bid;
+import main.java.resources.block.Block;
 import main.java.resources.user.User;
 import main.java.resources.user.UserAuctionInfo;
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClient;
@@ -136,10 +139,14 @@ public class AuctionServer extends Thread{
 								Object work = workQueue.remove();
 								String string = gson.toJson(work);
 //								printStringWithClassName("Update client bids updating for user " + userName + " with bid " + string);
-								if(work instanceof SecureProofOfWorkMessage)
+								if(work instanceof SecureProofOfWorkMessage) {
+//									printStringWithClassName("send proof of work for user " + userName);
 									messageType = MessagePacketServerToClientTypes.PROOF_OF_WORK;
-								else
+								}
+								else {
+//									printStringWithClassName("Update client bids updating for user " + userName + " with bid " + string);
 									messageType = MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS;
+								}
 								sslWriteResponse(responseSocket.getOutputStream(), string, null, messageType);
 							}
 						} catch (ParseException | IOException e) {
@@ -1140,7 +1147,7 @@ public class AuctionServer extends Thread{
 	}
 	
 	// TODO Change to proof of work message!
-	private void handleReceivedProofOfWork(String proofOfWorkSerializedJson) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+	private void handleReceivedProofOfWork(String proofOfWorkSerializedJson) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException, UnsupportedEncodingException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException {
 		printStringWithClassName("COMPLETE ME! (handleReceivedProofOfWork)");
 		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
 		
@@ -1181,22 +1188,142 @@ public class AuctionServer extends Thread{
 					// TODO challenge not valid
 				}
 				else {
-					// TODO broadcast
-				}
-				
-			}
-			
-			
-			
-			
-			
-		}
+					for (Entry<String, BlockingQueue<Object>> clientEntry : connectedClientsMap.entrySet()) {
+						String userPeerID = clientEntry.getKey();
+						Queue<Object> messageQueue = clientEntry.getValue();
+						if(!userPeerID.equals(userName)) {
+							
+							byte[] blockSerialized = secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSerialized();
+							
+							int sizeOfBidsOfCurrentBlockToTryToMineSerialized = 
+									proofOfWork.getSecureProofOfWorkMessageMetaHeader()
+											   .getSizeOfBidsOfCurrentBlockToTryToMineSerialized();
+							Block blockOfOpenBidsForChallenge = new Block(blockSerialized, sizeOfBidsOfCurrentBlockToTryToMineSerialized);
+							
+							byte[] blockOfOpenBidsForChallengeSerializedHashed = 
+									secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSolvedHashed();
+							
+							secureProofOfWorkMessageComponentsSolvedBlockInfo = 
+									new SecureProofOfWorkMessageComponentsSolvedBlockInfo
+											(blockOfOpenBidsForChallenge, blockOfOpenBidsForChallengeSerializedHashed);
 		
-		// Validate proof. If valid, broadcast to clients.
-		connectedClientsMap.forEach((x,y) -> {
-			if(!x.equals(userName))
-				y.add(proofOfWork);
-		});
+							secureProofOfWorkMessageComponentsSolvedBlockInfo
+									.doBlockSerializedAndSolvedHashed();
+					
+							secureProofOfWorkMessageComponentsSolvedBlockSignature = 
+									new SecureProofOfWorkMessageComponentsSolvedBlockSignature
+											(secureProofOfWorkMessageComponentsSolvedBlockInfo,
+											 "auctionServer");
+							
+							secureProofOfWorkMessageComponentsSolvedBlockSignature
+									.signSecureProofOfWorkMessageComponentsSolvedBlock();
+							
+							
+							secureProofOfWorkMessageComponentsSolvedBlock =
+									new SecureProofOfWorkMessageComponentsSolvedBlock
+											(secureProofOfWorkMessageComponentsSolvedBlockInfo,
+											 secureProofOfWorkMessageComponentsSolvedBlockSignature);
+							
+							secureProofOfWorkMessageComponentsSolvedBlock
+									.doSecureProofOfWorkMessageComponentsSolvedBlockSerialization();
+							
+							
+							SecureCommonHeader secureCommonHeader = 
+									new SecureCommonHeader(
+											VersionNumber.VERSION_01.getVersionNumber(), 
+											MessageType.MESSAGE_TYPE_3.getMessageType(),
+											System.currentTimeMillis());
+							
+							secureCommonHeader.doSecureCommonHeaderSerialization();
+							
+							
+							secureProofOfWorkMessageComponents =
+									new SecureProofOfWorkMessageComponents
+											(secureCommonHeader,
+											 secureProofOfWorkMessageComponentsSolvedBlock);
+							
+							secureProofOfWorkMessageComponents.doSecureProofOfWorkMessageComponentsSerialization();
+							secureProofOfWorkMessageComponents.encryptSecureProofOfWorkMessageComponents();
+							
+							secureProofOfWorkMessageDoSMitigation = 
+									new SecureProofOfWorkMessageDoSMitigation(secureProofOfWorkMessageComponents);
+							
+							secureProofOfWorkMessageDoSMitigation.doHashOfSecureProofOfWorkMessageDoSMitigation();
+							
+							byte[] initialisationVectorInBytes = secureProofOfWorkMessageComponents.getInitialisationVector();
+							
+							
+							byte[] secretSymmetricKeyForProofOfWorkMessageComponents = 
+									secureProofOfWorkMessageComponents.getSecretSymmetricKeyForProofOfWorkMessageComponentsInBytes();
+							byte[] secretHMACKeyForDoSMitigationInBytes = 
+									secureProofOfWorkMessageDoSMitigation.getSecretHMACKeyForDoSMitigationInBytes();
+					
+							
+							SecureCommonKeyExchange secureProofOfWorkMessageKeyExchange = 
+									new SecureCommonKeyExchange(secretSymmetricKeyForProofOfWorkMessageComponents,
+																secretHMACKeyForDoSMitigationInBytes,
+															    "auctionServer");
+							
+							secureProofOfWorkMessageKeyExchange.buildSecureCommonKeyExchangeToSend();
+							
+							byte[] secureBidMessageKeyExchangeSerializedCiphered = 
+									secureProofOfWorkMessageKeyExchange.getSecureCommonKeyExchangeSerializedCiphered();
+							byte[] secureBidMessageKeyExchangeSerializedCipheredSigned = 
+									secureProofOfWorkMessageKeyExchange.getSecureCommonKeyExchangeSerializedCipheredSigned();
+							
+							byte[] secureProofOfWorkMessageComponentsSerializedCiphered = 
+									secureProofOfWorkMessageComponents.getSecureProofOfWorkMessageComponentsSerializedCiphered();
+							byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
+									secureProofOfWorkMessageDoSMitigation.getSecureProofOfWorkMessageComponentsHashedForDoSMitigation();
+		
+							byte[] secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
+									secureProofOfWorkMessageComponentsSolvedBlock.getSecureProofOfWorkMessageComponentsSolvedBlockSerialized();
+							
+							byte[] secureBidMessageComponentsSolvedBlockInfoSerialized =
+									secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSerializedAndSolvedHashed();
+							byte[] secureBidMessageComponentsSolvedBlockSignatureSerialized = 
+										secureProofOfWorkMessageComponentsSolvedBlockSignature
+												.getSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSigned();
+							
+							
+							byte[] blockAndBlockSolvedHashedSerialized = 
+									secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSerializedAndSolvedHashed();
+							byte[] blockSolvedHashed = secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSolvedHashed();
+									
+							SecureProofOfWorkMessageMetaHeader secureProofOfWorkMessageMetaHeader = 
+										new SecureProofOfWorkMessageMetaHeader	
+													("auctionServer".getBytes("UTF-8").length,
+													 secureBidMessageKeyExchangeSerializedCiphered.length,
+													 secureBidMessageKeyExchangeSerializedCipheredSigned.length,
+													 secureProofOfWorkMessageComponentsSerializedCiphered.length,
+													 secureProofOfWorkMessageDoSMitigationSerialized.length,
+													 secureProofOfWorkMessageComponentsSolvedBlockSerialized.length,
+													 secureBidMessageComponentsSolvedBlockInfoSerialized.length,
+													 secureBidMessageComponentsSolvedBlockSignatureSerialized.length,
+												 	 blockAndBlockSolvedHashedSerialized.length,
+													 blockSerialized.length,
+													 blockSolvedHashed.length,
+													 sizeOfBidsOfCurrentBlockToTryToMineSerialized);
+							
+							secureProofOfWorkMessageMetaHeader.doSecureProofOfWorkMessageMetaHeaderSerialization();
+							
+							
+							SecureProofOfWorkMessage secureProofOfWorkMessage = 
+									new SecureProofOfWorkMessage(initialisationVectorInBytes,
+																 secureProofOfWorkMessageMetaHeader, 
+																 "auctionServer",
+																 secureProofOfWorkMessageKeyExchange,
+																 secureProofOfWorkMessageComponents,
+																 secureProofOfWorkMessageDoSMitigation);
+							
+							secureProofOfWorkMessage.doSecureProofOfWorkMessageSerialized();
+									
+							messageQueue.add(secureProofOfWorkMessage);
+						}
+					}
+				}			
+			}
+		}
 	}
 	
 	private String sslReadRequest(InputStream socketInStream) throws IOException {
@@ -1212,7 +1339,10 @@ public class AuctionServer extends Thread{
 			PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
 			String httpResponseMessage = null;
 			MessagePacketServerToClient messagePacket = null;
-			if(notResponseMessage != null && (messageType == MessagePacketServerToClientTypes.RECEIPT || messageType == MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS || messageType == MessagePacketServerToClientTypes.PROOF_OF_WORK)) {
+			if(notResponseMessage != null && 
+					(messageType == MessagePacketServerToClientTypes.RECEIPT ||
+					messageType == MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS ||
+					messageType == MessagePacketServerToClientTypes.PROOF_OF_WORK)) {
 				httpResponseMessage = notResponseMessage;
 				messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
 			}

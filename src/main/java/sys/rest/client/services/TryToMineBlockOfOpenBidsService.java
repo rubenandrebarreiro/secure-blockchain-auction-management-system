@@ -316,6 +316,9 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 					byte[] blockSerialized = secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSerialized();
 					byte[] blockSolvedHashed = secureProofOfWorkMessageComponentsSolvedBlockInfo.getBlockSolvedHashed();
 							
+					byte[] bidsOfCurrentBlockToTryToMineSerializedInBytes = 
+							blockOfOpenBidsForChallenge.getBidsOfCurrentBlockToTryToMineSerialized();
+					
 					SecureProofOfWorkMessageMetaHeader secureProofOfWorkMessageMetaHeader = 
 								new SecureProofOfWorkMessageMetaHeader	
 											(clientUserID.getBytes("UTF-8").length,
@@ -328,7 +331,8 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 											 secureBidMessageComponentsSolvedBlockSignatureSerialized.length,
 										 	 blockAndBlockSolvedHashedSerialized.length,
 											 blockSerialized.length,
-											 blockSolvedHashed.length);
+											 blockSolvedHashed.length,
+											 bidsOfCurrentBlockToTryToMineSerializedInBytes.length);
 					
 					secureProofOfWorkMessageMetaHeader.doSecureProofOfWorkMessageMetaHeaderSerialization();
 					

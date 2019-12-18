@@ -99,6 +99,35 @@ public class Block {
 	
 	
 	
+	public Block(byte[] blockSerialized, int sizeOfBidsOfCurrentBlockToTryToMineSerialized) {
+		
+		this.blockSerializedHashed = null;
+		this.isBlockSerializedHashed = false;
+		
+		this.isBlockMined = false;
+		
+		this.blockSerialized = blockSerialized;
+		this.sizeOfBlockSerialized = blockSerialized.length;
+		this.isBlockSerialized = true;
+		
+		
+		this.blockID = -1;
+		
+		
+		this.previousBlockHashed = null;
+		
+		this.bidsOfCurrentBlockToTryToMine = null;
+		this.bidsOfCurrentBlockToTryToMineSerialized = null;
+		this.sizeOfBidsOfCurrentBlockToTryToMineSerialized = 0;
+		this.areBidsOfCurrentBlockToTryToMineSerialized = false;
+		
+		this.strategyForCryptoPuzzle = -1;
+		this.numBytesToSolveChallengeDifficultyType = -1;
+		
+		this.nonce = -1;
+		
+	}
+	
 	
 	public int getBlockID() {
 		return this.blockID;
@@ -343,6 +372,77 @@ public class Block {
 		
 			
 			this.setIsBlockSerialized(true);
+			
+		}
+	}
+	
+	
+	public void undoBlockSerialization() {
+		
+		boolean isPossibleToUndoBidsOfCurrentBlockToTryToMineSerialization = 
+				(  this.areBidsOfCurrentBlockToTryToMineSerialized && this.isBlockSerialized && 
+				  !this.isBlockSerializedHashed && !this.isBlockMined );
+		
+		if(isPossibleToUndoBidsOfCurrentBlockToTryToMineSerialization) {
+			
+			byte[] blockIDSerialized = new byte[ CommonUtils.INTEGER_IN_BYTES_LENGTH ];
+			this.previousBlockHashed = new byte[ CommonUtils.LENGTH_256_BITS_IN_BYTES ];
+			this.bidsOfCurrentBlockToTryToMineSerialized = 
+					new byte[ this.sizeOfBidsOfCurrentBlockToTryToMineSerialized ];
+			byte[] nonceSerialized = new byte[ CommonUtils.INTEGER_IN_BYTES_LENGTH ];
+			
+			
+			// Operations to Fill a Byte Array, with the following parameters:
+			// 1) src - The source of the array to be copied
+			// 2) srcPos - The position from the array to be copied, representing the first element to be copied
+			// 3) dest - The destination of the array to be copied
+			// 4) destPos - The position of the array where will be placed the new copy,
+			//              representing the first element where new data will be placed
+			// 5) length - The length of the data to be copied from the source array to the destination array
+			
+			// The offset related to fulfilment of the serialization process
+			int serializationOffset = 0;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.blockSerialized, serializationOffset,
+							 blockIDSerialized, 0,
+					         blockIDSerialized.length);
+			serializationOffset += blockIDSerialized.length;
+
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.blockSerialized, serializationOffset,
+							 this.previousBlockHashed, 0,
+							 this.previousBlockHashed.length);
+			serializationOffset += this.previousBlockHashed.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.blockSerialized, serializationOffset,
+							 this.bidsOfCurrentBlockToTryToMineSerialized, 0,
+							 this.bidsOfCurrentBlockToTryToMineSerialized.length);
+			serializationOffset += this.bidsOfCurrentBlockToTryToMineSerialized.length;
+			
+			// Fills the byte array of the Block's Serialization with
+			// the correspondent bytes from the current Bid serialized,
+			// From the position corresponding to the length of the previous Bid's Serialization to
+			// the position corresponding to the length of the current Bid's Serialization
+			System.arraycopy(this.blockSerialized, serializationOffset,
+							 nonceSerialized, 0,
+					         nonceSerialized.length);
+		
+			
+			this.blockID = CommonUtils.fromByteArrayToInt(blockIDSerialized);
+			this.nonce = CommonUtils.fromByteArrayToInt(nonceSerialized);
+			
+			this.setIsBlockSerialized(false);
 			
 		}
 	}

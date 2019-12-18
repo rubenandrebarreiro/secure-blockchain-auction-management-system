@@ -240,6 +240,7 @@ public class Client {
 									System.out.println(getPrettyJsonString(message));
 									break;
 								case PROOF_OF_WORK:
+									System.err.println("OIIII!");
 									receivedProofOfWork(message);
 									break;
 								case RECEIPT:

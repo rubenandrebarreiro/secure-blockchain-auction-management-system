@@ -101,6 +101,7 @@ public class AuctionServerEntryPoint{
 				InputStream tempInputStream = responseSocket.getInputStream();
 				BufferedReader br = new BufferedReader(new InputStreamReader(tempInputStream));
 				String userName = br.readLine();
+				userName = userName.substring(1, userName.length() - 1);
 				connectedClientsMap.put(userName, new BlockingArrayQueue<Object>());
 				System.out.println("User logged in as: " + userName);
 				for (Entry<String, BlockingQueue<Object>> string : connectedClientsMap.entrySet()) {

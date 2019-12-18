@@ -28,6 +28,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	private int sizeOfBlockSolvedHashedSerialized;
 	
 	
+	private int sizeOfBidsOfCurrentBlockToTryToMineSerialized;
+	
 	private byte[] secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized;
 	
 	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized;
@@ -86,6 +88,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	       int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
 	       int sizeOfBlockSerialized,
 		   int sizeOfBlockSolvedHashedSerialized,
+		   int sizeOfBidsOfCurrentBlockToTryToMineSerialized,
 		   String userPeerID) {
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
@@ -108,6 +111,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 
 		this.sizeOfBlockSerialized = sizeOfBlockSerialized;
 		this.sizeOfBlockSolvedHashedSerialized = sizeOfBlockSolvedHashedSerialized;
+		
+		this.sizeOfBidsOfCurrentBlockToTryToMineSerialized = sizeOfBidsOfCurrentBlockToTryToMineSerialized;
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockInfo = null;
 		this.secureProofOfWorkMessageComponentsSolvedBlockSignature = null;
@@ -274,7 +279,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 			this.secureProofOfWorkMessageComponentsSolvedBlockInfo = 
 					new SecureProofOfWorkMessageComponentsSolvedBlockInfo
 						(secureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
-						 this.sizeOfBlockSerialized, this.sizeOfBlockSolvedHashedSerialized);
+						 this.sizeOfBlockSerialized, this.sizeOfBlockSolvedHashedSerialized,
+						 this.sizeOfBidsOfCurrentBlockToTryToMineSerialized);
 			
 			this.secureProofOfWorkMessageComponentsSolvedBlockSignature =
 					new SecureProofOfWorkMessageComponentsSolvedBlockSignature

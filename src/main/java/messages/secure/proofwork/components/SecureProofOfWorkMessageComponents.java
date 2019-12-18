@@ -46,6 +46,8 @@ public class SecureProofOfWorkMessageComponents {
 	
 	private int sizeOfBlockSolvedHashedSerialized;
 	
+	private int sizeOfBidsOfCurrentBlockToTryToMineSerialized;
+	
 	private byte[] secureProofOfWorkMessageComponentsSerialized;
 	
 	private int sizeOfSecureProofOfWorkMessageComponentsSerialized;
@@ -121,6 +123,7 @@ public class SecureProofOfWorkMessageComponents {
 								  			  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
 								  			  int sizeOfBlockSerialized,
 								  			  int sizeOfBlockSolvedHashedSerialized,
+								  			  int sizeOfBidsOfCurrentBlockToTryToMineSerialized,
 								  			  String userPeerID) {
 		
 		this.secureProofOfWorkMessageComponentsSerializedCiphered = 
@@ -160,6 +163,8 @@ public class SecureProofOfWorkMessageComponents {
 		
 		this.sizeOfBlockSerialized = sizeOfBlockSerialized;
 		this.sizeOfBlockSolvedHashedSerialized = sizeOfBlockSolvedHashedSerialized;
+		
+		this.sizeOfBidsOfCurrentBlockToTryToMineSerialized = sizeOfBidsOfCurrentBlockToTryToMineSerialized;
 		
 		this.userPeerID = userPeerID;
 		
@@ -385,6 +390,7 @@ public class SecureProofOfWorkMessageComponents {
 							 this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
 							 this.sizeOfBlockSerialized,
 							 this.sizeOfBlockSolvedHashedSerialized,
+							 this.sizeOfBidsOfCurrentBlockToTryToMineSerialized,
 							 this.userPeerID);
 			
 			secureProofOfWorkMessageComponentsSolvedBlock.undoSecureProofOfWorkMessageSolvedBlockSerialization();
