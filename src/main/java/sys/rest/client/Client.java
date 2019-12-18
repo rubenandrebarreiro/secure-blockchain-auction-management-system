@@ -1074,6 +1074,7 @@ public class Client {
 		System.out.println();
 		System.out.println(HELP);
 		System.out.println(EXIT);
+		System.out.println();
 	}
 	
 	public void sendMessage(MessagePacketClientToServer message) {
