@@ -301,110 +301,112 @@ public class Client {
 				if(currentUser == null) {
 					currentUser = login();
 				}
-
-				switch (line) {
-				case OPEN_AUCTION:
-					createAuction();
-					break;
-				case CLOSE_AUCTION:
-					closeAuction();
-					break;
-				case ADD_BID:
-					createBid();
-					break;
-				case LIST_ALL_AUCTIONS:
-					listAll();
-					break;
-				case LIST_OPENED_AUCTIONS:
-					listOpened();
-					break;
-				case LIST_CLOSED_AUCTIONS:
-					listClosed();
-					break;
-				case LIST_ALL_AUCTIONS_BY_OWNER:
-					listAllByUserID();
-					break;
-				case LIST_OPENED_AUCTIONS_BY_OWNER:
-					listOpenedByUserID();
-					break;
-				case LIST_CLOSED_AUCTIONS_BY_OWNER:
-					listClosedByUserID();
-					break;
-				case LIST_ALL_AUCTIONS_BY_ID:
-					listAllByAuctionID();
-					break;
-				case LIST_OPENED_AUCTIONS_BY_ID:
-					listOpenByAuctionID();
-					break;
-				case LIST_CLOSED_AUCTIONS_BY_ID:
-					listClosedByAuctionID();
-					break;
-				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
-					listBidsOfAllAuctionsByAuctionID();
-					break;
-				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
-					listBidsOfOpenedAuctionByAuctionID();
-					break;
-				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
-					listBidsOfClosedAuctionsByAuctionID();
-					break;	
-				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					listBidsOfAllAuctionsByAuctionIDAndClientID();
-					break;
-				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					listBidsOfOpenedAuctionsByAuctionIDAndClientID();
-					break;
-				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID();
-					break;
-			
+				else {
+					switch (line) {
+					case OPEN_AUCTION:
+						createAuction();
+						break;
+					case CLOSE_AUCTION:
+						closeAuction();
+						break;
+					case ADD_BID:
+						createBid();
+						break;
+					case LIST_ALL_AUCTIONS:
+						listAll();
+						break;
+					case LIST_OPENED_AUCTIONS:
+						listOpened();
+						break;
+					case LIST_CLOSED_AUCTIONS:
+						listClosed();
+						break;
+					case LIST_ALL_AUCTIONS_BY_OWNER:
+						listAllByUserID();
+						break;
+					case LIST_OPENED_AUCTIONS_BY_OWNER:
+						listOpenedByUserID();
+						break;
+					case LIST_CLOSED_AUCTIONS_BY_OWNER:
+						listClosedByUserID();
+						break;
+					case LIST_ALL_AUCTIONS_BY_ID:
+						listAllByAuctionID();
+						break;
+					case LIST_OPENED_AUCTIONS_BY_ID:
+						listOpenByAuctionID();
+						break;
+					case LIST_CLOSED_AUCTIONS_BY_ID:
+						listClosedByAuctionID();
+						break;
+					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
+						listBidsOfAllAuctionsByAuctionID();
+						break;
+					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
+						listBidsOfOpenedAuctionByAuctionID();
+						break;
+					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
+						listBidsOfClosedAuctionsByAuctionID();
+						break;	
+					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+						listBidsOfAllAuctionsByAuctionIDAndClientID();
+						break;
+					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+						listBidsOfOpenedAuctionsByAuctionIDAndClientID();
+						break;
+					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+						listBidsOfClosedAuctionsByAuctionIDAndClientID();
+						break;
+				
+						
+					case LIST_ALL_BIDS_BY_CLIENT_ID:
+						listAllBidsByClientID(); //TODO confirmar
+						break;
+					case LIST_OPENED_BIDS_BY_CLIENT_ID:
+						listOpenedBidsByClientID(); //TODO confirmar
+						break;
+					case LIST_CLOSED_BIDS_BY_CLIENT_ID:
+						listClosedBidsByClientID(); //TODO confirmat
+						break;
 					
-				case LIST_ALL_BIDS_BY_CLIENT_ID:
-					listAllBidsByClientID(); //TODO confirmar
-					break;
-				case LIST_OPENED_BIDS_BY_CLIENT_ID:
-					listOpenedBidsByClientID(); //TODO confirmar
-					break;
-				case LIST_CLOSED_BIDS_BY_CLIENT_ID:
-					listClosedBidsByClientID(); //TODO confirmat
-					break;
-				
+						
+					case CHECK_OUTCOME_ALL_AUCTION:
+						checkOutcomeAllAuctions(); //TODO confirmar
+						break;
+					case CHECK_OUTCOME_OPENED_AUCTION:
+						checkOutcomeOpenedAuctions(); //TODO confirmar
+						break;
+					case CHECK_OUTCOME_CLOSED_AUCTION:
+						checkOutcomeClosedAuctions(); //TODO confirmar
+						break;
 					
-				case CHECK_OUTCOME_ALL_AUCTION:
-					checkOutcomeAllAuctions(); //TODO confirmar
-					break;
-				case CHECK_OUTCOME_OPENED_AUCTION:
-					checkOutcomeOpenedAuctions(); //TODO confirmar
-					break;
-				case CHECK_OUTCOME_CLOSED_AUCTION:
-					checkOutcomeClosedAuctions(); //TODO confirmar
-					break;
-				
+						
+					case CHECK_OUTCOME_ALL_AUCTION_ID:
+						checkOutcomeAllAuctionsByAuctionID(); //TODO confirmar
+						break;
+					case CHECK_OUTCOME_OPENED_AUCTION_ID:
+						checkOutcomeOpenedAuctionsByAuctionID(); //TODO confirmar
+						break;
+					case CHECK_OUTCOME_CLOSED_AUCTION_ID:
+						checkOutcomeClosedAuctionsByAuctionID(); //TODO confirmar
+						break;
 					
-				case CHECK_OUTCOME_ALL_AUCTION_ID:
-					checkOutcomeAllAuctionsByAuctionID(); //TODO confirmar
-					break;
-				case CHECK_OUTCOME_OPENED_AUCTION_ID:
-					checkOutcomeOpenedAuctionsByAuctionID(); //TODO confirmar
-					break;
-				case CHECK_OUTCOME_CLOSED_AUCTION_ID:
-					checkOutcomeClosedAuctionsByAuctionID(); //TODO confirmar
-					break;
-				
-				// VALIDATE RECEIPT
-				
-				case HELP:
-					helpScreen();
-					break;
+					// VALIDATE RECEIPT
+					
+					case HELP:
+						helpScreen();
+						break;
 
-				case EXIT:
-					System.exit(0);
-					break;
+					case EXIT:
+						System.exit(0);
+						break;
 
-				default:
-					helpScreen();
-					break;
+					default:
+						helpScreen();
+						break;
+					}
 				}
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -432,25 +434,23 @@ public class Client {
 			fieldValues.put("userPeerID", id);
 			fieldValues.put("userPassword", hashResult);
 			result = userDao.queryForFieldValues(fieldValues).get(0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
-		OutputStream tempOut = null;
-		try {
+			OutputStream tempOut = null;
+
 			tempOut = socket.getOutputStream();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		PrintWriter printWriter = new PrintWriter(tempOut);
 
-		printWriter.print(gson.toJson(result.getUserPeerID()) + System.lineSeparator());
-		printWriter.flush();
-		
-		System.out.println("Welcome " + result.getUserPeerID());
-		System.out.println();
-		helpScreen();
+			PrintWriter printWriter = new PrintWriter(tempOut);
+
+			printWriter.print(gson.toJson(result.getUserPeerID()) + System.lineSeparator());
+			printWriter.flush();
+			
+			System.out.println("Welcome " + result.getUserPeerID());
+			System.out.println();
+			helpScreen();
+		}catch (Exception e) {
+			printErrorStringWithClassName("Login error!");
+		}
+
 
 		return result;
 	}
