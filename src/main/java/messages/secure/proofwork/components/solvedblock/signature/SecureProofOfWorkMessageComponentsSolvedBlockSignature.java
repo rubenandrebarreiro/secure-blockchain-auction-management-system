@@ -64,6 +64,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockSignature {
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified = false;
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid = false;
 		
+		this.userPeerID = userPeerID;
+		
 	}
 	
 	
@@ -89,6 +91,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockSignature {
 		
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedVerified = false;
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockInfoDigitalSignedValid = false;
+		
+		this.userPeerID = userPeerID;
 		
 	}
 	

@@ -130,7 +130,8 @@ public class SecureProofOfWorkMessage {
 			byte[] secureProofOfWorkMessageDoSMitigationSerialized = 
 					this.secureProofOfWorkMessageDoSMitigation.getSecureProofOfWorkMessageComponentsHashedForDoSMitigation();
 			
-			int sizeOfSecureBidMessageSerialized = (secureProofOfWorkMessageMetaHeaderSerialized.length +
+			int sizeOfSecureBidMessageSerialized = (initialisationVector.length +
+													secureProofOfWorkMessageMetaHeaderSerialized.length +
 													userPeerIDSerialized.length +
 												    secureProofOfWorkMessageKeyExchangeSerializedCipheredAndSigned.length +
 													secureProofOfWorkMessageComponentsSerialized.length +

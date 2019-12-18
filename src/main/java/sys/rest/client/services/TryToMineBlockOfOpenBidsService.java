@@ -100,8 +100,9 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 				}
 
 
-				if(numOpenBidsToMine <= numPossibleOpenBidsToMine) {
-
+				while( (numOpenBidsToMine > numPossibleOpenBidsToMine) || 
+						(numOpenBidsToMine > numChosenOpenBidsToMine) ) {
+					
 					while(numChosenOpenBidsToMine < numOpenBidsToMine) {
 
 						int chosenBidToMineIndex = random.nextInt(numPossibleOpenBidsToMine);
@@ -111,13 +112,26 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 						if(!chosenOpenBidsToMineList.contains(chosenBidToMine)) {
 
 							chosenOpenBidsToMineList.add(chosenBidToMine);
-
+							
+							numChosenOpenBidsToMine++;
 						}
 
-						numChosenOpenBidsToMine++;
+						openBidsToMineList = this.openBidsMap.values().stream()
+								.filter(bid -> !bid.getIsBidMined())
+								.collect(Collectors.toList());
 
+
+						numPossibleOpenBidsToMine = openBidsToMineList.size();
+						
 					}
+					
+					openBidsToMineList = this.openBidsMap.values().stream()
+							.filter(bid -> !bid.getIsBidMined())
+							.collect(Collectors.toList());
 
+
+					numPossibleOpenBidsToMine = openBidsToMineList.size();
+					
 				}
 
 				
@@ -183,9 +197,12 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 						
 				}
 				
+				Bid[] chosenOpenBidsToMineArray = new Bid[chosenOpenBidsToMineList.size()];
+				
+				chosenOpenBidsToMineArray = chosenOpenBidsToMineList.toArray(chosenOpenBidsToMineArray);
 				
 				Block blockOfOpenBidsForChallenge = new Block( currentBlockID, previousBlockHashed,
-															   ( (Bid[]) chosenOpenBidsToMineList.toArray() ),
+															   ( chosenOpenBidsToMineArray ),
 															   this.strategyForTryToMineBlockOfBids,
 															   difficultyToSolveChallenge );
 				
@@ -256,6 +273,8 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 					
 					SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation = 
 							new SecureProofOfWorkMessageDoSMitigation(secureProofOfWorkMessageComponents);
+					
+					secureProofOfWorkMessageDoSMitigation.doHashOfSecureProofOfWorkMessageDoSMitigation();
 					
 					byte[] initialisationVectorInBytes = secureProofOfWorkMessageComponents.getInitialisationVector();
 					

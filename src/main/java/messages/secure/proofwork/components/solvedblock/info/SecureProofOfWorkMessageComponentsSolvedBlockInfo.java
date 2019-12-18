@@ -171,7 +171,7 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
 			// the position corresponding to the length of the current ProofOfWork's Serialization
 			System.arraycopy(this.blockSolvedHashed, 0,
 					         this.blockSerializedAndSolvedHashed,
-					         serializationOffset, this.blockSerialized.length);
+					         serializationOffset, this.blockSolvedHashed.length);
 			
 			
 			this.setIsBlockSerializedAndSolvedHashed(true);
