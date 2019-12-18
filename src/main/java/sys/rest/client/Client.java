@@ -1075,27 +1075,6 @@ public class Client {
 		System.out.println(HELP);
 		System.out.println(EXIT);
 	}
-
-	// TODO Remove when confirmed thread works
-//	private String sslReadResponse(InputStream socketInStream) throws IOException {
-//		//Intercept auction bid message
-//		//If special message, run special method TODO
-//		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
-//		String response = br.readLine();
-//		return response;
-//	}
-
-	// TODO Remove when confirmed thread works
-//	private String sendMessageAndGetResponse(SSLSocketMessage message) throws IOException {
-//		OutputStream out = socket.getOutputStream();
-//		PrintWriter printWriter = new PrintWriter(out);
-//
-//		printWriter.print(gson.toJson(message) + System.lineSeparator());
-//		printWriter.flush();
-//
-//		InputStream in = socket.getInputStream();
-//		return sslReadResponse(in);
-//	}
 	
 	public void sendMessage(MessagePacketClientToServer message) {
 		PrintWriter printWriter = new PrintWriter(outputStream);
