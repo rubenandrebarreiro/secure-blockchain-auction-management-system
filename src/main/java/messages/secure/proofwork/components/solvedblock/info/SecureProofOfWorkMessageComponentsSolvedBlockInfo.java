@@ -53,8 +53,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
 	}
 	
 	public SecureProofOfWorkMessageComponentsSolvedBlockInfo(byte[] blockSerializedAndSolvedHashed,
-																	 int sizeOfBlockSolvedHashed,
-																	 int sizeOfBlockSerialized) {
+															 int sizeOfBlockSolvedHashed,
+															 int sizeOfBlockSerialized) {
 		
 		this.blockSerializedAndSolvedHashed = blockSerializedAndSolvedHashed;
 		this.sizeOfBlockSerializedAndSolvedHashed = blockSerializedAndSolvedHashed.length;

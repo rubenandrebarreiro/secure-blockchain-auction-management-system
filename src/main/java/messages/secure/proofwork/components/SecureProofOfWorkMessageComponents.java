@@ -42,6 +42,9 @@ public class SecureProofOfWorkMessageComponents {
 	
 	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockSerialized;
 	
+	private int sizeOfBlockSerialized;
+	
+	private int sizeOfBlockSolvedHashedSerialized;
 	
 	private byte[] secureProofOfWorkMessageComponentsSerialized;
 	
@@ -113,7 +116,9 @@ public class SecureProofOfWorkMessageComponents {
 								  			  byte[] secretSymmetricKeyForProofOfWorkMessageComponentsInBytes,
 								  			  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized,
 								  			  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
-								  			  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized) {
+								  			  int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
+								  			  int sizeOfBlockSerialized,
+								  			  int sizeOfBlockSolvedHashedSerialized) {
 		
 		this.secureProofOfWorkMessageComponentsSerializedCiphered = 
 					secureProofOfWorkMessageComponentsSerializedCiphered;
@@ -137,13 +142,16 @@ public class SecureProofOfWorkMessageComponents {
 		
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockSerialized = null;
-		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized = 0;		
+		this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized = 
+				sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSerialized;		
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockSerialized = true;
 				
+		
 		this.secureCommonHeader = null;
 		this.secureProofOfWorkMessageComponentsSolvedBlock = null;
 		
-		
+		this.sizeOfBlockSerialized = sizeOfBlockSerialized;
+		this.sizeOfBlockSolvedHashedSerialized = sizeOfBlockSolvedHashedSerialized;
 		
 	}
 
@@ -364,7 +372,9 @@ public class SecureProofOfWorkMessageComponents {
 					new SecureProofOfWorkMessageComponentsSolvedBlock
 							(this.secureProofOfWorkMessageComponentsSolvedBlockSerialized,
 							 this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
-							 this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized);
+							 this.sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
+							 this.sizeOfBlockSerialized,
+							 this.sizeOfBlockSolvedHashedSerialized);
 			
 			secureProofOfWorkMessageComponentsSolvedBlock.undoSecureProofOfWorkMessageSolvedBlockSerialization();
 			

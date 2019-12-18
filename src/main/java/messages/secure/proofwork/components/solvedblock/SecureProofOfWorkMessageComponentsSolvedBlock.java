@@ -22,7 +22,12 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	
 	private boolean isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	
-
+	
+	private int sizeOfBlockSerialized;
+	
+	private int sizeOfBlockSolvedHashedSerialized;
+	
+	
 	private byte[] secureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized;
 	
 	private int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized;
@@ -42,6 +47,9 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	      (SecureProofOfWorkMessageComponentsSolvedBlockInfo secureProofOfWorkMessageComponentsSolvedBlockInfo,
 		   SecureProofOfWorkMessageComponentsSolvedBlockSignature secureProofOfWorkMessageComponentsSolvedBlockSignature)
 		   throws InvalidKeyException, SignatureException, NoSuchAlgorithmException {
+		
+		this.sizeOfBlockSerialized = 0;
+		this.sizeOfBlockSolvedHashedSerialized = 0;
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockInfo = secureProofOfWorkMessageComponentsSolvedBlockInfo;
 		this.secureProofOfWorkMessageComponentsSolvedBlockSignature = secureProofOfWorkMessageComponentsSolvedBlockSignature;
@@ -73,7 +81,9 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 	public SecureProofOfWorkMessageComponentsSolvedBlock
 	      (byte[] secureProofOfWorkMessageComponentsSolvedBlockSerialized,
 	       int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized,
-	       int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized) {
+	       int sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized,
+	       int sizeOfBlockSerialized,
+		   int sizeOfBlockSolvedHashedSerialized) {
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockSerialized = 
 				secureProofOfWorkMessageComponentsSolvedBlockSerialized;
@@ -93,6 +103,8 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 				sizeOfSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized;
 		this.isSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized = true;
 
+		this.sizeOfBlockSerialized = sizeOfBlockSerialized;
+		this.sizeOfBlockSolvedHashedSerialized = sizeOfBlockSolvedHashedSerialized;
 		
 		this.secureProofOfWorkMessageComponentsSolvedBlockInfo = null;
 		this.secureProofOfWorkMessageComponentsSolvedBlockSignature = null;
@@ -126,6 +138,16 @@ public class SecureProofOfWorkMessageComponentsSolvedBlock {
 				isSecureProofOfWorkMessageComponentsSolvedBlockInfoSerialized;
 	
 	}
+	
+	
+	public int getSizeOfBlockSerialized() {
+		return this.sizeOfBlockSerialized;
+	}
+
+	public int getSizeOfBlockSolvedHashedSerialized() {
+		return this.sizeOfBlockSolvedHashedSerialized;
+	}
+	
 	
 	public boolean getIsSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized() {
 		return this.isSecureProofOfWorkMessageComponentsSolvedBlockSignatureSerialized;
