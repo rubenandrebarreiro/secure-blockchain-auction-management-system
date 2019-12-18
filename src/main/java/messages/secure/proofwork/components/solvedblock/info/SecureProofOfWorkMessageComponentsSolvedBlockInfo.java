@@ -230,7 +230,6 @@ public class SecureProofOfWorkMessageComponentsSolvedBlockInfo {
 			this.setIsBlockSerializedAndSolvedHashed(false);
 			
 		}
-		
 	}
 	
 	public boolean checkIfBlockSolvedHashedIsValid() throws NoSuchAlgorithmException {
