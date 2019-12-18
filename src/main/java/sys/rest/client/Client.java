@@ -36,12 +36,10 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 
-import main.java.api.rest.client.ClientAPI;
 import main.java.common.protocols.MessageType;
 import main.java.common.protocols.NumBytesChallengeType;
 import main.java.common.protocols.StrategyCryptoPuzzle;
 import main.java.common.protocols.VersionNumber;
-import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.SecureBidMessage;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.components.data.SecureBidMessageData;
@@ -51,6 +49,7 @@ import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigatio
 import main.java.messages.secure.bid.metaheader.SecureBidMessageMetaHeader;
 import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
+import main.java.messages.secure.proofwork.SecureProofOfWorkMessage;
 import main.java.messages.secure.receipt.SecureReceiptMessage;
 import main.java.messages.secure.receipt.components.SecureReceiptMessageComponents;
 import main.java.messages.secure.receipt.components.data.SecureReceiptMessageComponentsData;
@@ -68,7 +67,7 @@ import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClien
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketClientToServerTypes;
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketClientToServer;
 
-public class Client implements ClientAPI {
+public class Client {
 
 	private static final String OPEN_AUCTION = "create auction";
 	private static final String CLOSE_AUCTION = "close auction";
@@ -123,6 +122,8 @@ public class Client implements ClientAPI {
 	private InputStream inputStream;
 	private OutputStream outputStream;
 	
+	private Map<Integer, Bid> openBidsList;
+	private Map<Integer, Block> minedBlockMap;
 	
 	private TryToMineBlockOfOpenBidsService tryToMineBlockOfOpenBidsService;
 	
@@ -201,12 +202,14 @@ public class Client implements ClientAPI {
 			//		    socket.setSoTimeout(1000);
 			socket.startHandshake();
 			
+			openBidsList = new HashMap<Integer, Bid>();
+			minedBlockMap = new HashMap<Integer, Block>();
 			
 			this.tryToMineBlockOfOpenBidsService = 
 					new TryToMineBlockOfOpenBidsService(this,
 														StrategyCryptoPuzzle.STRATEGY_CRYPTO_PUZZLE_1.getStrategyUsedForCryptoPuzzle(),
 														NumBytesChallengeType.NUM_BYTES_CHALLENGE_TYPE_3.getNumBytesChallengeType(),
-														/**openBidsList**/ null, /**minedBlockMap**/ null);
+														openBidsList, minedBlockMap);
 			
 			this.tryToMineBlockOfOpenBidsServiceThread = new Thread(this.tryToMineBlockOfOpenBidsService);
 			this.tryToMineBlockOfOpenBidsServiceThread.start();
@@ -223,7 +226,6 @@ public class Client implements ClientAPI {
 						inputStream = socket.getInputStream();
 						BufferedReader socketReader = new BufferedReader(new InputStreamReader(inputStream));
 						while(!exitFlag) {
-							// TODO Read and handle response
 							response = socketReader.readLine();
 							try {
 								envelope = gson.fromJson(response, MessagePacketServerToClient.class);
@@ -237,11 +239,13 @@ public class Client implements ClientAPI {
 									System.out.println(getPrettyJsonString(message));
 									break;
 								case PROOF_OF_WORK:
-								// TODO complete
-									printErrorStringWithClassName("PROOF OF WORK!!!");
+									receivedProofOfWork(message);
 									break;
 								case RECEIPT:
 									System.out.println(decodeReceipt(message));
+									break;
+								case UPDATE_CLIENT_BIDS:
+									updateBids(message);
 									break;
 								default:
 									break;
@@ -297,110 +301,110 @@ public class Client implements ClientAPI {
 				if(currentUser == null) {
 					currentUser = login();
 				}
-
-				switch (line) {
-				case OPEN_AUCTION:
-					createAuction();
-					break;
-				case CLOSE_AUCTION:
-					closeAuction();
-					break;
-				case ADD_BID:
-					createBid();
-					break;
-				case LIST_ALL_AUCTIONS:
-					listAll();
-					break;
-				case LIST_OPENED_AUCTIONS:
-					listOpened();
-					break;
-				case LIST_CLOSED_AUCTIONS:
-					listClosed();
-					break;
-				case LIST_ALL_AUCTIONS_BY_OWNER:
-					listAllByUserID();
-					break;
-				case LIST_OPENED_AUCTIONS_BY_OWNER:
-					listOpenedByUserID();
-					break;
-				case LIST_CLOSED_AUCTIONS_BY_OWNER:
-					listClosedByUserID();
-					break;
-				case LIST_ALL_AUCTIONS_BY_ID:
-					listAllByAuctionID();
-					break;
-				case LIST_OPENED_AUCTIONS_BY_ID:
-					listOpenByAuctionID();
-					break;
-				case LIST_CLOSED_AUCTIONS_BY_ID:
-					listClosedByAuctionID();
-					break;
-				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
-					listBidsOfAllAuctionsByAuctionID();
-					break;
-				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
-					listBidsOfOpenedAuctionByAuctionID();
-					break;
-				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
-					listBidsOfClosedAuctionsByAuctionID();
-					break;	
-				case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					listBidsOfAllAuctionsByAuctionIDAndClientID();
-					break;
-				case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					listBidsOfOpenedAuctionsByAuctionIDAndClientID();
-					break;
-				case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-					listBidsOfClosedAuctionsByAuctionIDAndClientID();
-					break;
-			
+				else {
+					switch (line) {
+					case OPEN_AUCTION:
+						createAuction();
+						break;
+					case CLOSE_AUCTION:
+						closeAuction();
+						break;
+					case ADD_BID:
+						createBid();
+						break;
+					case LIST_ALL_AUCTIONS:
+						listAll();
+						break;
+					case LIST_OPENED_AUCTIONS:
+						listOpened();
+						break;
+					case LIST_CLOSED_AUCTIONS:
+						listClosed();
+						break;
+					case LIST_ALL_AUCTIONS_BY_OWNER:
+						listAllByUserID();
+						break;
+					case LIST_OPENED_AUCTIONS_BY_OWNER:
+						listOpenedByUserID();
+						break;
+					case LIST_CLOSED_AUCTIONS_BY_OWNER:
+						listClosedByUserID();
+						break;
+					case LIST_ALL_AUCTIONS_BY_ID:
+						listAllByAuctionID();
+						break;
+					case LIST_OPENED_AUCTIONS_BY_ID:
+						listOpenByAuctionID();
+						break;
+					case LIST_CLOSED_AUCTIONS_BY_ID:
+						listClosedByAuctionID();
+						break;
+					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
+						listBidsOfAllAuctionsByAuctionID();
+						break;
+					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
+						listBidsOfOpenedAuctionByAuctionID();
+						break;
+					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
+						listBidsOfClosedAuctionsByAuctionID();
+						break;	
+					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+						listBidsOfAllAuctionsByAuctionIDAndClientID();
+						break;
+					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+						listBidsOfOpenedAuctionsByAuctionIDAndClientID();
+						break;
+					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
+						listBidsOfClosedAuctionsByAuctionIDAndClientID();
+						break;
+				
+						
+					case LIST_ALL_BIDS_BY_CLIENT_ID:
+						listAllBidsByClientID(); //TODO confirmar
+						break;
+					case LIST_OPENED_BIDS_BY_CLIENT_ID:
+						listOpenedBidsByClientID(); //TODO confirmar
+						break;
+					case LIST_CLOSED_BIDS_BY_CLIENT_ID:
+						listClosedBidsByClientID(); //TODO confirmat
+						break;
 					
-				case LIST_ALL_BIDS_BY_CLIENT_ID:
-					listAllBidsByClientID(); //TODO confirmar
-					break;
-				case LIST_OPENED_BIDS_BY_CLIENT_ID:
-					listOpenedBidsByClientID(); //TODO confirmar
-					break;
-				case LIST_CLOSED_BIDS_BY_CLIENT_ID:
-					listClosedBidsByClientID(); //TODO confirmat
-					break;
-				
+						
+					case CHECK_OUTCOME_ALL_AUCTION:
+						checkOutcomeAllAuctions(); //TODO confirmar
+						break;
+					case CHECK_OUTCOME_OPENED_AUCTION:
+						checkOutcomeOpenedAuctions(); //TODO confirmar
+						break;
+					case CHECK_OUTCOME_CLOSED_AUCTION:
+						checkOutcomeClosedAuctions(); //TODO confirmar
+						break;
 					
-				case CHECK_OUTCOME_ALL_AUCTION:
-					checkOutcomeAllAuctions(); //TODO confirmar
-					break;
-				case CHECK_OUTCOME_OPENED_AUCTION:
-					checkOutcomeOpenedAuctions(); //TODO confirmar
-					break;
-				case CHECK_OUTCOME_CLOSED_AUCTION:
-					checkOutcomeClosedAuctions(); //TODO confirmar
-					break;
-				
-					
-				case CHECK_OUTCOME_ALL_AUCTION_ID:
-					checkOutcomeAllAuctionsByAuctionID(); //TODO confirmar
-					break;
-				case CHECK_OUTCOME_OPENED_AUCTION_ID:
-					checkOutcomeOpenedAuctionsByAuctionID(); //TODO confirmar
-					break;
-				case CHECK_OUTCOME_CLOSED_AUCTION_ID:
-					checkOutcomeClosedAuctionsByAuctionID(); //TODO confirmar
-					break;
-				
-				// VALIDATE RECEIPT
-				
-				case HELP:
-					helpScreen();
-					break;
+						
+					case CHECK_OUTCOME_ALL_AUCTION_ID:
+						checkOutcomeAllAuctionsByAuctionID(); //TODO confirmar
+						break;
+					case CHECK_OUTCOME_OPENED_AUCTION_ID:
+						checkOutcomeOpenedAuctionsByAuctionID(); //TODO confirmar
+						break;
+					case CHECK_OUTCOME_CLOSED_AUCTION_ID:
+						checkOutcomeClosedAuctionsByAuctionID(); //TODO confirmar
+						break;
+										
+					case HELP:
+						helpScreen();
+						break;
 
-				case EXIT:
-					System.exit(0);
-					break;
+					case EXIT:
+						System.exit(0);
+						break;
 
-				default:
-					helpScreen();
-					break;
+					default:
+						helpScreen();
+						break;
+					}
 				}
+
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -428,13 +432,23 @@ public class Client implements ClientAPI {
 			fieldValues.put("userPeerID", id);
 			fieldValues.put("userPassword", hashResult);
 			result = userDao.queryForFieldValues(fieldValues).get(0);
-		} catch (Exception e) {
-			e.printStackTrace();
+
+			OutputStream tempOut = null;
+
+			tempOut = socket.getOutputStream();
+
+			PrintWriter printWriter = new PrintWriter(tempOut);
+
+			printWriter.print(gson.toJson(result.getUserPeerID()) + System.lineSeparator());
+			printWriter.flush();
+			
+			System.out.println("Welcome " + result.getUserPeerID());
+			System.out.println();
+			helpScreen();
+		}catch (Exception e) {
+			printErrorStringWithClassName("Login error!");
 		}
 
-		System.out.println("Welcome " + result.getUserPeerID());
-		System.out.println();
-		helpScreen();
 
 		return result;
 	}
@@ -788,9 +802,8 @@ public class Client implements ClientAPI {
 		}
 		
 		String bidInfoSerialiazed = gson.toJson(bidMessage);
-		HashMap<String,Object> paramsMap = new HashMap<String, Object>();
+		HashMap<String,String> paramsMap = new HashMap<String, String>();
 		paramsMap.put("auction-id", auctionID);
-		paramsMap.put("iv", initialisationVectorBytes);
 		MessagePacketClientToServer message = new MessagePacketClientToServer(MessagePacketClientToServerTypes.ADD_BID, paramsMap, bidInfoSerialiazed);
 		sendMessage(message);
 	}
@@ -1061,28 +1074,8 @@ public class Client implements ClientAPI {
 		System.out.println();
 		System.out.println(HELP);
 		System.out.println(EXIT);
+		System.out.println();
 	}
-
-	// TODO Remove when confirmed thread works
-//	private String sslReadResponse(InputStream socketInStream) throws IOException {
-//		//Intercept auction bid message
-//		//If special message, run special method TODO
-//		BufferedReader br = new BufferedReader(new InputStreamReader(socketInStream));
-//		String response = br.readLine();
-//		return response;
-//	}
-
-	// TODO Remove when confirmed thread works
-//	private String sendMessageAndGetResponse(SSLSocketMessage message) throws IOException {
-//		OutputStream out = socket.getOutputStream();
-//		PrintWriter printWriter = new PrintWriter(out);
-//
-//		printWriter.print(gson.toJson(message) + System.lineSeparator());
-//		printWriter.flush();
-//
-//		InputStream in = socket.getInputStream();
-//		return sslReadResponse(in);
-//	}
 	
 	public void sendMessage(MessagePacketClientToServer message) {
 		PrintWriter printWriter = new PrintWriter(outputStream);
@@ -1116,49 +1109,49 @@ public class Client implements ClientAPI {
 	}
 	
 	private String decodeReceipt(String toDecode){
-		String result = "COMPLETE ME (THE RECEIPT DECODE) PLS!!!";
+		String result = null;
 		byte[] secureReceiptMessageSerialized = Base64.getDecoder().decode(toDecode);
-		
+
 		try {
 			SecureReceiptMessage secureReceiptMessage = 
 					new SecureReceiptMessage(secureReceiptMessageSerialized);
-			
+
 			secureReceiptMessage.undoSecureReceiptMessageSerialized();
-			
+
 			SecureReceiptMessageDoSMitigation secureReceiptMessageDoSMitigation =
 					secureReceiptMessage.getSecureReceiptMessageDoSMitigation();
-			
+
 			if(!secureReceiptMessageDoSMitigation.checkIfHashOfSecureReceiptMessageDoSMitigationIsValid()) {
-				System.out.println("OH NOES!");
+				printErrorStringWithClassName("Received receipt has an invalid signature! Dismissing...");
 			}
 			else {
 				SecureReceiptMessageComponents secureReceiptMessageComponents = 
 						secureReceiptMessage.getSecureReceiptMessageComponents();
-				
+
 				secureReceiptMessageComponents.decryptSecureReceiptMessageComponents();
 				secureReceiptMessageComponents.undoSecureReceiptMessageComponentsSerialization();
-				
+
 				SecureCommonHeader secureCommonHeader = secureReceiptMessageComponents.getSecureCommonHeader();
-				
+
 				// TODO - verificar header
-				
-				
-				
+
+
+
 				SecureReceiptMessageComponentsData secureReceiptMessageComponentsData = 
 						secureReceiptMessageComponents.getSecureReceiptMessageComponentsData();
-				
+
 				SecureReceiptMessageComponentsDataInfo secureReceiptMessageComponentsDataInfo = 
 						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataInfo();
-				
+
 				secureReceiptMessageComponentsDataInfo.undoSecureReceiptMessageComponentsDataInfoSerialization();
-				
+
 				SecureReceiptMessageComponentsDataSignature secureReceiptMessageComponentsDataSignature = 
 						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataSignature();
-				
+
 				String secureReceiptMessageComponentsDataResponse = 
 						secureReceiptMessageComponentsData.getSecureReceiptMessageComponentsDataResponse();
-				
-				
+
+
 				if(!secureReceiptMessageComponentsDataSignature.checkIfSecureReceiptMessageComponentsDataInfoDigitalSignedIsValid()) {
 					//TODO error
 					result = "ERROR";
@@ -1166,11 +1159,29 @@ public class Client implements ClientAPI {
 				else {
 					result =  secureReceiptMessageComponentsDataResponse;
 				}
-				
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		return result;
+	}
+	
+	// TODO complete and test
+	private void receivedProofOfWork(String proofOfWorkSerializedJson) {
+		printErrorStringWithClassName("PROOF OF WORK!!! -> " + proofOfWorkSerializedJson);
+		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
+		// check if trying to do work already done by this proof and stop
+		
+		// add proof to minedBlockMap?
+	}
+	
+	// TODO
+	private void updateBids(String message) {
+		Bid bidToAdd = gson.fromJson(message, Bid.class);
+		// TODO CHANGE KEY!!!
+		Random r = new Random();
+		openBidsList.put(r.nextInt(), bidToAdd);
 	}
 }

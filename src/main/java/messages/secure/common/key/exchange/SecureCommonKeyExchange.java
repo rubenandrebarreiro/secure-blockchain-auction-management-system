@@ -59,8 +59,6 @@ public class SecureCommonKeyExchange {
 	
 	private String userPeerID;
 
-	private byte[] initializationBytes;
-	
 	public SecureCommonKeyExchange(byte[] secretSymmetricKeyInBytes,
 								   byte[] secretHMACKeyForDoSMitigationInBytes,
 								   String userPeerID) {
@@ -222,7 +220,6 @@ public class SecureCommonKeyExchange {
 	}
 	
 	public void setInitializationBytes(byte[] ivBytes) {
-		this.initializationBytes = ivBytes;
 	}
 	
 	public void buildSecureCommonKeyExchangeToSend() 
@@ -594,12 +591,12 @@ public class SecureCommonKeyExchange {
 			
 			if(this.isSecureCommonKeyExchangeSerializedCipheredSignedValid) {
 				
-				System.out.println("Valid Signature!!!");
+//				System.out.println("Valid Signature!!!");
 				
 			}
 	        else {
 	        	
-	        	System.out.println("Invalid Signature!!!");
+//	        	System.out.println("Invalid Signature!!!");
 	        	
 	        }
 			

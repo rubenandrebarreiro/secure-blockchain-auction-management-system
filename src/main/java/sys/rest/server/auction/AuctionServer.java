@@ -20,9 +20,15 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
-
+import java.util.concurrent.BlockingQueue;
 import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLServerSocket;
@@ -41,10 +47,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
-import main.java.api.rest.server.auction.AuctionServerAPI;
 import main.java.common.protocols.MessageType;
 import main.java.common.protocols.VersionNumber;
+import main.java.common.utils.CommonUtils;
 import main.java.messages.secure.bid.SecureBidMessage;
 import main.java.messages.secure.bid.components.SecureBidMessageComponents;
 import main.java.messages.secure.bid.components.data.SecureBidMessageData;
@@ -53,6 +60,7 @@ import main.java.messages.secure.bid.components.data.signature.SecureBidMessageD
 import main.java.messages.secure.bid.dos.mitigation.SecureBidMessageDoSMitigation;
 import main.java.messages.secure.common.header.SecureCommonHeader;
 import main.java.messages.secure.common.key.exchange.SecureCommonKeyExchange;
+import main.java.messages.secure.proofwork.SecureProofOfWorkMessage;
 import main.java.messages.secure.receipt.SecureReceiptMessage;
 import main.java.messages.secure.receipt.components.SecureReceiptMessageComponents;
 import main.java.messages.secure.receipt.components.data.SecureReceiptMessageComponentsData;
@@ -68,7 +76,7 @@ import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClien
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketServerToClientTypes;
 import main.java.sys.rest.server.auction.messageTypes.MessagePacketClientToServer;
 
-public class AuctionServer extends Thread implements AuctionServerAPI{
+public class AuctionServer extends Thread{
 
 	private static final String AUCTION_SERVER_REPOSITORY_ADDRESS = "http://localhost:8080/products-auctions";
 
@@ -78,14 +86,20 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 
 	private Gson gson;
 
-	HttpClient httpClient;
+	private HttpClient httpClient;
 
+	private boolean exitFlag;
+	
 	private SSLSocket responseSocket;
 	private Random random;
-	private Map<String, String> connectedClientsMap;
+	private Map<String, BlockingQueue<Object>> connectedClientsMap;
 	private boolean mutualAuth;
+	private String userName;
+	
+	private Thread updateClientBidsService;
 
-	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, String> connectedClientsMap, String mutualAuth) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+	public AuctionServer(SSLServerSocket serverSocket, SSLSocket responseSocket, Map<String, BlockingQueue<Object>> connectedClientsMap, String mutualAuth, String userName) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, CertificateException, KeyManagementException {
+		exitFlag = false;
 		this.responseSocket = responseSocket;
 		this.connectedClientsMap = connectedClientsMap;
 		this.gson = new Gson();
@@ -94,15 +108,45 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		if(mutualAuth.contentEquals(AuctionServerEntryPoint.TLS_CONF_SERVER_ONLY))
 			this.mutualAuth = false;
 		else this.mutualAuth = true;		
+		this.userName = userName;
+		
+		updateClientBidsService = new Thread(){
+			public void run() {
+				printStringWithClassName("Update client bids service is online for user " + userName + ".");
+				while(!exitFlag) {
+//					printErrorStringWithClassName("Current map status:");
+//					connectedClientsMap.forEach((x,y) -> {
+//						printErrorStringWithClassName(x + " " + y);
+//					});
+					try {
+						Thread.sleep(CommonUtils.TRY_TO_CLOSE_BLOCK_OF_BIDS_SERVICE_VERIFICATION_RATE_TIME);
+					} catch (InterruptedException e) {
+						printStringWithClassName("Error! Update client bids service could not sleep!");
+					}
+					BlockingQueue<Object> workQueue = connectedClientsMap.get(userName);
+					if(workQueue != null) {
+						try {
+							while(!workQueue.isEmpty()) {
+								String string = gson.toJson(workQueue.remove());
+//								printStringWithClassName("Update client bids updating for user " + userName + " with bid " + string);
+								sslWriteResponse(responseSocket.getOutputStream(), string, null, MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS);
+							}
+						} catch (ParseException | IOException e) {
+							printStringWithClassName("Error! Update client bids service had trouble adding work to queue!");
+						}
+					}
+				}
+				printStringWithClassName("Update client bids service is going down for user " + userName + ".");
+			}
+		};
+		updateClientBidsService.start();
 	}
 
 	public void run() {
 		String arg1 = null, arg2 = null;
-		byte[] arg3 = null;
 		HttpResponse response = null;
-		String receiptResponse = null;
+		String responseString = null;
 		MessagePacketServerToClientTypes messageType = null;
-		boolean exitFlag = false;
 		
 		if(mutualAuth) {
 			SSLSession session = responseSocket.getSession();
@@ -111,13 +155,13 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				clientID = session.getPeerPrincipal();
 				System.out.println("Client has been identified as: " + clientID);
 			} catch (SSLPeerUnverifiedException e) {
-				printErrorStringWithClassName("Error getting peer principal!\n" + e.getMessage());
+				printStringWithClassName("Error getting peer principal!\n" + e.getMessage());
 			}
 		}
 		
 		try {
 			while(!exitFlag) {
-				receiptResponse = null;
+				responseString = null;
 				response = null;
 				String jsonMessage = sslReadRequest(responseSocket.getInputStream());
 				MessagePacketClientToServer message = gson.fromJson(jsonMessage, MessagePacketClientToServer.class);
@@ -129,14 +173,13 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						messageType = MessagePacketServerToClientTypes.SIMPLE_RESPONSE;
 						break;
 					case CLOSE_AUCTION:
-						response = closeAuction((String)message.getParamsMap().get("auction-id"));
+						response = closeAuction(message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.SIMPLE_RESPONSE;
 						break;
 					case ADD_BID:
-						arg1 = (String)message.getParamsMap().get("auction-id");
+						arg1 = message.getParamsMap().get("auction-id");
 						arg2 = message.getBody();
-//						arg3 = (byte[])message.getParamsMap().get("iv");
-						receiptResponse = addBidToOpenedProductAuction(arg1, arg2, arg3);
+						responseString = addBidToOpenedProductAuction(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.RECEIPT;
 						break;
 					case LIST_ALL_AUCTIONS:
@@ -152,131 +195,135 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_ALL_AUCTIONS_BY_OWNER:
-						response = listAllProductsAuctionsByProductOwnerUserClient((String)message.getParamsMap().get("product-owner-user-client-id"));
+						response = listAllProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_AUCTIONS_BY_OWNER:
-						response = listOpenedProductsAuctionsByProductOwnerUserClient((String)message.getParamsMap().get("product-owner-user-client-id"));
+						response = listOpenedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_AUCTIONS_BY_OWNER:
-						response = listClosedProductsAuctionsByProductOwnerUserClient((String)message.getParamsMap().get("product-owner-user-client-id"));
+						response = listClosedProductsAuctionsByProductOwnerUserClient(message.getParamsMap().get("product-owner-user-client-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_ALL_AUCTIONS_BY_ID:
-						response = findProductAuctionByID((String)message.getParamsMap().get("auction-id"));
+						response = findProductAuctionByID(message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_AUCTIONS_BY_ID:
-						response = findOpenedProductAuctionByID((String)message.getParamsMap().get("auction-id"));
+						response = findOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_AUCTIONS_BY_ID:
-						response = findClosedProductAuctionByID((String)message.getParamsMap().get("auction-id"));
+						response = findClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID:
-						response = listAllBidsOfProductAuctionByID((String)message.getParamsMap().get("auction-id"));
+						response = listAllBidsOfProductAuctionByID(message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID:
-						response = listAllBidsOfOpenedProductAuctionByID((String)message.getParamsMap().get("auction-id"));
+						response = listAllBidsOfOpenedProductAuctionByID(message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID:
-						response = listAllBidsOfClosedProductAuctionByID((String)message.getParamsMap().get("auction-id"));
+						response = listAllBidsOfClosedProductAuctionByID(message.getParamsMap().get("auction-id"));
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_ALL_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-						arg1 = (String)message.getParamsMap().get("auction-id");
-						arg2 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg1 = message.getParamsMap().get("auction-id");
+						arg2 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInAllProductAuctionByID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_OPENED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-						arg1 = (String)message.getParamsMap().get("auction-id");
-						arg2 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg1 = message.getParamsMap().get("auction-id");
+						arg2 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_BIDS_OF_CLOSED_AUCTIONS_BY_AUCTION_ID_AND_CLIENT_ID:
-						arg1 = (String)message.getParamsMap().get("auction-id");
-						arg2 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg1 = message.getParamsMap().get("auction-id");
+						arg2 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 						
 					case LIST_ALL_BIDS_BY_CLIENT_ID:
-						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = listAllBidsMadeByBidderUserClientID(arg1);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_OPENED_BIDS_BY_CLIENT_ID:
-						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = listOpenedBidsMadeByBidderUserClientID(arg1);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case LIST_CLOSED_BIDS_BY_CLIENT_ID:
-						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = listClosedBidsMadeByBidderUserClientID(arg1);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					
 					
 					case CHECK_OUTCOME_ALL_AUCTION:
-						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_OPENED_AUCTION:
-						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_CLOSED_AUCTION:
-						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
 						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					
 					
 					case CHECK_OUTCOME_ALL_AUCTION_ID:
-						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
-						arg2 = (String)message.getParamsMap().get("auction-id");
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg2 = message.getParamsMap().get("auction-id");
 						response = checkOutcomeAllAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_OPENED_AUCTION_ID:
-						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
-						arg2 = (String)message.getParamsMap().get("auction-id");
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg2 = message.getParamsMap().get("auction-id");
 						response = checkOutcomeOpenedAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;
 					case CHECK_OUTCOME_CLOSED_AUCTION_ID:
-						arg1 = (String)message.getParamsMap().get("bidder-user-client-id");
-						arg2 = (String)message.getParamsMap().get("auction-id");
+						arg1 = message.getParamsMap().get("bidder-user-client-id");
+						arg2 = message.getParamsMap().get("auction-id");
 						response = checkOutcomeClosedAuctionsByAuctionID(arg1, arg2);
 						messageType = MessagePacketServerToClientTypes.COMPLEX_RESPONSE;
 						break;						
-						
+					
+					case PROOF_WORK_SENT:
+						messageType = MessagePacketServerToClientTypes.PROOF_OF_WORK;
+						responseString = "";
+						handleReceivedProofOfWork(message.getBody());
+						break;
 					default:
 						break;
 					}
-					sslWriteResponse(responseSocket.getOutputStream(), receiptResponse, response, messageType);
+					sslWriteResponse(responseSocket.getOutputStream(), responseString, response, messageType);
 				}
 				else {
 					// Not supposed to get null messages Except is the client disconnects.
+					connectedClientsMap.remove(userName);
 					exitFlag = true;
 				}
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
-			e.getMessage();
+			printStringWithClassName("Error! Catastrophic failure on server thread!");
 			e.printStackTrace();
 		}
 	}
 
-	@Override
 	public HttpResponse createAuction(String clientAuctionInformation) {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to create a new Auction!");
@@ -352,22 +399,16 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			postRequest.setHeader("Content-type", "application/json");
 			response = httpClient.execute(postRequest);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! UnsupportedEnconding for string entity!");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
-	@Override
 	public HttpResponse closeAuction(String openedAuctionID) throws SQLException {	
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to close an existing Auction!");
@@ -379,17 +420,15 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(putRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
-	@Override
-	public String addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo, byte[] ivBytes)
+	public String addBidToOpenedProductAuction(String openedAuctionID, String userBidInfo)
 			throws SQLException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, NoSuchProviderException, NoSuchPaddingException, InvalidAlgorithmParameterException, ClientProtocolException, IOException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to add bid to " + openedAuctionID + "!");
@@ -434,7 +473,6 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				
 				String bidJson = gson.toJson(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
-				System.err.println("Bid is: " + secureBidMessageData.getSecureBidMessageDataSignature().getBid());
 				postRequest.setEntity(new StringEntity(bidJson));
 				postRequest.setHeader("Accept", "application/json");
 				postRequest.setHeader("Content-type", "application/json");
@@ -442,8 +480,8 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				response = httpClient.execute(postRequest);
 				
-				printErrorStringWithClassName(response.getStatusLine());
-				printErrorStringWithClassName(response.getEntity());
+				printStringWithClassName(response.getStatusLine());
+				printStringWithClassName(response.getEntity());
 				
 				
 				
@@ -553,7 +591,20 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 				
 				
 				byte[] secureReceiptMessageSerialized = secureReceiptMessage.getSecureReceiptMessageSerialized();
-				methodResult = java.util.Base64.getEncoder().encodeToString(secureReceiptMessageSerialized);
+
+				// If create bid was successful, add bid to send to other clients queue
+				if(response.getStatusLine().getStatusCode() == 202) {
+					for (Entry<String, BlockingQueue<Object>> entry : connectedClientsMap.entrySet()) {
+						if(!entry.getKey().equals(userName))
+							entry.getValue().add(secureBidMessageData.getSecureBidMessageDataSignature().getBid());
+					}
+//					printStringWithClassName("Bids to send to: ");
+//					connectedClientsMap.forEach( (x,y) -> {
+//						System.out.println(x + " " + y);
+//					});
+				}
+
+				methodResult = Base64.getEncoder().encodeToString(secureReceiptMessageSerialized);
 			}
 			
 		}
@@ -561,8 +612,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return methodResult;
 	}
 
-	@Override
-	public HttpResponse listAllProductsAuctions() throws SQLException {
+	public HttpResponse listAllProductsAuctions() throws SQLException, JsonSyntaxException, ParseException, IOException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all Auctions!");
 		
@@ -573,16 +623,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+
+		removeBids(response);
+		
 		return response;
 	}
 
-	@Override
 	public HttpResponse listOpenedProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all opened Auctions!");
@@ -594,16 +645,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listClosedProductsAuctions() throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all closed Auctions!");
@@ -615,16 +667,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -637,16 +690,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listOpenedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -659,16 +713,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listClosedProductsAuctionsByProductOwnerUserClient(String productOwnerUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -681,16 +736,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse findProductAuctionByID(String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get Auction with id " + auctionID + "!");
@@ -702,16 +758,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse findOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id " + openedAuctionID + "!");
@@ -723,16 +780,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse findClosedProductAuctionByID(String closedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened Auction with id " + closedAuctionID + "!");
@@ -744,16 +802,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsOfProductAuctionByID(String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all bids from all Auction with id " + auctionID + "!");
@@ -765,16 +824,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsOfOpenedProductAuctionByID(String openedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all bids from opened Auction with id " + openedAuctionID + "!");
@@ -786,16 +846,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsOfClosedProductAuctionByID(String closedAuctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all bids from closed Auction with id" + closedAuctionID + "!");
@@ -807,16 +868,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientInAllProductAuctionByID(String auctionID, String bidderUserClientID)
 			throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -829,16 +891,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientInOpenedProductAuctionByID(String openedAuctionID,
 			String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -851,16 +914,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 
-	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientInClosedProductAuctionByID(String closedAuctionID,
 			String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
@@ -873,16 +937,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 	
-	@Override
 	public HttpResponse listAllBidsMadeByBidderUserClientID(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get all bids from " + bidderUserClientID + "!");
@@ -894,16 +959,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 	
-	@Override
 	public HttpResponse listOpenedBidsMadeByBidderUserClientID(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get opened bids from " + bidderUserClientID + "!");
@@ -915,16 +981,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 	
-	@Override
 	public HttpResponse listClosedBidsMadeByBidderUserClientID(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to get closed bids from " + bidderUserClientID + "!");
@@ -936,16 +1003,17 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
+		
+		removeBids(response);
+
 		return response;
 	}
 	
-	@Override
 	public HttpResponse checkOutcomeAllAuctions(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from all auctions where " + bidderUserClientID + " participated!");
@@ -957,16 +1025,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
-	@Override
 	public HttpResponse checkOutcomeOpenedAuctions(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from opened auctions where " + bidderUserClientID + " participated!");
@@ -978,16 +1044,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
-	@Override
 	public HttpResponse checkOutcomeClosedAuctions(String bidderUserClientID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from closed auctions where " + bidderUserClientID + " participated!");
@@ -999,16 +1063,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
-	@Override
 	public HttpResponse checkOutcomeAllAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from closed auctions with ID " + auctionID + "where " + bidderUserClientID + " participated!");
@@ -1020,16 +1082,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 
-	@Override
 	public HttpResponse checkOutcomeOpenedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from opened auctions with ID " + auctionID + "where " + bidderUserClientID + " participated!");
@@ -1041,16 +1101,14 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
-	@Override
 	public HttpResponse checkOutcomeClosedAuctionsByAuctionID(String bidderUserClientID, String auctionID) throws SQLException {
 		System.out.println("[" + this.getClass().getCanonicalName() + "]: " +
 				"Received request to check the outcome from closed auctions with ID " + auctionID + "where " + bidderUserClientID + " participated!");
@@ -1062,15 +1120,24 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		try {
 			response = httpClient.execute(getRequest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			printStringWithClassName("Error! Could not execute request!");
 		}
 		
-		printErrorStringWithClassName(response.getStatusLine());
-		printErrorStringWithClassName(response.getEntity());
+		printStringWithClassName(response.getStatusLine());
+		printStringWithClassName(response.getEntity());
 		return response;
 	}
 	
+	// TODO Change to proof of work message!
+	private void handleReceivedProofOfWork(String proofOfWorkSerializedJson) {
+		printStringWithClassName("COMPLETE ME! (handleReceivedProofOfWork)");
+		SecureProofOfWorkMessage proofOfWork = gson.fromJson(proofOfWorkSerializedJson, SecureProofOfWorkMessage.class);
+		// Validate proof. If valid, broadcast to clients.
+		connectedClientsMap.forEach((x,y) -> {
+			if(!x.equals(userName))
+				y.add(proofOfWork);
+		});
+	}
 	
 	private String sslReadRequest(InputStream socketInStream) throws IOException {
 		StringBuilder builder = new StringBuilder();
@@ -1080,12 +1147,12 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return builder.toString();
 	}
 
-	private void sslWriteResponse(OutputStream socketOutStream, String receiptMessage, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
+	private void sslWriteResponse(OutputStream socketOutStream, String notResponseMessage, HttpResponse response, MessagePacketServerToClientTypes messageType) throws ParseException, IOException {
 		PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(socketOutStream));
 		String httpResponseMessage = null;
 		MessagePacketServerToClient messagePacket = null;
-		if(messageType == MessagePacketServerToClientTypes.RECEIPT && receiptMessage != null) {
-			httpResponseMessage = receiptMessage;
+		if(notResponseMessage != null && (messageType == MessagePacketServerToClientTypes.RECEIPT || messageType == MessagePacketServerToClientTypes.UPDATE_CLIENT_BIDS)) {
+			httpResponseMessage = notResponseMessage;
 			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
 		}
 		else {
@@ -1095,7 +1162,7 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 			messagePacket = new MessagePacketServerToClient(messageType, httpResponseMessage);
 		}
 		String messagePacketJson = gson.toJson(messagePacket);
-		printErrorStringWithClassName("Sending -> " + messagePacketJson);
+//		printStringWithClassName("Sending -> " + messagePacketJson);
 		printWriter.print(messagePacketJson + System.lineSeparator());
 		printWriter.flush();
 	}
@@ -1104,8 +1171,39 @@ public class AuctionServer extends Thread implements AuctionServerAPI{
 		return url.replace(" ", URL_SPACE);
 	}
 	
-	private void printErrorStringWithClassName(Object message) {
-		System.err.println("[" + this.getClass().getCanonicalName() + "] " + 
-				"Response: " + message);
+	private void printStringWithClassName(Object message) {
+		System.out.println("[" + this.getClass().getCanonicalName() + "]: " + message);
+	}
+	
+	private void removeBids(HttpResponse response){
+		Auction[] auctionArray = null;
+		try {
+			auctionArray = gson.fromJson(EntityUtils.toString(response.getEntity()), Auction[].class);
+		} catch (JsonSyntaxException | ParseException | IOException e) {
+			printStringWithClassName("Error getting auction array from JSON!");
+		}
+		List<Auction> auctionsWithBids = new ArrayList<Auction>(Arrays.asList(auctionArray));
+		List<Auction> result = new ArrayList<Auction>(auctionsWithBids.size());
+
+		for (Auction auction : auctionsWithBids) {
+			if(auction.verifyIfAuctionIsOpen()) {
+				auction.setAuctionBids(new HashMap<Long, Bid>());
+				result.add(auction);
+			}
+			else {
+				auction.getAuctionBidsMade().forEach((x,y) -> {
+					// Do not pollute client with this unnecessary information.
+					y.setBidSerializedBytes(new byte[0]);
+				});
+				result.add(auction);
+			}
+		}
+		
+		String newEntity = gson.toJson(result);
+		try {
+			EntityUtils.updateEntity(response, new StringEntity(newEntity));
+		} catch (IOException e) {
+			printStringWithClassName("Error setting new entity!");
+		}
 	}
 }
