@@ -221,7 +221,7 @@ public class TryToMineBlockOfOpenBidsService implements Runnable {
 									 secureProofOfWorkMessageComponentsSolvedBlock);
 					
 					secureProofOfWorkMessageComponents.doSecureProofOfWorkMessageComponentsSerialization();
-					
+					secureProofOfWorkMessageComponents.encryptSecureProofOfWorkMessageComponents();
 					
 					SecureProofOfWorkMessageDoSMitigation secureProofOfWorkMessageDoSMitigation = 
 							new SecureProofOfWorkMessageDoSMitigation(secureProofOfWorkMessageComponents);
