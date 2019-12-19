@@ -2,6 +2,8 @@
 
 O programa está dividido em 3 partes. Dentro da pasta **PACKAGE** encontram-se scripts para executar cada uma das partes ou as 3 de uma só vez. Os scripts estão feitos para serem corridos a partir da própria pasta **PACKAGE**.
 
+É de notar que o script *runAll.sh* está depedente do terminal *gnome-terminal* portanto não corre em sistemas sem esse terminal sem modificações. Neste caso, é para correr os scripts indicados de seguida para cada programa a executar.
+
 **AuctionServerRepository**
 É o servidor que guarda os dados em relação a **auctions** e **bids**.
 É iniciado com o script *runAuctionServerRepository.sh* e inicia o servidor automaticamente com a porta 8080.
