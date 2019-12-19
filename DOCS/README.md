@@ -1,6 +1,6 @@
 # Secure Blocchain-Enabled Auction Management System
 
-O programa está dividido em 3 partes. Dentro da pasta **PACKAGE** encontram-se scripts para executar cada uma das partes ou as 3 de uma só vez. 
+O programa está dividido em 3 partes. Dentro da pasta **PACKAGE** encontram-se scripts para executar cada uma das partes ou as 3 de uma só vez. Os scripts estão feitos para serem corridos a partir da própria pasta **PACKAGE**.
 
 **AuctionServerRepository**
 É o servidor que guarda os dados em relação a **auctions** e **bids**.
@@ -35,3 +35,11 @@ Os utilizadores que o cliente aceita estão definidos em *res/database/client/us
 Como exemplo, utilizador: henrique, palavra-passe: henrique1920
 
 Depois de o login ficar feito, é indicada uma lista de operações que o cliente pode efetuar.
+
+***
+###Criação de stores e certificados##
+***
+Na pasta *res/scripts/createStoresAndSignedCerts/* encontram-se vários scripts, *createRootCA.sh* para a criação de uma root CA, *createUserCA.sh* para a criação de um user com certificado assinado a partir de uma rootCA criada anteriormente e *createForManyUsers.sh* que contem uma lista de utilizadores que pode ser costumizada a gosto.
+
+Finalmente, o último script, *moveEverythingToPlace.sh* pega nos ficheiros gerados pelos scripts indicados anteriormente e introduz tudo nos locais necessários para os servidores e cliente utilizarem.
+ 
