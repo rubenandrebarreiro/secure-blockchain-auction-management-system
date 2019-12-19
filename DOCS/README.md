@@ -1,6 +1,6 @@
 # Secure Blocchain-Enabled Auction Management System
 
-##Iniciar o programa
+###Iniciar o programa
 O programa está dividido em 3 partes. Dentro da pasta **PACKAGE** encontram-se scripts para executar cada uma das partes ou as 3 de uma só vez. 
 
 **AuctionServerRepository**
