@@ -11,7 +11,7 @@ PATH=$(echo $PATH:$(pwd))
 declare -a names=("auctionServer" 
                   "eduardo"
                   "ruben"
-                  "hj"
+                  "henrique"
                   "luis"
                   "legatheaux")
 
