@@ -8,7 +8,12 @@ clientTruststorePath="res/truststores/eduardoTruststore.jks"
 clientKeystorePassword="eduardo1920"
 clientTruststorePassword="eduardo1920"
 
+cd ..
+
 mvn clean compile
+
+cd PACKAGE
+
 gnome-terminal -- sh -c "./runAuctionServerRepository.sh $repositoryPort"
 gnome-terminal -- sh -c "./runAuctionServer.sh"
 sleep 1

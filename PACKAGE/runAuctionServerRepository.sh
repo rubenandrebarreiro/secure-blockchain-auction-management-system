@@ -5,4 +5,6 @@ then
   exit 1
 fi
 
+cd ..
 mvn exec:java -Dexec.mainClass="main.java.sys.rest.server.auction.repository.AuctionRepositoryServer" -Dexec.args="$1"
+cd PACKAGE
