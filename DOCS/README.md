@@ -37,7 +37,7 @@ Como exemplo, utilizador: henrique, palavra-passe: henrique1920
 Depois de o login ficar feito, é indicada uma lista de operações que o cliente pode efetuar.
 
 ***
-###Criação de stores e certificados##
+###Criação de stores e certificados
 ***
 Na pasta *res/scripts/createStoresAndSignedCerts/* encontram-se vários scripts, *createRootCA.sh* para a criação de uma root CA, *createUserCA.sh* para a criação de um user com certificado assinado a partir de uma rootCA criada anteriormente e *createForManyUsers.sh* que contem uma lista de utilizadores que pode ser costumizada a gosto.
 
